@@ -1,26 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
+import { BouquetInquiry } from "@/components/BouquetInquiry";
 import type { Bouquet } from "@/lib/types";
-
-const bouquetImages = [
-  "https://images.unsplash.com/photo-1563241527-3004b7be0ffd?w=800&q=80",
-  "https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=800&q=80",
-  "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=800&q=80",
-];
+import { getDistinctBouquetPhotoSrcs, getPhotosByCategory } from "@/lib/photos.server";
+import { getContactEmail } from "@/lib/email";
 
 interface BouquetCardProps {
   bouquet: Bouquet;
-  index?: number;
+  imageSrc: string;
+  contactEmail?: string;
 }
 
-export function BouquetCard({ bouquet, index = 0 }: BouquetCardProps) {
-  const imageUrl = bouquetImages[index % bouquetImages.length];
-
+export function BouquetCard({ bouquet, imageSrc, contactEmail }: BouquetCardProps) {
   return (
     <article className="group">
       <div className="relative aspect-[3/4] overflow-hidden rounded-2xl mb-4 bg-cream-dark">
         <Image
-          src={imageUrl}
+          src={imageSrc}
           alt={bouquet.title}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -39,8 +35,14 @@ export function BouquetCard({ bouquet, index = 0 }: BouquetCardProps) {
         {bouquet.description}
       </p>
       {bouquet.price && (
-        <p className="text-terracotta font-medium">{bouquet.price}</p>
+        <p className="text-terracotta font-medium mb-1">{bouquet.price}</p>
       )}
+      <BouquetInquiry
+        bouquetId={bouquet._id}
+        bouquetTitle={bouquet.title}
+        bouquetPrice={bouquet.price}
+        contactEmail={contactEmail}
+      />
     </article>
   );
 }
@@ -48,10 +50,15 @@ export function BouquetCard({ bouquet, index = 0 }: BouquetCardProps) {
 interface BouquetGridProps {
   bouquets: Bouquet[];
   showAll?: boolean;
+  contactEmail?: string;
 }
 
-export function BouquetGrid({ bouquets, showAll = false }: BouquetGridProps) {
+export function BouquetGrid({ bouquets, showAll = false, contactEmail }: BouquetGridProps) {
   const display = showAll ? bouquets : bouquets.filter((b) => b.featured).slice(0, 3);
+  const bouquetPhotos = getPhotosByCategory("bouquets");
+  const distinctPhotoSrcs = getDistinctBouquetPhotoSrcs(display.length);
+  const fallbackSrc = distinctPhotoSrcs[0] || bouquetPhotos[0]?.src || "/photos/615466887_122118881559020895_1273262402101944493_n.jpg";
+  const resolvedContactEmail = getContactEmail(contactEmail);
 
   return (
     <section className="py-20 md:py-28">
@@ -78,7 +85,12 @@ export function BouquetGrid({ bouquets, showAll = false }: BouquetGridProps) {
 
         <div className="grid md:grid-cols-3 gap-8 md:gap-10">
           {display.map((bouquet, i) => (
-            <BouquetCard key={bouquet._id} bouquet={bouquet} index={i} />
+            <BouquetCard
+              key={bouquet._id}
+              bouquet={bouquet}
+              imageSrc={distinctPhotoSrcs[i] || fallbackSrc}
+              contactEmail={resolvedContactEmail}
+            />
           ))}
         </div>
       </div>

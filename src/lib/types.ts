@@ -35,6 +35,7 @@ export interface SiteSettings {
   tagline?: string;
   aboutText?: string;
   instagramHandle?: string;
+  facebookPageUrl?: string;
   email?: string;
   phone?: string;
   location?: string;
@@ -47,7 +48,7 @@ export const fallbackWorkshops: Workshop[] = [
     slug: { current: "hydrangea-wreath-workshop" },
     description:
       "Gather with friends and learn to craft a lush, seasonal hydrangea wreath using blooms from the garden. All materials included — just bring your creativity and a willingness to get your hands a little dirty.",
-    date: "2026-07-19",
+    date: "2026-09-22",
     time: "10:00 AM – 12:30 PM",
     price: "$65",
     spotsAvailable: 8,
@@ -64,6 +65,18 @@ export const fallbackWorkshops: Workshop[] = [
     price: "$55",
     spotsAvailable: 10,
     featured: false,
+  },
+  {
+    _id: "christmas-wreath",
+    title: "Christmas Wreath Workshop",
+    slug: { current: "christmas-wreath-workshop" },
+    description:
+      "Get into the holiday spirit and craft a lush evergreen wreath for your front door. We'll work with fresh greens, pinecones, dried oranges, ribbon, and other festive touches — all materials included. Perfect for gifting or keeping.",
+    date: "2026-12-05",
+    time: "10:00 AM – 1:00 PM",
+    price: "$75",
+    spotsAvailable: 12,
+    featured: true,
   },
 ];
 
@@ -92,15 +105,6 @@ export const fallbackEvents: PickYourOwnEvent[] = [
 
 export const fallbackBouquets: Bouquet[] = [
   {
-    _id: "wild-meadow",
-    title: "Wild Meadow",
-    description:
-      "A loose, whimsical gathering of garden blooms woven with local grasses and seed heads. No two are alike.",
-    price: "From $45",
-    available: true,
-    featured: true,
-  },
-  {
     _id: "front-porch-classic",
     title: "Front Porch Classic",
     description:
@@ -118,6 +122,33 @@ export const fallbackBouquets: Bouquet[] = [
     available: true,
     featured: false,
   },
+  {
+    _id: "porch-swing",
+    title: "Porch Swing",
+    description:
+      "A relaxed, airy mix meant for slow afternoons — soft pastels, trailing greenery, and whatever caught Rhoda's eye on the way in from the garden.",
+    price: "From $50",
+    available: true,
+    featured: true,
+  },
+  {
+    _id: "late-summer-glow",
+    title: "Late Summer Glow",
+    description:
+      "Dahlias, zinnias, and golden tones in a generous gathering. Bold, warm, and a little bit wild — like the garden at its peak.",
+    price: "From $60",
+    available: true,
+    featured: true,
+  },
+  {
+    _id: "meadow-jar",
+    title: "Meadow Jar",
+    description:
+      "A casual mason-jar bundle of backyard blooms and wispy grasses. Unfussy, charming, and perfect for a windowsill or bedside table.",
+    price: "From $40",
+    available: true,
+    featured: false,
+  },
 ];
 
 export const fallbackSettings: SiteSettings = {
@@ -125,6 +156,7 @@ export const fallbackSettings: SiteSettings = {
   aboutText:
     "Hi, I'm Rhoda. I grow flowers in my own backyard and turn them into bouquets that feel like you wandered through a meadow and gathered whatever caught your eye. I love incorporating local grasses, seed heads, and other wild things — nothing too fussy, just beautiful blooms for laid-back occasions.",
   instagramHandle: "front_porchflowers",
+  facebookPageUrl: "https://www.facebook.com/FrontPorchFlowers",
   email: "hello@frontporchflowers.ca",
   location: "Local pickup available",
 };

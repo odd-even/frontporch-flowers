@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
 const navLinks = [
   { href: "/bouquets", label: "Bouquets" },
+  { href: "/gallery", label: "Gallery" },
   { href: "/workshops", label: "Workshops" },
   { href: "/pick-your-own", label: "Pick Your Own" },
   { href: "/about", label: "About" },
@@ -17,16 +17,12 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 bg-cream/90 backdrop-blur-md border-b border-sage/20">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 group">
-          <Image
-            src="/logo.svg"
-            alt="Front Porch Flowers"
-            width={48}
-            height={48}
-            className="w-10 h-10 md:w-12 md:h-12 transition-transform group-hover:scale-105"
-          />
-          <span className="font-display text-xl md:text-2xl text-charcoal hidden sm:block">
-            Front Porch Flowers
+        <Link href="/" className="group inline-flex flex-col shrink-0">
+          <span className="font-display text-base md:text-lg text-charcoal leading-tight whitespace-nowrap">
+            Front Porch
+          </span>
+          <span className="font-display text-base md:text-lg text-charcoal leading-tight whitespace-nowrap">
+            flowers
           </span>
         </Link>
 

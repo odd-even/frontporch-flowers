@@ -1,15 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getAboutPhoto } from "@/lib/photos.server";
 
 export function AboutTeaser({ aboutText }: { aboutText?: string }) {
+  const photo = getAboutPhoto();
+
   return (
     <section className="py-20 md:py-28">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
           <div className="relative aspect-[4/5] rounded-2xl overflow-hidden">
             <Image
-              src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=80"
-              alt="Hands arranging wildflowers in a garden"
+              src={photo.src}
+              alt={photo.alt}
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 50vw"

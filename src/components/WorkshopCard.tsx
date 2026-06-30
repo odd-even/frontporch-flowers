@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Workshop } from "@/lib/types";
 import { formatShortDate } from "@/lib/utils";
+import { getFacebookPageUrl } from "@/lib/facebook";
 
 interface WorkshopCardProps {
   workshop: Workshop;
@@ -53,12 +54,12 @@ export function WorkshopCard({ workshop }: WorkshopCardProps) {
       </div>
 
       <a
-        href="https://www.instagram.com/front_porchflowers"
+        href={getFacebookPageUrl()}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center gap-2 text-sm font-medium text-sage-dark hover:text-terracotta transition-colors"
       >
-        Reserve via Instagram
+        Reserve via Facebook
         <span aria-hidden="true">&rarr;</span>
       </a>
     </article>
@@ -71,7 +72,15 @@ interface WorkshopsSectionProps {
 }
 
 export function WorkshopsSection({ workshops, showAll = false }: WorkshopsSectionProps) {
-  const display = showAll ? workshops : workshops.slice(0, 2);
+  const display = showAll
+    ? workshops
+    : [...workshops]
+        .sort((a, b) => {
+          if (a.featured && !b.featured) return -1;
+          if (!a.featured && b.featured) return 1;
+          return a.date.localeCompare(b.date);
+        })
+        .slice(0, 2);
 
   return (
     <section className="py-20 md:py-28 bg-cream-dark/30">

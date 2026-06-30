@@ -1,17 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getHeroPhoto } from "@/lib/photos.server";
 
 interface HeroProps {
   tagline?: string;
 }
 
 export function Hero({ tagline }: HeroProps) {
+  const photo = getHeroPhoto();
+
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden">
       <div className="absolute inset-0">
         <Image
-          src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1920&q=80"
-          alt="Wild garden flowers in soft morning light"
+          src={photo.src}
+          alt={photo.alt}
           fill
           priority
           className="object-cover"

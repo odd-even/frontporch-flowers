@@ -2,6 +2,7 @@ import Image from "next/image";
 import { EventCard } from "@/components/WorkshopCard";
 import { PageHeader } from "@/components/AboutTeaser";
 import { getPickYourOwnEvents } from "@/lib/queries";
+import { getPickYourOwnPhoto } from "@/lib/photos.server";
 
 export const metadata = {
   title: "Pick Your Own | Front Porch Flowers",
@@ -11,6 +12,7 @@ export const metadata = {
 
 export default async function PickYourOwnPage() {
   const events = await getPickYourOwnEvents();
+  const gardenPhoto = getPickYourOwnPhoto();
 
   return (
     <>
@@ -32,8 +34,8 @@ export default async function PickYourOwnPage() {
             <div>
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-8">
                 <Image
-                  src="https://images.unsplash.com/photo-1592150621744-aca64f48394c?w=800&q=80"
-                  alt="Colorful flower garden rows"
+                  src={gardenPhoto.src}
+                  alt={gardenPhoto.alt}
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 50vw"

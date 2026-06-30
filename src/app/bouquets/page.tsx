@@ -1,6 +1,7 @@
 import { BouquetGrid } from "@/components/BouquetCard";
 import { PageHeader } from "@/components/AboutTeaser";
-import { getBouquets } from "@/lib/queries";
+import { getBouquets, getSiteSettings } from "@/lib/queries";
+import { buildMailtoUrl, getContactEmail } from "@/lib/email";
 
 export const metadata = {
   title: "Bouquets | Front Porch Flowers",
@@ -9,7 +10,13 @@ export const metadata = {
 };
 
 export default async function BouquetsPage() {
-  const bouquets = await getBouquets();
+  const [bouquets, settings] = await Promise.all([getBouquets(), getSiteSettings()]);
+  const contactEmail = getContactEmail(settings.email);
+  const orderMailto = buildMailtoUrl(
+    contactEmail,
+    "Bouquet order inquiry",
+    "Hi Rhoda!\n\nI'd love to order a bouquet. Here are a few details:\n\nOccasion:\nPreferred colors:\nPickup date:\n\nThanks!"
+  );
 
   return (
     <>
@@ -18,7 +25,7 @@ export default async function BouquetsPage() {
         title="Bouquets"
         description="Each bouquet is a one-of-a-kind gathering of backyard blooms — loose, whimsical, and woven with local grasses and whatever wild things are calling that day. Perfect for laid-back celebrations, kitchen tables, and gifting."
       />
-      <BouquetGrid bouquets={bouquets} showAll />
+      <BouquetGrid bouquets={bouquets} showAll contactEmail={contactEmail} />
 
       <section className="py-16 bg-cream-dark/30">
         <div className="max-w-2xl mx-auto px-6 text-center">
@@ -26,16 +33,14 @@ export default async function BouquetsPage() {
             Ready to order?
           </h2>
           <p className="text-warm-brown/80 mb-6">
-            Send Rhoda a message on Instagram with your occasion, preferred colors, and
-            pickup date. She&apos;ll craft something beautiful just for you.
+            Email Rhoda with your occasion, preferred colors, and pickup date.
+            She&apos;ll craft something beautiful just for you.
           </p>
           <a
-            href="https://www.instagram.com/front_porchflowers"
-            target="_blank"
-            rel="noopener noreferrer"
+            href={orderMailto}
             className="inline-flex items-center gap-2 px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors"
           >
-            Order via Instagram
+            Order by email
             <span aria-hidden="true">&rarr;</span>
           </a>
         </div>

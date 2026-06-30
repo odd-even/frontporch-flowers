@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { PageHeader } from "@/components/AboutTeaser";
 import { getSiteSettings } from "@/lib/queries";
+import { getAboutPhoto } from "@/lib/photos.server";
+import { getFacebookPageUrl } from "@/lib/facebook";
 
 export const metadata = {
   title: "About | Front Porch Flowers",
@@ -10,6 +12,8 @@ export const metadata = {
 
 export default async function AboutPage() {
   const settings = await getSiteSettings();
+  const aboutPhoto = getAboutPhoto();
+  const facebookUrl = getFacebookPageUrl(settings.facebookPageUrl);
 
   return (
     <>
@@ -25,8 +29,8 @@ export default async function AboutPage() {
             <div className="md:col-span-2">
               <div className="relative aspect-[3/4] rounded-2xl overflow-hidden sticky top-28">
                 <Image
-                  src="https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800&q=80"
-                  alt="Wildflower bouquet in soft natural light"
+                  src={aboutPhoto.src}
+                  alt={aboutPhoto.alt}
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 40vw"
@@ -90,12 +94,12 @@ export default async function AboutPage() {
 
               <div className="pt-8">
                 <a
-                  href="https://www.instagram.com/front_porchflowers"
+                  href={facebookUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors"
                 >
-                  Say hello on Instagram
+                  Reserve on Facebook
                   <span aria-hidden="true">&rarr;</span>
                 </a>
               </div>

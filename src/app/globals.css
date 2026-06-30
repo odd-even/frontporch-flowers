@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
-@theme {
-  --font-display: "Labor Union", Georgia, serif;
-  --font-accent: "Always In My Heart", cursive;
-  --font-body: "Poppins", system-ui, sans-serif;
+@theme inline {
+  --font-display: var(--font-labor-union), Georgia, serif;
+  --font-accent: var(--font-script), cursive;
+  --font-body: var(--font-poppins), system-ui, sans-serif;
 
   --color-cream: #faf6f0;
   --color-cream-dark: #f0e8dc;
@@ -39,6 +39,10 @@
 
   .grain {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+
+  .font-display {
+    font-family: var(--font-display);
   }
 
   .font-accent {

@@ -24,6 +24,12 @@ export default defineType({
       description: "Without the @",
     }),
     defineField({
+      name: "facebookPageUrl",
+      title: "Facebook Page URL",
+      type: "url",
+      description: "Used for workshop, bouquet, and event reservations",
+    }),
+    defineField({
       name: "email",
       title: "Email",
       type: "string",

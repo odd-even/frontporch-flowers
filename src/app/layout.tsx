@@ -7,19 +7,19 @@ import { Footer } from "@/components/Footer";
 
 const laborUnion = localFont({
   src: "../fonts/LaborUnion-Regular.woff",
-  variable: "--font-display",
+  variable: "--font-labor-union",
   display: "swap",
 });
 
 const alwaysInMyHeart = localFont({
   src: "../fonts/AlwaysInMyHeart.woff",
-  variable: "--font-accent",
+  variable: "--font-script",
   display: "swap",
 });
 
 const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-body",
+  variable: "--font-poppins",
   weight: ["300", "400", "500", "600"],
 });
 

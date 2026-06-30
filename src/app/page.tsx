@@ -3,6 +3,7 @@ import { BouquetGrid } from "@/components/BouquetCard";
 import { WorkshopsSection } from "@/components/WorkshopCard";
 import { AboutTeaser, PickYourOwnTeaser } from "@/components/AboutTeaser";
 import { InstagramFeed } from "@/components/InstagramFeed";
+import { getContactEmail } from "@/lib/email";
 import {
   getBouquets,
   getPickYourOwnEvents,
@@ -23,7 +24,7 @@ export default async function HomePage() {
   return (
     <>
       <Hero tagline={settings.tagline} />
-      <BouquetGrid bouquets={bouquets} />
+      <BouquetGrid bouquets={bouquets} contactEmail={getContactEmail(settings.email)} />
       <AboutTeaser aboutText={settings.aboutText} />
       <PickYourOwnTeaser
         nextEvent={
