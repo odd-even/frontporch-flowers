@@ -22,7 +22,7 @@ export default async function WorkshopsPage() {
 
       <section className="py-16">
         <div className="max-w-2xl mx-auto px-6 text-center">
-          <h2 className="font-display text-2xl font-semibold text-charcoal mb-4">
+          <h2 className="font-display text-2xl text-charcoal mb-4">
             How to sign up
           </h2>
           <p className="text-warm-brown/80 mb-6">

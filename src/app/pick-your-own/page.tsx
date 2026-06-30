@@ -41,7 +41,7 @@ export default async function PickYourOwnPage() {
               </div>
 
               <div className="bg-cream-dark/50 rounded-2xl p-8 border border-sage/10">
-                <h2 className="font-display text-2xl font-semibold text-charcoal mb-4">
+                <h2 className="font-display text-2xl text-charcoal mb-4">
                   What to expect
                 </h2>
                 <ul className="space-y-3 text-warm-brown/80 text-sm">

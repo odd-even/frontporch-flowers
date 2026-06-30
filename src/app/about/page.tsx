@@ -56,7 +56,7 @@ export default async function AboutPage() {
                 way.
               </p>
 
-              <h2 className="font-display text-2xl font-semibold text-charcoal pt-4">
+              <h2 className="font-display text-2xl text-charcoal pt-4">
                 What we believe
               </h2>
 
@@ -80,7 +80,7 @@ export default async function AboutPage() {
                   },
                 ].map((item) => (
                   <div key={item.title} className="bg-cream-dark/50 rounded-xl p-6 border border-sage/10">
-                    <h3 className="font-display text-lg font-semibold text-charcoal mb-2">
+                    <h3 className="font-display text-lg text-charcoal mb-2">
                       {item.title}
                     </h3>
                     <p className="text-sm">{item.text}</p>

@@ -70,6 +70,28 @@ cd sanity && npm install && npm run dev
 
 Upload Rhoda's flower photos from Instagram into Sanity to replace the placeholder images.
 
+## Instagram Feed
+
+The homepage pulls recent posts from [@front_porchflowers](https://www.instagram.com/front_porchflowers) via the Instagram Graph API. Until credentials are added, it shows placeholder images that link to the profile.
+
+### One-time setup (about 10 minutes)
+
+1. **Switch to a Business or Creator account** on Instagram (Settings → Account type)
+2. **Link a Facebook Page** to the Instagram account (Meta Business Suite)
+3. Create an app at [developers.facebook.com](https://developers.facebook.com) → **Create App** → **Business**
+4. Add the **Instagram Graph API** product
+5. Under Instagram → **API setup**, connect `@front_porchflowers` and generate a token
+6. Copy the **Instagram User ID** and **Access Token** (use a long-lived token — 60 days, refreshable)
+
+Add to `.env.local` and Vercel environment variables:
+
+```env
+INSTAGRAM_ACCESS_TOKEN=your_long_lived_token
+INSTAGRAM_USER_ID=your_instagram_user_id
+```
+
+The feed refreshes hourly. Posts link directly to Instagram.
+
 ## Deploy to Vercel
 
 1. Push this repo to GitHub

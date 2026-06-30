@@ -17,7 +17,7 @@ export function WorkshopCard({ workshop }: WorkshopCardProps) {
           <span className="block text-xs uppercase tracking-wider opacity-80">
             {new Date(workshop.date + "T12:00:00").toLocaleDateString("en-US", { month: "short" })}
           </span>
-          <span className="block text-2xl font-display font-semibold leading-none">
+          <span className="block text-2xl font-display leading-none">
             {new Date(workshop.date + "T12:00:00").getDate()}
           </span>
         </time>
@@ -26,7 +26,7 @@ export function WorkshopCard({ workshop }: WorkshopCardProps) {
         )}
       </div>
 
-      <h3 className="font-display text-2xl font-semibold text-charcoal mb-3">
+      <h3 className="font-display text-2xl text-charcoal mb-3">
         {workshop.title}
       </h3>
       <p className="text-warm-brown/80 text-sm leading-relaxed mb-4">
@@ -81,7 +81,7 @@ export function WorkshopsSection({ workshops, showAll = false }: WorkshopsSectio
             <p className="text-sage text-sm uppercase tracking-[0.2em] mb-3">
               Gather &amp; create
             </p>
-            <h2 className="font-display text-4xl md:text-5xl font-semibold text-charcoal">
+            <h2 className="font-display text-4xl md:text-5xl text-charcoal">
               Seasonal workshops
             </h2>
           </div>
@@ -116,13 +116,13 @@ export function EventCard({ event }: { event: import("@/lib/types").PickYourOwnE
         <span className="block text-xs uppercase tracking-wider">
           {formatShortDate(event.date).split(" ")[0]}
         </span>
-        <span className="block text-2xl font-display font-semibold leading-none">
+        <span className="block text-2xl font-display leading-none">
           {new Date(event.date + "T12:00:00").getDate()}
         </span>
       </time>
 
       <div className="flex-1">
-        <h3 className="font-display text-xl font-semibold text-charcoal mb-1">
+        <h3 className="font-display text-xl text-charcoal mb-1">
           {event.title}
         </h3>
         <p className="text-sm text-warm-brown/70 mb-2">

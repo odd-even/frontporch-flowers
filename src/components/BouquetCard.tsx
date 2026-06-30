@@ -32,7 +32,7 @@ export function BouquetCard({ bouquet, index = 0 }: BouquetCardProps) {
           </span>
         )}
       </div>
-      <h3 className="font-display text-2xl font-semibold text-charcoal mb-2 group-hover:text-terracotta transition-colors">
+      <h3 className="font-display text-2xl text-charcoal mb-2 group-hover:text-terracotta transition-colors">
         {bouquet.title}
       </h3>
       <p className="text-warm-brown/80 text-sm leading-relaxed mb-3">
@@ -61,7 +61,7 @@ export function BouquetGrid({ bouquets, showAll = false }: BouquetGridProps) {
             <p className="text-sage text-sm uppercase tracking-[0.2em] mb-3">
               Seasonal offerings
             </p>
-            <h2 className="font-display text-4xl md:text-5xl font-semibold text-charcoal">
+            <h2 className="font-display text-4xl md:text-5xl text-charcoal">
               Bouquets for laid-back occasions
             </h2>
           </div>

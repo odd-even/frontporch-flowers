@@ -125,6 +125,6 @@ export const fallbackSettings: SiteSettings = {
   aboutText:
     "Hi, I'm Rhoda. I grow flowers in my own backyard and turn them into bouquets that feel like you wandered through a meadow and gathered whatever caught your eye. I love incorporating local grasses, seed heads, and other wild things — nothing too fussy, just beautiful blooms for laid-back occasions.",
   instagramHandle: "front_porchflowers",
-  email: "hello@frontporchflowers.com",
+  email: "hello@frontporchflowers.ca",
   location: "Local pickup available",
 };

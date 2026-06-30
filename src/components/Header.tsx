@@ -25,7 +25,7 @@ export function Header() {
             height={48}
             className="w-10 h-10 md:w-12 md:h-12 transition-transform group-hover:scale-105"
           />
-          <span className="font-display text-xl md:text-2xl font-semibold text-charcoal hidden sm:block">
+          <span className="font-display text-xl md:text-2xl text-charcoal hidden sm:block">
             Front Porch Flowers
           </span>
         </Link>

@@ -25,10 +25,10 @@ export function Hero({ tagline }: HeroProps) {
           <p className="text-sage-light text-sm uppercase tracking-[0.3em] mb-6 font-medium">
             Backyard grown &middot; Locally loved
           </p>
-          <h1 className="font-display text-5xl md:text-7xl font-semibold text-cream leading-[1.1] mb-6">
+          <h1 className="font-display text-5xl md:text-7xl text-cream leading-[1.1] mb-6">
             Wild &amp; whimsical
             <br />
-            <span className="italic font-normal">bouquets</span>
+            <span className="font-accent text-6xl md:text-8xl text-sage-light">bouquets</span>
           </h1>
           <p className="text-cream/85 text-lg md:text-xl leading-relaxed mb-10 max-w-lg">
             {tagline ||

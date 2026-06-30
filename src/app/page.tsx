@@ -1,7 +1,8 @@
 import { Hero } from "@/components/Hero";
 import { BouquetGrid } from "@/components/BouquetCard";
 import { WorkshopsSection } from "@/components/WorkshopCard";
-import { AboutTeaser, InstagramFeed, PickYourOwnTeaser } from "@/components/AboutTeaser";
+import { AboutTeaser, PickYourOwnTeaser } from "@/components/AboutTeaser";
+import { InstagramFeed } from "@/components/InstagramFeed";
 import {
   getBouquets,
   getPickYourOwnEvents,
@@ -37,7 +38,7 @@ export default async function HomePage() {
         }
       />
       <WorkshopsSection workshops={workshops} />
-      <InstagramFeed />
+      <InstagramFeed handle={settings.instagramHandle} />
     </>
   );
 }

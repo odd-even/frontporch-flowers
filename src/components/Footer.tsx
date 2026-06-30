@@ -6,7 +6,7 @@ export function Footer() {
       <div className="max-w-6xl mx-auto px-6 py-16">
         <div className="grid md:grid-cols-3 gap-12">
           <div>
-            <h3 className="font-display text-2xl font-semibold mb-4">
+            <h3 className="font-display text-2xl mb-4">
               Front Porch Flowers
             </h3>
             <p className="text-cream/70 text-sm leading-relaxed">
@@ -60,10 +60,10 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:hello@frontporchflowers.com"
+                  href="mailto:hello@frontporchflowers.ca"
                   className="hover:text-cream transition-colors"
                 >
-                  hello@frontporchflowers.com
+                  hello@frontporchflowers.ca
                 </a>
               </li>
             </ul>
@@ -72,7 +72,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-cream/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-cream/50">
           <p>&copy; {new Date().getFullYear()} Front Porch Flowers. All rights reserved.</p>
-          <p className="italic font-display text-sm text-cream/40">
+          <p className="font-accent text-xl text-cream/50">
             grown in the backyard, arranged with whimsy
           </p>
         </div>

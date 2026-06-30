@@ -1,23 +1,30 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Jost } from "next/font/google";
+import { Poppins } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
-const display = Cormorant_Garamond({
-  subsets: ["latin"],
+const laborUnion = localFont({
+  src: "../fonts/LaborUnion-Regular.woff",
   variable: "--font-display",
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
+  display: "swap",
 });
 
-const body = Jost({
+const alwaysInMyHeart = localFont({
+  src: "../fonts/AlwaysInMyHeart.woff",
+  variable: "--font-accent",
+  display: "swap",
+});
+
+const poppins = Poppins({
   subsets: ["latin"],
   variable: "--font-body",
-  weight: ["300", "400", "500"],
+  weight: ["300", "400", "500", "600"],
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.frontporchflowers.ca"),
   title: "Front Porch Flowers | Wild & Whimsical Bouquets",
   description:
     "Locally grown, backyard blooms by Rhoda. Wild and whimsical bouquets, pick-your-own flower days, and seasonal workshops in a laid-back garden setting.",
@@ -26,6 +33,7 @@ export const metadata: Metadata = {
     description:
       "Wild & whimsical bouquets grown with love in Rhoda's backyard.",
     type: "website",
+    url: "https://www.frontporchflowers.ca",
   },
 };
 
@@ -35,7 +43,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
+    <html
+      lang="en"
+      className={`${laborUnion.variable} ${alwaysInMyHeart.variable} ${poppins.variable}`}
+    >
       <body className="min-h-screen flex flex-col grain">
         <Header />
         <main className="flex-1">{children}</main>
