@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -17,13 +18,15 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 bg-cream/90 backdrop-blur-md border-b border-sage/20">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="group inline-flex flex-col shrink-0">
-          <span className="font-display text-base md:text-lg text-charcoal leading-tight whitespace-nowrap">
-            Front Porch
-          </span>
-          <span className="font-display text-base md:text-lg text-charcoal leading-tight whitespace-nowrap">
-            flowers
-          </span>
+        <Link href="/" className="group shrink-0">
+          <Image
+            src="/logo-header.svg"
+            alt="Front Porch Flowers"
+            width={3072}
+            height={745}
+            priority
+            className="h-10 md:h-12 w-auto transition-opacity duration-300 group-hover:opacity-80"
+          />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
