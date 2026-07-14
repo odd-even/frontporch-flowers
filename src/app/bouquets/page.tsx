@@ -15,7 +15,7 @@ export default async function BouquetsPage() {
   const orderMailto = buildMailtoUrl(
     contactEmail,
     "Bouquet order inquiry",
-    "Hi Rhoda!\n\nI'd love to order a bouquet. Here are a few details:\n\nOccasion:\nPreferred colors:\nPickup date:\n\nThanks!"
+    "Hi Rhoda!\n\nI'd love to order a bouquet. Here are a few details:\n\nOccasion:\nColor (Soft / Bright / Surprise me):\nPickup date:\n\nThanks!"
   );
 
   return (
@@ -33,8 +33,8 @@ export default async function BouquetsPage() {
             Ready to order?
           </h2>
           <p className="text-warm-brown/80 mb-6">
-            Email Rhoda with your occasion, preferred colors, and pickup date.
-            She&apos;ll craft something beautiful just for you.
+            Email Rhoda with your occasion, Soft or Bright preference, and pickup date.
+            She&apos;ll arrange whatever&apos;s blooming for you.
           </p>
           <a
             href={orderMailto}

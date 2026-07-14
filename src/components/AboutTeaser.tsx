@@ -30,19 +30,13 @@ export function AboutTeaser({ aboutText }: { aboutText?: string }) {
             </h2>
             <p className="text-warm-brown/80 leading-relaxed mb-6">
               {aboutText ||
-                "Hi, I'm Rhoda. I grow flowers in my own backyard and turn them into bouquets that feel like you wandered through a meadow and gathered whatever caught your eye."}
+                "Hi, I'm Rhoda. I grow flowers in my backyard and make seasonal bouquets for local pickup. Each one is cut from what's blooming that week."}
             </p>
-            <p className="text-warm-brown/80 leading-relaxed mb-8">
-              I love incorporating local grasses, seed heads, and other wild things into my
-              arrangements — nothing too fussy, just beautiful blooms for laid-back occasions.
+            <p className="text-warm-brown/80 leading-relaxed">
+              I also host pick-your-own days and a few seasonal workshops when the garden
+              has enough to share — wreath making, bouquet arranging, and similar days in
+              the yard.
             </p>
-            <Link
-              href="/about"
-              className="inline-flex items-center gap-2 text-terracotta font-medium hover:text-terracotta-dark transition-colors"
-            >
-              Read Rhoda&apos;s story
-              <span aria-hidden="true">&rarr;</span>
-            </Link>
           </div>
         </div>
       </div>
@@ -52,9 +46,13 @@ export function AboutTeaser({ aboutText }: { aboutText?: string }) {
 
 export function PickYourOwnTeaser({
   nextEvent,
+  facebookUrl,
 }: {
   nextEvent?: { title: string; date: string; startTime: string; endTime: string };
+  facebookUrl?: string;
 }) {
+  const facebookHref = facebookUrl || "https://www.facebook.com/people/Front-Porch-Flowers/61580626863252/";
+
   return (
     <section className="py-20 md:py-28 bg-sage/10">
       <div className="max-w-6xl mx-auto px-6 text-center">
@@ -66,16 +64,12 @@ export function PickYourOwnTeaser({
         </h2>
         <p className="text-warm-brown/80 max-w-xl mx-auto mb-8">
           On select dates, wander the rows and fill a bucket with whatever speaks to you.
-          A laid-back morning in the garden — clip your own stems and take home a bundle of
-          backyard beauty.
         </p>
 
-        {nextEvent && (
+        {nextEvent ? (
           <div className="inline-block bg-cream rounded-2xl px-8 py-6 mb-8 border border-sage/15">
             <p className="text-sm text-sage-dark uppercase tracking-wider mb-1">Next date</p>
-            <p className="font-display text-2xl text-charcoal">
-              {nextEvent.title}
-            </p>
+            <p className="font-display text-2xl text-charcoal">{nextEvent.title}</p>
             <p className="text-warm-brown/70 text-sm mt-1">
               {new Date(nextEvent.date + "T12:00:00").toLocaleDateString("en-US", {
                 weekday: "long",
@@ -85,16 +79,38 @@ export function PickYourOwnTeaser({
               &middot; {nextEvent.startTime} – {nextEvent.endTime}
             </p>
           </div>
+        ) : (
+          <div className="inline-block bg-cream rounded-2xl px-8 py-6 mb-8 border border-sage/15">
+            <p className="text-sm text-sage-dark uppercase tracking-wider mb-1">
+              Dates coming soon
+            </p>
+            <p className="font-display text-2xl text-charcoal">No date announced yet</p>
+            <p className="text-warm-brown/70 text-sm mt-1">
+              Pick-your-own days are posted on Facebook when they&apos;re scheduled.
+            </p>
+          </div>
         )}
 
         <div>
-          <Link
-            href="/pick-your-own"
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-sage text-cream rounded-full font-medium hover:bg-sage-dark transition-colors"
-          >
-            See all dates
-            <span aria-hidden="true">&rarr;</span>
-          </Link>
+          {nextEvent ? (
+            <Link
+              href="/pick-your-own"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-sage text-cream rounded-full font-medium hover:bg-sage-dark transition-colors"
+            >
+              See all dates
+              <span aria-hidden="true">&rarr;</span>
+            </Link>
+          ) : (
+            <a
+              href={facebookHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-sage text-cream rounded-full font-medium hover:bg-sage-dark transition-colors"
+            >
+              Check Facebook for dates
+              <span aria-hidden="true">&rarr;</span>
+            </a>
+          )}
         </div>
       </div>
     </section>

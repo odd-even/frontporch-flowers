@@ -2,8 +2,9 @@ import { Hero } from "@/components/Hero";
 import { BouquetGrid } from "@/components/BouquetCard";
 import { WorkshopsSection } from "@/components/WorkshopCard";
 import { AboutTeaser, PickYourOwnTeaser } from "@/components/AboutTeaser";
-import { InstagramFeed } from "@/components/InstagramFeed";
+import { FacebookFeed } from "@/components/FacebookFeed";
 import { getContactEmail } from "@/lib/email";
+import { getFacebookPageUrl } from "@/lib/facebook";
 import {
   getBouquets,
   getPickYourOwnEvents,
@@ -27,6 +28,7 @@ export default async function HomePage() {
       <BouquetGrid bouquets={bouquets} contactEmail={getContactEmail(settings.email)} />
       <AboutTeaser aboutText={settings.aboutText} />
       <PickYourOwnTeaser
+        facebookUrl={getFacebookPageUrl(settings.facebookPageUrl)}
         nextEvent={
           nextEvent
             ? {
@@ -38,8 +40,11 @@ export default async function HomePage() {
             : undefined
         }
       />
-      <WorkshopsSection workshops={workshops} />
-      <InstagramFeed handle={settings.instagramHandle} />
+      <WorkshopsSection
+        workshops={workshops}
+        facebookUrl={getFacebookPageUrl(settings.facebookPageUrl)}
+      />
+      <FacebookFeed pageUrl={settings.facebookPageUrl} />
     </>
   );
 }

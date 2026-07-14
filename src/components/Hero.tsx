@@ -26,7 +26,7 @@ export function Hero({ tagline }: HeroProps) {
       <div className="relative max-w-6xl mx-auto px-6 py-24 w-full">
         <div className="max-w-2xl">
           <p className="text-sage-light text-sm uppercase tracking-[0.3em] mb-6 font-medium">
-            Backyard grown &middot; Locally loved
+            Backyard grown
           </p>
           <h1 className="font-display text-5xl md:text-7xl text-cream leading-[1.1] mb-6">
             Wild &amp; whimsical
@@ -39,10 +39,10 @@ export function Hero({ tagline }: HeroProps) {
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
-              href="/bouquets"
+              href="#bouquets"
               className="px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors"
             >
-              Shop Bouquets
+              See Bouquets
             </Link>
             <Link
               href="/workshops"

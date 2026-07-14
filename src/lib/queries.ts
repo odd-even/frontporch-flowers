@@ -19,7 +19,7 @@ const eventsQuery = `*[_type == "pickYourOwnEvent"] | order(date asc) {
 }`;
 
 const bouquetsQuery = `*[_type == "bouquet" && _id != "wild-meadow"] | order(_createdAt desc) {
-  _id, title, description, price, image, available, featured
+  _id, title, description, price, image, available, featured, tags
 }`;
 
 const settingsQuery = `*[_type == "siteSettings"][0] {
@@ -27,10 +27,18 @@ const settingsQuery = `*[_type == "siteSettings"][0] {
 }`;
 
 export async function getWorkshops(): Promise<Workshop[]> {
-  if (!isSanityConfigured) return fallbackWorkshops;
+  const today = new Date().toISOString().slice(0, 10);
+
+  function upcomingOnly(workshops: Workshop[]) {
+    return workshops
+      .filter((workshop) => workshop.date >= today)
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }
+
+  if (!isSanityConfigured) return upcomingOnly(fallbackWorkshops);
   try {
     const data = await client.fetch<Workshop[]>(workshopsQuery);
-    if (!data?.length) return fallbackWorkshops;
+    if (!data?.length) return upcomingOnly(fallbackWorkshops);
 
     const fallbackById = new Map(fallbackWorkshops.map((workshop) => [workshop._id, workshop]));
 
@@ -40,21 +48,30 @@ export async function getWorkshops(): Promise<Workshop[]> {
     });
 
     const sanityIds = new Set(merged.map((workshop) => workshop._id));
-    return [...merged, ...fallbackWorkshops.filter((workshop) => !sanityIds.has(workshop._id))].sort(
-      (a, b) => a.date.localeCompare(b.date)
-    );
+    return upcomingOnly([
+      ...merged,
+      ...fallbackWorkshops.filter((workshop) => !sanityIds.has(workshop._id)),
+    ]);
   } catch {
-    return fallbackWorkshops;
+    return upcomingOnly(fallbackWorkshops);
   }
 }
 
 export async function getPickYourOwnEvents(): Promise<PickYourOwnEvent[]> {
-  if (!isSanityConfigured) return fallbackEvents;
+  const today = new Date().toISOString().slice(0, 10);
+
+  function upcomingOnly(events: PickYourOwnEvent[]) {
+    return events
+      .filter((event) => event.date >= today)
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }
+
+  if (!isSanityConfigured) return upcomingOnly(fallbackEvents);
   try {
     const data = await client.fetch<PickYourOwnEvent[]>(eventsQuery);
-    return data?.length ? data : fallbackEvents;
+    return upcomingOnly(data?.length ? data : fallbackEvents);
   } catch {
-    return fallbackEvents;
+    return upcomingOnly(fallbackEvents);
   }
 }
 

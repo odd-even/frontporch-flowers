@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { EventCard } from "@/components/WorkshopCard";
 import { PageHeader } from "@/components/AboutTeaser";
-import { getPickYourOwnEvents } from "@/lib/queries";
+import { getFacebookPageUrl } from "@/lib/facebook";
+import { getPickYourOwnEvents, getSiteSettings } from "@/lib/queries";
 import { getPickYourOwnPhoto } from "@/lib/photos.server";
 
 export const metadata = {
@@ -11,24 +12,50 @@ export const metadata = {
 };
 
 export default async function PickYourOwnPage() {
-  const events = await getPickYourOwnEvents();
+  const [events, settings] = await Promise.all([
+    getPickYourOwnEvents(),
+    getSiteSettings(),
+  ]);
   const gardenPhoto = getPickYourOwnPhoto();
+  const facebookUrl = getFacebookPageUrl(settings.facebookPageUrl);
 
   return (
     <>
       <PageHeader
         eyebrow="In the garden"
         title="Pick Your Own"
-        description="On select dates throughout the season, the garden opens for pick-your-own. Wander the rows, clip your own stems, and take home a bundle of whatever's blooming — zinnias, cosmos, dahlias, and more."
+        description="On select dates throughout the season, the garden opens for pick-your-own. Wander the rows, clip your own stems, and take home a bundle of whatever's blooming that day."
       />
 
       <section className="py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-start">
             <div className="space-y-4">
-              {events.map((event) => (
-                <EventCard key={event._id} event={event} />
-              ))}
+              {events.length > 0 ? (
+                events.map((event) => <EventCard key={event._id} event={event} />)
+              ) : (
+                <div className="bg-cream-dark/50 rounded-2xl p-8 border border-sage/10">
+                  <p className="text-sm text-sage-dark uppercase tracking-wider mb-2">
+                    Dates coming soon
+                  </p>
+                  <h2 className="font-display text-2xl text-charcoal mb-3">
+                    No pick-your-own date announced yet
+                  </h2>
+                  <p className="text-warm-brown/80 text-sm leading-relaxed mb-6">
+                    New garden days get posted on Facebook when they&apos;re scheduled. Follow
+                    along there for the next open date and hours.
+                  </p>
+                  <a
+                    href={facebookUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-sage text-cream rounded-full font-medium hover:bg-sage-dark transition-colors"
+                  >
+                    Check Facebook for dates
+                    <span aria-hidden="true">&rarr;</span>
+                  </a>
+                </div>
+              )}
             </div>
 
             <div>
@@ -73,7 +100,16 @@ export default async function PickYourOwnPage() {
       <section className="py-16 bg-sage/10">
         <div className="max-w-2xl mx-auto px-6 text-center">
           <p className="text-warm-brown/80 mb-6">
-            No reservation needed — just show up during the posted hours. Follow{" "}
+            Dates and hours are announced on{" "}
+            <a
+              href={facebookUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-terracotta hover:text-terracotta-dark"
+            >
+              Facebook
+            </a>
+            . You can also follow{" "}
             <a
               href="https://www.instagram.com/front_porchflowers"
               target="_blank"
@@ -82,7 +118,7 @@ export default async function PickYourOwnPage() {
             >
               @front_porchflowers
             </a>{" "}
-            for weather updates and last-minute announcements.
+            for garden updates.
           </p>
         </div>
       </section>

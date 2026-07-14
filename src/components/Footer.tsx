@@ -33,11 +33,6 @@ export function Footer() {
             </h4>
             <ul className="space-y-2 text-sm text-cream/70">
               <li>
-                <Link href="/bouquets" className="hover:text-cream transition-colors">
-                  Bouquets
-                </Link>
-              </li>
-              <li>
                 <Link href="/gallery" className="hover:text-cream transition-colors">
                   Gallery
                 </Link>
@@ -50,11 +45,6 @@ export function Footer() {
               <li>
                 <Link href="/pick-your-own" className="hover:text-cream transition-colors">
                   Pick Your Own
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="hover:text-cream transition-colors">
-                  About Rhoda
                 </Link>
               </li>
             </ul>

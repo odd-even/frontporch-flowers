@@ -8,7 +8,7 @@ import { getFacebookPageUrl } from "@/lib/facebook";
 export const metadata = {
   title: "Workshops | Front Porch Flowers",
   description:
-    "Seasonal flower workshops — hydrangea and Christmas wreath making, wild bouquet arranging, and more. Gather with friends in the garden.",
+    "Seasonal workshops — wreath making, wild bouquet arranging, and more. Gather with friends in the garden.",
 };
 
 export default async function WorkshopsPage() {
@@ -21,9 +21,13 @@ export default async function WorkshopsPage() {
       <PageHeader
         eyebrow="Gather & create"
         title="Workshops"
-        description="Occasional hands-on workshops in the garden — from hydrangea and Christmas wreath making to wild bouquet arranging. All materials included. Just bring your creativity and a willingness to get your hands a little dirty."
+        description="Occasional hands-on workshops in the garden — wreath making, bouquet arranging, and similar days when the garden has enough to share. All materials included. Just bring your creativity and a willingness to get your hands a little dirty."
       />
-      <WorkshopsSection workshops={workshops} showAll />
+      <WorkshopsSection
+        workshops={workshops}
+        showAll
+        facebookUrl={facebookUrl}
+      />
 
       {workshopPhotos.length > 0 && (
         <section className="py-16 md:py-24 bg-cream-dark/30">
@@ -32,7 +36,7 @@ export default async function WorkshopsPage() {
               Past workshops
             </p>
             <h2 className="font-display text-3xl md:text-4xl text-charcoal text-center mb-10">
-              Wreaths, hydrangeas &amp;{" "}
+              Wreaths, stems &amp;{" "}
               <span className="font-accent text-terracotta">good company</span>
             </h2>
             <PhotoGallery photos={workshopPhotos} layout="square" />
@@ -46,8 +50,8 @@ export default async function WorkshopsPage() {
             How to sign up
           </h2>
           <p className="text-warm-brown/80 mb-6">
-            Workshop spots are limited. Message Rhoda on Facebook to reserve your spot — she&apos;ll
-            send you all the details including location and what to bring.
+            Workshop dates are announced on Facebook when they&apos;re ready. Message Rhoda
+            there to reserve a spot — she&apos;ll share location and what to bring.
           </p>
           <a
             href={facebookUrl}
@@ -55,7 +59,7 @@ export default async function WorkshopsPage() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-3.5 bg-sage text-cream rounded-full font-medium hover:bg-sage-dark transition-colors"
           >
-            Reserve on Facebook
+            See Facebook page
             <span aria-hidden="true">&rarr;</span>
           </a>
         </div>

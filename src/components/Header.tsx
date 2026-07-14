@@ -5,11 +5,9 @@ import Link from "next/link";
 import { useState } from "react";
 
 const navLinks = [
-  { href: "/bouquets", label: "Bouquets" },
   { href: "/gallery", label: "Gallery" },
   { href: "/workshops", label: "Workshops" },
   { href: "/pick-your-own", label: "Pick Your Own" },
-  { href: "/about", label: "About" },
 ];
 
 export function Header() {

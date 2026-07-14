@@ -69,9 +69,15 @@ export function WorkshopCard({ workshop }: WorkshopCardProps) {
 interface WorkshopsSectionProps {
   workshops: Workshop[];
   showAll?: boolean;
+  facebookUrl?: string;
 }
 
-export function WorkshopsSection({ workshops, showAll = false }: WorkshopsSectionProps) {
+export function WorkshopsSection({
+  workshops,
+  showAll = false,
+  facebookUrl,
+}: WorkshopsSectionProps) {
+  const facebookHref = facebookUrl || getFacebookPageUrl();
   const display = showAll
     ? workshops
     : [...workshops]
@@ -94,7 +100,7 @@ export function WorkshopsSection({ workshops, showAll = false }: WorkshopsSectio
               Seasonal workshops
             </h2>
           </div>
-          {!showAll && (
+          {!showAll && display.length > 0 && (
             <Link
               href="/workshops"
               className="text-terracotta font-medium hover:text-terracotta-dark transition-colors flex items-center gap-2"
@@ -105,11 +111,35 @@ export function WorkshopsSection({ workshops, showAll = false }: WorkshopsSectio
           )}
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {display.map((workshop) => (
-            <WorkshopCard key={workshop._id} workshop={workshop} />
-          ))}
-        </div>
+        {display.length > 0 ? (
+          <div className="grid md:grid-cols-2 gap-6">
+            {display.map((workshop) => (
+              <WorkshopCard key={workshop._id} workshop={workshop} />
+            ))}
+          </div>
+        ) : (
+          <div className="max-w-2xl mx-auto text-center bg-cream rounded-2xl px-8 py-10 border border-sage/15">
+            <p className="text-sm text-sage-dark uppercase tracking-wider mb-2">
+              Dates announced soon
+            </p>
+            <p className="font-display text-2xl md:text-3xl text-charcoal mb-3">
+              Workshops will be posted on Facebook
+            </p>
+            <p className="text-warm-brown/70 text-sm mb-6">
+              Check the Facebook page for the next workshop date, details, and how to reserve
+              a spot.
+            </p>
+            <a
+              href={facebookHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-sage text-cream rounded-full font-medium hover:bg-sage-dark transition-colors"
+            >
+              See Facebook page
+              <span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        )}
       </div>
     </section>
   );

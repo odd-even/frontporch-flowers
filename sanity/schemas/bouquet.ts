@@ -41,6 +41,14 @@ export default defineType({
       type: "boolean",
       initialValue: false,
     }),
+    defineField({
+      name: "tags",
+      title: "Tags",
+      type: "array",
+      of: [{ type: "string" }],
+      description: 'e.g. "Includes vase"',
+      options: { layout: "tags" },
+    }),
   ],
   preview: {
     select: { title: "title", media: "image" },
