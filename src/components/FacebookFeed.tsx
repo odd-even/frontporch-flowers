@@ -14,7 +14,10 @@ interface FacebookFeedProps {
 
 export async function FacebookFeed({ pageUrl }: FacebookFeedProps) {
   const facebookUrl = getFacebookPageUrl(pageUrl);
-  const { posts, nextCursor } = await getFacebookPostsPage({ limit: 9 });
+  const { posts, nextCursor } = await getFacebookPostsPage({
+    limit: 9,
+    dynamic: true,
+  });
   const connected = isFacebookFeedConfigured() && posts.length > 0;
   const fallbackPhotos = getInstagramFallbackPhotos();
 

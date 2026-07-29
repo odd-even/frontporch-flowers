@@ -12,6 +12,9 @@ import {
   getWorkshops,
 } from "@/lib/queries";
 
+/** Keep Facebook posts fresh; homepage is server-rendered with env-backed Graph API. */
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const [settings, bouquets, workshops, events] = await Promise.all([
     getSiteSettings(),
