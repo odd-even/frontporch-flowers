@@ -4,13 +4,23 @@ export const DEFAULT_FACEBOOK_PAGE_URL =
 const GRAPH_API = "https://graph.facebook.com/v21.0";
 const DEFAULT_PAGE_NAME_HINT = "front porch flowers";
 
+export type FacebookMediaItem = {
+  type: "image" | "video";
+  /** Image URL, or MP4 source for videos. */
+  url: string;
+  /** Poster frame for videos. */
+  poster?: string;
+};
+
 export interface FacebookPost {
   id: string;
   message?: string;
-  /** First / cover image — kept for simple rendering. */
+  /** First / cover image (or video poster) — kept for simple rendering. */
   mediaUrl: string;
-  /** All photos on the post (cover first). */
+  /** All media preview URLs (images / video posters). */
   mediaUrls: string[];
+  /** Ordered images and videos for the post. */
+  media: FacebookMediaItem[];
   permalink: string;
 }
 
@@ -101,13 +111,23 @@ async function resolvePageAccess(
 }
 
 type GraphAttachment = {
-  media?: { image?: { src?: string } };
+  media?: {
+    image?: { src?: string };
+    source?: string;
+  };
   type?: string;
   title?: string;
+  url?: string;
+  target?: { id?: string; url?: string };
   subattachments?: {
     data?: Array<{
-      media?: { image?: { src?: string } };
+      media?: {
+        image?: { src?: string };
+        source?: string;
+      };
       type?: string;
+      url?: string;
+      target?: { id?: string; url?: string };
     }>;
   };
 };
@@ -127,6 +147,13 @@ const SKIPPED_ATTACHMENT_TYPES = new Set([
   "cover_photo",
 ]);
 
+const VIDEO_ATTACHMENT_TYPES = new Set([
+  "video",
+  "video_inline",
+  "video_autoplay",
+  "video_direct_response",
+]);
+
 function isSkippedSystemPost(item: GraphPost): boolean {
   const attachmentType = item.attachments?.data?.[0]?.type;
   if (attachmentType && SKIPPED_ATTACHMENT_TYPES.has(attachmentType)) {
@@ -140,29 +167,65 @@ function isSkippedSystemPost(item: GraphPost): boolean {
   );
 }
 
-function collectMediaUrls(item: GraphPost): string[] {
-  const urls: string[] = [];
+function isVideoAttachmentType(type?: string): boolean {
+  if (!type) return false;
+  return VIDEO_ATTACHMENT_TYPES.has(type) || type.includes("video");
+}
+
+function collectMedia(item: GraphPost): FacebookMediaItem[] {
+  const items: FacebookMediaItem[] = [];
   const seen = new Set<string>();
 
-  const add = (url?: string) => {
-    if (!url || seen.has(url)) return;
-    seen.add(url);
-    urls.push(url);
+  const add = (opts: {
+    type?: string;
+    image?: string;
+    source?: string;
+  }) => {
+    const isVideo = Boolean(opts.source) || isVideoAttachmentType(opts.type);
+
+    if (isVideo && opts.source) {
+      if (seen.has(opts.source)) return;
+      seen.add(opts.source);
+      if (opts.image) seen.add(opts.image);
+      items.push({
+        type: "video",
+        url: opts.source,
+        poster: opts.image,
+      });
+      return;
+    }
+
+    if (opts.image) {
+      if (seen.has(opts.image)) return;
+      seen.add(opts.image);
+      items.push({ type: "image", url: opts.image });
+    }
   };
 
   for (const attachment of item.attachments?.data || []) {
     const children = attachment.subattachments?.data || [];
     if (children.length) {
       for (const child of children) {
-        add(child.media?.image?.src);
+        add({
+          type: child.type,
+          image: child.media?.image?.src,
+          source: child.media?.source,
+        });
       }
     } else {
-      add(attachment.media?.image?.src);
+      add({
+        type: attachment.type,
+        image: attachment.media?.image?.src,
+        source: attachment.media?.source,
+      });
     }
   }
 
-  add(item.full_picture);
-  return urls;
+  if (!items.length && item.full_picture) {
+    add({ image: item.full_picture });
+  }
+
+  return items;
 }
 
 function mapPosts(items: GraphPost[]): FacebookPost[] {
@@ -170,14 +233,19 @@ function mapPosts(items: GraphPost[]): FacebookPost[] {
     .map((item): FacebookPost | null => {
       if (!item.permalink_url) return null;
       if (isSkippedSystemPost(item)) return null;
-      const mediaUrls = collectMediaUrls(item);
-      if (!mediaUrls.length) return null;
+      const media = collectMedia(item);
+      if (!media.length) return null;
+
+      const mediaUrls = media.map((entry) =>
+        entry.type === "video" ? entry.poster || entry.url : entry.url
+      );
 
       return {
         id: item.id,
         message: item.message,
         mediaUrl: mediaUrls[0],
         mediaUrls,
+        media,
         permalink: item.permalink_url,
       };
     })
@@ -207,7 +275,7 @@ export async function getFacebookPostsPage({
     "full_picture",
     "permalink_url",
     "created_time",
-    "attachments{media,type,title,subattachments{media,type}}",
+    "attachments{media{image,source},type,title,subattachments{media{image,source},type}}",
   ].join(",");
 
   const fetchLimit = Math.min(Math.max(limit * 2, 12), 50);

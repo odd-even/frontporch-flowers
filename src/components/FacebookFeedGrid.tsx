@@ -2,16 +2,19 @@
 
 import { useEffect, useState, useTransition, type MouseEvent } from "react";
 import Image from "next/image";
-import type { FacebookPost } from "@/lib/facebook";
+import type { FacebookMediaItem, FacebookPost } from "@/lib/facebook";
 
 interface FacebookFeedGridProps {
   initialPosts: FacebookPost[];
   initialCursor: string | null;
 }
 
-function getMediaUrls(post: FacebookPost): string[] {
-  if (post.mediaUrls?.length) return post.mediaUrls;
-  return post.mediaUrl ? [post.mediaUrl] : [];
+function getMediaItems(post: FacebookPost): FacebookMediaItem[] {
+  if (post.media?.length) return post.media;
+  if (post.mediaUrls?.length) {
+    return post.mediaUrls.map((url) => ({ type: "image" as const, url }));
+  }
+  return post.mediaUrl ? [{ type: "image", url: post.mediaUrl }] : [];
 }
 
 function PostMedia({
@@ -25,36 +28,56 @@ function PostMedia({
   onIndexChange: (index: number) => void;
   linked?: boolean;
 }) {
-  const mediaUrls = getMediaUrls(post);
-  const current = mediaUrls[Math.min(index, mediaUrls.length - 1)] || post.mediaUrl;
-  const hasCarousel = mediaUrls.length > 1;
+  const mediaItems = getMediaItems(post);
+  const current =
+    mediaItems[Math.min(index, mediaItems.length - 1)] ||
+    (post.mediaUrl ? { type: "image" as const, url: post.mediaUrl } : null);
+  const hasCarousel = mediaItems.length > 1;
   const message = post.message?.trim() || "";
+
+  if (!current) return null;
 
   function showPrevious(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
     event.stopPropagation();
-    onIndexChange((index - 1 + mediaUrls.length) % mediaUrls.length);
+    onIndexChange((index - 1 + mediaItems.length) % mediaItems.length);
   }
 
   function showNext(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
     event.stopPropagation();
-    onIndexChange((index + 1) % mediaUrls.length);
+    onIndexChange((index + 1) % mediaItems.length);
   }
 
-  const image = (
-    <Image
-      src={current}
-      alt={message.slice(0, 100) || "Front Porch Flowers on Facebook"}
-      fill
-      className="object-cover"
-      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-    />
-  );
+  const media =
+    current.type === "video" ? (
+      <video
+        key={current.url}
+        src={current.url}
+        poster={current.poster || undefined}
+        controls
+        playsInline
+        preload="metadata"
+        className="absolute inset-0 h-full w-full object-cover bg-charcoal"
+        onClick={(event) => event.stopPropagation()}
+      >
+        Your browser does not support video playback.
+      </video>
+    ) : (
+      <Image
+        src={current.url}
+        alt={message.slice(0, 100) || "Front Porch Flowers on Facebook"}
+        fill
+        className="object-cover"
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+      />
+    );
+
+  const wrapWithLink = linked && !message && current.type === "image";
 
   return (
     <div className="relative aspect-square overflow-hidden bg-charcoal">
-      {linked && !message ? (
+      {wrapWithLink ? (
         <a
           href={post.permalink}
           target="_blank"
@@ -62,10 +85,10 @@ function PostMedia({
           className="absolute inset-0"
           aria-label="View on Facebook"
         >
-          {image}
+          {media}
         </a>
       ) : (
-        image
+        media
       )}
 
       {hasCarousel ? (
@@ -73,7 +96,7 @@ function PostMedia({
           <button
             type="button"
             onClick={showPrevious}
-            aria-label="Previous photo"
+            aria-label="Previous media"
             className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-charcoal/70 text-cream hover:bg-charcoal/90 transition-colors"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -83,7 +106,7 @@ function PostMedia({
           <button
             type="button"
             onClick={showNext}
-            aria-label="Next photo"
+            aria-label="Next media"
             className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-charcoal/70 text-cream hover:bg-charcoal/90 transition-colors"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -91,7 +114,7 @@ function PostMedia({
             </svg>
           </button>
           <p className="absolute bottom-2 right-2 z-10 rounded-full bg-charcoal/70 px-2.5 py-1 text-xs text-cream tabular-nums">
-            {index + 1} / {mediaUrls.length}
+            {index + 1} / {mediaItems.length}
           </p>
         </>
       ) : null}
