@@ -2,6 +2,7 @@ import { Hero } from "@/components/Hero";
 import { BouquetGrid } from "@/components/BouquetCard";
 import { WorkshopsSection } from "@/components/WorkshopCard";
 import { AboutTeaser, PickYourOwnTeaser } from "@/components/AboutTeaser";
+import { PaymentOptions } from "@/components/PaymentOptions";
 import { FacebookFeed } from "@/components/FacebookFeed";
 import { getContactEmail } from "@/lib/email";
 import { getFacebookPageUrl } from "@/lib/facebook";
@@ -24,11 +25,16 @@ export default async function HomePage() {
   ]);
 
   const nextEvent = events[0];
+  const etransferEmail =
+    process.env.NEXT_PUBLIC_ETRANSFER_EMAIL || "rhoda@frontporchflowers.ca";
+  const phone =
+    process.env.NEXT_PUBLIC_CONTACT_PHONE || settings.phone || "+15064253850";
 
   return (
     <>
       <Hero tagline={settings.tagline} />
       <BouquetGrid bouquets={bouquets} contactEmail={getContactEmail(settings.email)} />
+      <PaymentOptions etransferEmail={etransferEmail} phone={phone} />
       <AboutTeaser aboutText={settings.aboutText} />
       <PickYourOwnTeaser
         facebookUrl={getFacebookPageUrl(settings.facebookPageUrl)}

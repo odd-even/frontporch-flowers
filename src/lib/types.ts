@@ -111,5 +111,6 @@ export const fallbackSettings: SiteSettings = {
   instagramHandle: "front_porchflowers",
   facebookPageUrl: "https://www.facebook.com/people/Front-Porch-Flowers/61580626863252/",
   email: "hello@frontporchflowers.ca",
+  phone: "+15064253850",
   location: "Local pickup available",
 };
