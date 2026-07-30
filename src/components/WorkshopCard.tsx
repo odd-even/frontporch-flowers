@@ -120,14 +120,14 @@ export function WorkshopsSection({
         ) : (
           <div className="max-w-2xl mx-auto text-center bg-cream rounded-2xl px-8 py-10 border border-sage/15">
             <p className="text-sm text-sage-dark uppercase tracking-wider mb-2">
-              Dates announced soon
+              Stay tuned
             </p>
             <p className="font-display text-2xl md:text-3xl text-charcoal mb-3">
-              Workshops will be posted on Facebook
+              Check for announcements on social
             </p>
             <p className="text-warm-brown/70 text-sm mb-6">
-              Check the Facebook page for the next workshop date, details, and how to reserve
-              a spot.
+              Workshop dates are shared on Facebook and Instagram when they&apos;re ready —
+              including details and how to reserve a spot.
             </p>
             <a
               href={facebookHref}

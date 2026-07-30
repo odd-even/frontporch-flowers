@@ -3,16 +3,11 @@ import {
   fallbackBouquets,
   fallbackEvents,
   fallbackSettings,
-  fallbackWorkshops,
   type Bouquet,
   type PickYourOwnEvent,
   type SiteSettings,
   type Workshop,
 } from "./types";
-
-const workshopsQuery = `*[_type == "workshop"] | order(date asc) {
-  _id, title, slug, description, date, time, price, spotsAvailable, image, featured
-}`;
 
 const eventsQuery = `*[_type == "pickYourOwnEvent"] | order(date asc) {
   _id, title, date, startTime, endTime, description, spotsAvailable
@@ -27,34 +22,8 @@ const settingsQuery = `*[_type == "siteSettings"][0] {
 }`;
 
 export async function getWorkshops(): Promise<Workshop[]> {
-  const today = new Date().toISOString().slice(0, 10);
-
-  function upcomingOnly(workshops: Workshop[]) {
-    return workshops
-      .filter((workshop) => workshop.date >= today)
-      .sort((a, b) => a.date.localeCompare(b.date));
-  }
-
-  if (!isSanityConfigured) return upcomingOnly(fallbackWorkshops);
-  try {
-    const data = await client.fetch<Workshop[]>(workshopsQuery);
-    if (!data?.length) return upcomingOnly(fallbackWorkshops);
-
-    const fallbackById = new Map(fallbackWorkshops.map((workshop) => [workshop._id, workshop]));
-
-    const merged = data.map((workshop) => {
-      const fallback = fallbackById.get(workshop._id);
-      return fallback ? { ...workshop, ...fallback } : workshop;
-    });
-
-    const sanityIds = new Set(merged.map((workshop) => workshop._id));
-    return upcomingOnly([
-      ...merged,
-      ...fallbackWorkshops.filter((workshop) => !sanityIds.has(workshop._id)),
-    ]);
-  } catch {
-    return upcomingOnly(fallbackWorkshops);
-  }
+  // Workshop dates are announced on social for now — don't list CMS dates.
+  return [];
 }
 
 export async function getPickYourOwnEvents(): Promise<PickYourOwnEvent[]> {

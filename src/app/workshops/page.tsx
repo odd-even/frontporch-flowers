@@ -50,8 +50,8 @@ export default async function WorkshopsPage() {
             How to sign up
           </h2>
           <p className="text-warm-brown/80 mb-6">
-            Workshop dates are announced on Facebook when they&apos;re ready. Message Rhoda
-            there to reserve a spot — she&apos;ll share location and what to bring.
+            Check for announcements on social — workshop dates are shared on Facebook and
+            Instagram when they&apos;re ready. Message Rhoda there to reserve a spot.
           </p>
           <a
             href={facebookUrl}
