@@ -33,16 +33,19 @@ export function Hero({ tagline }: HeroProps) {
             <br />
             <span className="font-accent text-6xl md:text-8xl text-sage-light">bouquets</span>
           </h1>
-          <p className="text-cream/85 text-lg md:text-xl leading-relaxed mb-10 max-w-lg">
-            {tagline ||
-              "Rhoda grows flowers in her own backyard and crafts laid-back bouquets with local grasses and whatever wild things catch her eye."}
-          </p>
+          {tagline ? (
+            <p className="text-cream/85 text-lg md:text-xl leading-relaxed mb-10 max-w-lg">
+              {tagline}
+            </p>
+          ) : (
+            <div className="mb-10" />
+          )}
           <div className="flex flex-wrap gap-4">
             <Link
               href="#bouquets"
               className="px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors"
             >
-              See Bouquets
+              Order a bouquet
             </Link>
             <Link
               href="/workshops"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AcceptedPaymentLogos } from "@/components/PaymentLogos";
+import { InPersonPaymentLogos, InteracPaymentLogo } from "@/components/PaymentLogos";
 
 const PAY_HASH = "pay";
 
@@ -167,14 +167,17 @@ export function PaymentOptions({
                 How to pay
               </h2>
               <p className="text-warm-brown/75 text-sm leading-relaxed mb-6">
-                Choose whatever works best — Interac e-Transfer, card, or cash.
+                Send an e-Transfer anytime, or pay with card or cash in person.
               </p>
 
-              <div className="space-y-5">
+              <div className="space-y-6">
                 <div>
-                  <p className="text-xs uppercase tracking-widest text-sage-dark mb-2">
+                  <p className="text-xs uppercase tracking-widest text-sage-dark mb-3">
                     Interac e-Transfer
                   </p>
+                  <div className="mb-3">
+                    <InteracPaymentLogo />
+                  </div>
                   <div className="flex flex-wrap items-center gap-3">
                     <a
                       href={`mailto:${etransferEmail}`}
@@ -193,8 +196,15 @@ export function PaymentOptions({
                 </div>
 
                 <div>
+                  <p className="text-xs uppercase tracking-widest text-sage-dark mb-3">
+                    In person
+                  </p>
+                  <InPersonPaymentLogos />
+                </div>
+
+                <div>
                   <p className="text-xs uppercase tracking-widest text-sage-dark mb-2">
-                    Phone
+                    Contact
                   </p>
                   <a
                     href={telHref(phone)}
@@ -202,13 +212,6 @@ export function PaymentOptions({
                   >
                     {phoneDisplay}
                   </a>
-                </div>
-
-                <div>
-                  <p className="text-xs uppercase tracking-widest text-sage-dark mb-3">
-                    Accepted
-                  </p>
-                  <AcceptedPaymentLogos />
                 </div>
               </div>
 

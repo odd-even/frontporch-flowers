@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="750" height="471" viewBox="0 0 750 471">
-  <rect width="750" height="471" rx="40" fill="#1B7A4E"/>
+  <rect width="750" height="471" rx="40" fill="#1A3A6B"/>
   <text
     x="375"
     y="235.5"
@@ -10,5 +10,5 @@
     font-weight="700"
     letter-spacing="8"
     fill="#FFFFFF"
-  >CASH</text>
+  >DEBIT</text>
 </svg>

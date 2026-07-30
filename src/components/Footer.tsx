@@ -21,7 +21,6 @@ export function Footer() {
             </Link>
             <div className="min-w-0 pt-1">
               <p className="text-cream/70 text-sm leading-relaxed">
-                Wild & whimsical bouquets grown with love in Rhoda&apos;s backyard.
                 Local grasses, seed heads, and whatever&apos;s blooming.
               </p>
             </div>

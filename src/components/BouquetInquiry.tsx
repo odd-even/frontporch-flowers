@@ -1,8 +1,104 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { buildMailtoUrl, getContactEmail } from "@/lib/email";
+import { useEffect, useMemo, useState } from "react";
+
+const CUSTOM_DATE_ID = "custom" as const;
+const SAME_DAY_CUTOFF_HOUR = 10;
+type PickupDateId = string;
+
+type DayOption = {
+  id: string;
+  weekday: string;
+  day: string;
+  month: string;
+  fullLabel: string;
+  available: boolean;
+  isToday: boolean;
+  hoursLeft?: number;
+};
+
+function startOfLocalDay(date: Date): Date {
+  const next = new Date(date);
+  next.setHours(12, 0, 0, 0);
+  return next;
+}
+
+function formatDateId(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getSameDayCutoff(now = new Date()): Date {
+  const cutoff = new Date(now);
+  cutoff.setHours(SAME_DAY_CUTOFF_HOUR, 0, 0, 0);
+  return cutoff;
+}
+
+function getHoursUntilSameDayCutoff(now = new Date()): number {
+  const ms = getSameDayCutoff(now).getTime() - now.getTime();
+  return Math.max(0, Math.ceil(ms / (1000 * 60 * 60)));
+}
+
+function isSameDayStillAvailable(now = new Date()): boolean {
+  return now.getTime() < getSameDayCutoff(now).getTime();
+}
+
+function formatHoursLeft(hours: number): string {
+  if (hours <= 0) return "0 hrs left";
+  if (hours === 1) return "1 hr left";
+  return `${hours} hrs left`;
+}
+
+function getUpcomingDays(count = 7, now = new Date()): DayOption[] {
+  const today = startOfLocalDay(now);
+  const sameDayAvailable = isSameDayStillAvailable(now);
+  const hoursLeft = sameDayAvailable ? getHoursUntilSameDayCutoff(now) : undefined;
+
+  return Array.from({ length: count }, (_, index) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() + index);
+    const isToday = index === 0;
+
+    return {
+      id: formatDateId(date),
+      weekday: date.toLocaleDateString("en-CA", { weekday: "short" }),
+      day: String(date.getDate()),
+      month: date.toLocaleDateString("en-CA", { month: "short" }),
+      fullLabel: date.toLocaleDateString("en-CA", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      }),
+      available: isToday ? sameDayAvailable : true,
+      isToday,
+      hoursLeft: isToday ? hoursLeft : undefined,
+    };
+  });
+}
+
+function getDefaultPickupDate(dayOptions: DayOption[]): PickupDateId {
+  return dayOptions.find((day) => day.available)?.id ?? dayOptions[1]?.id ?? dayOptions[0]?.id ?? "";
+}
+
+function formatPickupLabel(
+  pickupDate: PickupDateId,
+  customDateNote: string,
+  dayOptions: DayOption[]
+): string {
+  if (pickupDate === CUSTOM_DATE_ID) {
+    const detail = customDateNote.trim();
+    return detail
+      ? `Custom date (to discuss): ${detail}`
+      : "Custom date — happy to discuss timing with Rhoda";
+  }
+
+  const day = dayOptions.find((option) => option.id === pickupDate);
+  return day?.fullLabel ?? pickupDate;
+}
 
 const COLOR_OPTIONS = [
   { id: "soft", label: "Soft", hint: "gentle, quiet seasonal tones" },
@@ -10,41 +106,39 @@ const COLOR_OPTIONS = [
   { id: "surprise", label: "Surprise me", hint: "Rhoda picks from what's blooming" },
 ] as const;
 
-const SIZE_OPTIONS = [
-  { id: "petite", label: "Petite", hint: "desk or bedside" },
-  { id: "medium", label: "Medium", hint: "everyday table size" },
-  { id: "generous", label: "Generous", hint: "statement piece" },
-  { id: "unsure", label: "Not sure", hint: "happy for Rhoda's suggestion" },
-] as const;
-
 export const PRESENTATION_OPTIONS = [
   {
     id: "sleeve",
     label: "In a sleeve",
+    shortLabel: "Sleeve",
     hint: "wrapped for carrying",
-    imageSrc: "/photos/boquets/556484266_122105077845020895_3847170219576850714_n.jpg",
+    imageSrc: "/photos/boquets/sleeve-arrangement.png",
   },
   {
     id: "vase",
     label: "In a vase",
+    shortLabel: "Vase",
     hint: "ready to place",
-    imageSrc: "/photos/boquets/702572655_122133553461020895_5304639158855184104_n.jpg",
+    imageSrc: "/photos/boquets/vase-arrangement.png",
   },
   {
     id: "mason-jar",
     label: "In a mason jar",
+    shortLabel: "Mason jar",
     hint: "casual & charming",
-    imageSrc: "/photos/boquets/729276999_122136899331020895_216954514993060721_n.jpg",
+    imageSrc: "/photos/boquets/mason-jar-arrangement.png",
   },
   {
     id: "bucket",
     label: "In a bucket",
+    shortLabel: "Bucket",
     hint: "garden-gather style",
-    imageSrc: "/photos/boquets/552223925_122103898959020895_6852126795117702538_n.jpg",
+    imageSrc: "/photos/boquets/bucket-arrangement.png",
   },
   {
     id: "custom",
     label: "Custom",
+    shortLabel: "Custom",
     hint: "your own idea",
     imageSrc: "/photos/boquets/547207860_122098033839020895_4924931008274506536_n.jpg",
   },
@@ -58,20 +152,17 @@ const QUANTITY_OPTIONS = [
 ] as const;
 
 type ColorId = (typeof COLOR_OPTIONS)[number]["id"];
-type SizeId = (typeof SIZE_OPTIONS)[number]["id"];
 export type PresentationId = (typeof PRESENTATION_OPTIONS)[number]["id"];
 type QuantityId = (typeof QUANTITY_OPTIONS)[number]["id"];
 
 type BouquetPreferences = {
   color: ColorId;
-  size: SizeId;
   presentation: PresentationId;
   quantity: QuantityId;
 };
 
 const DEFAULT_PREFERENCES: BouquetPreferences = {
   color: "soft",
-  size: "medium",
   presentation: "sleeve",
   quantity: "1",
 };
@@ -79,91 +170,46 @@ const DEFAULT_PREFERENCES: BouquetPreferences = {
 const BOUQUET_DEFAULTS: Record<string, BouquetPreferences> = {
   "for-your-event": {
     color: "surprise",
-    size: "medium",
     presentation: "custom",
     quantity: "1",
   },
   "front-porch-classic": {
     color: "bright",
-    size: "medium",
     presentation: "sleeve",
     quantity: "1",
   },
   "garden-posy": {
     color: "soft",
-    size: "petite",
     presentation: "sleeve",
     quantity: "1",
   },
   "porch-swing": {
     color: "soft",
-    size: "medium",
     presentation: "vase",
     quantity: "1",
   },
   "anniversary-bouquet": {
     color: "soft",
-    size: "medium",
     presentation: "vase",
     quantity: "1",
   },
   "late-summer-glow": {
     color: "bright",
-    size: "generous",
     presentation: "vase",
     quantity: "1",
   },
   "meadow-jar": {
     color: "soft",
-    size: "petite",
     presentation: "mason-jar",
     quantity: "1",
   },
 };
 
-function getBouquetPreferences(bouquetId?: string, bouquetPrice?: string): BouquetPreferences {
+function getBouquetPreferences(bouquetId?: string): BouquetPreferences {
   if (bouquetId && BOUQUET_DEFAULTS[bouquetId]) {
     return BOUQUET_DEFAULTS[bouquetId];
   }
-
-  const basePrice = parseBasePrice(bouquetPrice);
-  let size: SizeId = DEFAULT_PREFERENCES.size;
-
-  if (basePrice) {
-    if (basePrice <= 40) size = "petite";
-    else if (basePrice >= 60) size = "generous";
-  }
-
-  return { ...DEFAULT_PREFERENCES, size };
-}
-
-function parseBasePrice(price?: string): number | null {
-  if (!price) return null;
-  const match = price.match(/\$([\d]+)/);
-  return match ? Number.parseInt(match[1], 10) : null;
-}
-
-function formatPrice(amount: number): string {
-  return `$${amount}`;
-}
-
-function getSizePriceMap(basePrice: number | null): Partial<Record<SizeId, number>> {
-  if (!basePrice) return {};
-
-  return {
-    petite: Math.max(basePrice - 15, 25),
-    medium: basePrice,
-    generous: basePrice + 15,
-  };
-}
-
-function getSizeOptions(basePrice: number | null) {
-  const priceMap = getSizePriceMap(basePrice);
-
-  return SIZE_OPTIONS.map((option) => ({
-    ...option,
-    price: priceMap[option.id] ? formatPrice(priceMap[option.id]!) : undefined,
-  }));
+  return DEFAULT_PREFERENCES;
 }
 
 interface BouquetInquiryProps {
@@ -176,23 +222,22 @@ interface BouquetInquiryProps {
 function buildMessage(
   bouquetTitle: string,
   color: ColorId,
-  size: SizeId,
   presentation: PresentationId,
   quantity: QuantityId,
+  pickupDate: PickupDateId,
+  customDateNote: string,
   note: string,
-  bouquetPrice?: string,
-  options?: { finishFirst?: boolean }
+  options?: { finishFirst?: boolean; dayOptions?: DayOption[] }
 ) {
   const colorLabel = COLOR_OPTIONS.find((o) => o.id === color)?.label ?? color;
   const presentationLabel =
     PRESENTATION_OPTIONS.find((o) => o.id === presentation)?.label ?? presentation;
   const quantityLabel = QUANTITY_OPTIONS.find((o) => o.id === quantity)?.label ?? quantity;
-  const sizeOption = getSizeOptions(parseBasePrice(bouquetPrice)).find((o) => o.id === size);
-  const sizeLabel = sizeOption
-    ? sizeOption.price
-      ? `${sizeOption.label} (${sizeOption.price})`
-      : sizeOption.label
-    : size;
+  const pickupLabel = formatPickupLabel(
+    pickupDate,
+    customDateNote,
+    options?.dayOptions ?? getUpcomingDays()
+  );
 
   const intro = options?.finishFirst
     ? `Hi Rhoda! I'd like a bouquet finished ${presentationLabel.toLowerCase()}.`
@@ -203,8 +248,8 @@ function buildMessage(
     "",
     `Quantity: ${quantityLabel}`,
     `Color scheme: ${colorLabel}`,
-    `Size: ${sizeLabel}`,
     `Presentation: ${presentationLabel}`,
+    `Pickup / ready by: ${pickupLabel}`,
   ];
 
   if (note.trim()) {
@@ -213,6 +258,114 @@ function buildMessage(
 
   lines.push("", "Thanks!");
   return lines.join("\n");
+}
+
+function PickupDatePicker({
+  value,
+  onChange,
+  customDateNote,
+  onCustomDateNoteChange,
+  dayOptions,
+}: {
+  value: PickupDateId;
+  onChange: (id: PickupDateId) => void;
+  customDateNote: string;
+  onCustomDateNoteChange: (value: string) => void;
+  dayOptions: DayOption[];
+}) {
+  const isCustom = value === CUSTOM_DATE_ID;
+
+  return (
+    <fieldset>
+      <legend className="text-sm font-medium text-charcoal mb-3">Pickup / ready by</legend>
+      <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+        {dayOptions.map((day) => {
+          const isSelected = value === day.id;
+          const showHoursLeft = day.isToday && day.available && day.hoursLeft != null;
+
+          return (
+            <label
+              key={day.id}
+              className={`rounded-xl border px-1.5 py-2.5 text-center transition-colors ${
+                !day.available
+                  ? "cursor-not-allowed border-sage/10 bg-cream/50 opacity-35"
+                  : day.isToday
+                    ? isSelected
+                      ? "cursor-pointer border-sage bg-sage/10 opacity-70"
+                      : "cursor-pointer border-sage/20 bg-cream opacity-55 hover:opacity-80 hover:border-sage/40"
+                    : isSelected
+                      ? "cursor-pointer border-sage bg-sage/10"
+                      : "cursor-pointer border-sage/20 hover:border-sage/40 bg-cream"
+              }`}
+            >
+              <input
+                type="radio"
+                name="pickup-date"
+                value={day.id}
+                checked={isSelected}
+                disabled={!day.available}
+                onChange={() => {
+                  if (day.available) onChange(day.id);
+                }}
+                className="sr-only"
+              />
+              <span className="block text-[10px] uppercase tracking-wide text-warm-brown/70">
+                {day.weekday}
+              </span>
+              <span className="block text-base font-medium text-charcoal leading-tight mt-0.5">
+                {day.day}
+              </span>
+              <span className="block text-[10px] text-warm-brown/60 mt-0.5">
+                {showHoursLeft ? formatHoursLeft(day.hoursLeft!) : day.month}
+              </span>
+            </label>
+          );
+        })}
+      </div>
+
+      <label
+        className={`mt-2 flex cursor-pointer rounded-xl border px-4 py-3 transition-colors ${
+          isCustom
+            ? "border-sage bg-sage/10"
+            : "border-sage/20 hover:border-sage/40 bg-cream"
+        }`}
+      >
+        <input
+          type="radio"
+          name="pickup-date"
+          value={CUSTOM_DATE_ID}
+          checked={isCustom}
+          onChange={() => onChange(CUSTOM_DATE_ID)}
+          className="sr-only"
+        />
+        <span>
+          <span className="block text-sm font-medium text-charcoal">Custom date</span>
+          <span className="block text-xs text-warm-brown/70 mt-0.5">
+            Outside this week — happy to discuss with Rhoda
+          </span>
+        </span>
+      </label>
+
+      {isCustom && (
+        <div className="mt-3">
+          <label
+            htmlFor="custom-pickup-date"
+            className="block text-sm font-medium text-charcoal mb-2"
+          >
+            Preferred date or timing
+          </label>
+          <textarea
+            id="custom-pickup-date"
+            value={customDateNote}
+            onChange={(event) => onCustomDateNoteChange(event.target.value)}
+            rows={2}
+            placeholder="e.g. Saturday Aug 15 for a wedding, or anytime next month…"
+            className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-sm text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50 resize-none"
+          />
+        </div>
+      )}
+    </fieldset>
+  );
 }
 
 function OptionGroup<T extends string>({
@@ -281,6 +434,60 @@ function OptionGroup<T extends string>({
   );
 }
 
+function PresentationChooser({
+  value,
+  onChange,
+}: {
+  value: PresentationId;
+  onChange: (id: PresentationId) => void;
+}) {
+  return (
+    <fieldset>
+      <legend className="text-sm font-medium text-charcoal mb-3">Arrangement</legend>
+      <div className="grid grid-cols-5 gap-2">
+        {PRESENTATION_OPTIONS.map((option) => {
+          const isSelected = option.id === value;
+          return (
+            <button
+              key={option.id}
+              type="button"
+              onClick={() => onChange(option.id)}
+              className={`group text-center transition-opacity ${
+                isSelected ? "opacity-100" : "opacity-35 hover:opacity-70"
+              }`}
+              aria-label={option.label}
+              aria-pressed={isSelected}
+            >
+              <span
+                className={`relative block w-full aspect-[3/4] overflow-hidden rounded-lg border bg-cream ${
+                  isSelected
+                    ? "border-sage ring-1 ring-sage/40"
+                    : "border-sage/15 group-hover:border-sage/40"
+                }`}
+              >
+                <Image
+                  src={option.imageSrc}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="80px"
+                />
+              </span>
+              <span
+                className={`mt-1.5 block text-[10px] sm:text-xs leading-tight ${
+                  isSelected ? "font-medium text-charcoal" : "text-warm-brown/70"
+                }`}
+              >
+                {option.shortLabel}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
+
 function InquiryModal({
   open,
   onClose,
@@ -288,19 +495,27 @@ function InquiryModal({
   description,
   presentation,
   setPresentation,
-  showPresentation,
   quantity,
   setQuantity,
   color,
   setColor,
-  size,
-  setSize,
+  pickupDate,
+  setPickupDate,
+  customDateNote,
+  setCustomDateNote,
+  dayOptions,
+  customerName,
+  setCustomerName,
+  customerEmail,
+  setCustomerEmail,
+  customerPhone,
+  setCustomerPhone,
   note,
   setNote,
   submitted,
+  submitting,
+  submitError,
   onSubmit,
-  email,
-  bouquetPrice,
 }: {
   open: boolean;
   onClose: () => void;
@@ -308,19 +523,27 @@ function InquiryModal({
   description: string;
   presentation: PresentationId;
   setPresentation?: (id: PresentationId) => void;
-  showPresentation: boolean;
   quantity: QuantityId;
   setQuantity: (id: QuantityId) => void;
   color: ColorId;
   setColor: (id: ColorId) => void;
-  size: SizeId;
-  setSize: (id: SizeId) => void;
+  pickupDate: PickupDateId;
+  setPickupDate: (id: PickupDateId) => void;
+  customDateNote: string;
+  setCustomDateNote: (value: string) => void;
+  dayOptions: DayOption[];
+  customerName: string;
+  setCustomerName: (value: string) => void;
+  customerEmail: string;
+  setCustomerEmail: (value: string) => void;
+  customerPhone: string;
+  setCustomerPhone: (value: string) => void;
   note: string;
   setNote: (value: string) => void;
   submitted: boolean;
+  submitting: boolean;
+  submitError: string | null;
   onSubmit: (event: React.FormEvent) => void;
-  email: string;
-  bouquetPrice?: string;
 }) {
   useEffect(() => {
     if (!open) return;
@@ -338,9 +561,6 @@ function InquiryModal({
   }, [open, onClose]);
 
   if (!open) return null;
-
-  const presentationLabel =
-    PRESENTATION_OPTIONS.find((o) => o.id === presentation)?.label ?? presentation;
 
   return (
     <div
@@ -368,10 +588,10 @@ function InquiryModal({
         <div className="p-6 sm:p-8">
           {submitted ? (
             <div className="text-center py-4">
-              <p className="font-display text-2xl text-charcoal mb-3">Check your email</p>
+              <p className="font-display text-2xl text-charcoal mb-3">Request sent</p>
               <p className="text-warm-brown/80 text-sm leading-relaxed mb-6">
-                Your bouquet request should open in your email app. Send the message to Rhoda at{" "}
-                <span className="font-medium text-charcoal">{email}</span> to finish.
+                Thanks! Your bouquet request is on its way to Rhoda. She&apos;ll follow up by email
+                soon.
               </p>
               <button
                 type="button"
@@ -390,18 +610,27 @@ function InquiryModal({
               >
                 {title}
               </h2>
-              {!showPresentation && (
-                <p className="text-terracotta text-sm font-medium mb-2">{presentationLabel}</p>
-              )}
               <p className="text-warm-brown/80 text-sm mb-6">{description}</p>
 
               <form onSubmit={onSubmit} className="space-y-6">
+                {setPresentation && (
+                  <PresentationChooser value={presentation} onChange={setPresentation} />
+                )}
+
                 <OptionGroup
                   legend="How many bouquets?"
                   name="quantity"
                   options={QUANTITY_OPTIONS}
                   value={quantity}
                   onChange={setQuantity}
+                />
+
+                <PickupDatePicker
+                  value={pickupDate}
+                  onChange={setPickupDate}
+                  customDateNote={customDateNote}
+                  onCustomDateNoteChange={setCustomDateNote}
+                  dayOptions={dayOptions}
                 />
 
                 <OptionGroup
@@ -412,24 +641,52 @@ function InquiryModal({
                   onChange={setColor}
                 />
 
-                <OptionGroup
-                  legend="Size"
-                  name="size"
-                  options={getSizeOptions(parseBasePrice(bouquetPrice))}
-                  value={size}
-                  onChange={setSize}
-                />
-
-                {showPresentation && setPresentation && (
-                  <OptionGroup
-                    legend="How should it be finished?"
-                    name="presentation"
-                    options={PRESENTATION_OPTIONS}
-                    value={presentation}
-                    onChange={setPresentation}
-                    withImages
-                  />
-                )}
+                <div className="space-y-3">
+                  <p className="text-sm font-medium text-charcoal">Your contact details</p>
+                  <div>
+                    <label htmlFor="customer-name" className="sr-only">
+                      Name
+                    </label>
+                    <input
+                      id="customer-name"
+                      type="text"
+                      value={customerName}
+                      onChange={(event) => setCustomerName(event.target.value)}
+                      placeholder="Name (optional)"
+                      autoComplete="name"
+                      className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-sm text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="customer-email" className="sr-only">
+                      Email
+                    </label>
+                    <input
+                      id="customer-email"
+                      type="email"
+                      required
+                      value={customerEmail}
+                      onChange={(event) => setCustomerEmail(event.target.value)}
+                      placeholder="Email"
+                      autoComplete="email"
+                      className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-sm text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="customer-phone" className="sr-only">
+                      Phone
+                    </label>
+                    <input
+                      id="customer-phone"
+                      type="tel"
+                      value={customerPhone}
+                      onChange={(event) => setCustomerPhone(event.target.value)}
+                      placeholder="Phone (optional)"
+                      autoComplete="tel"
+                      className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-sm text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
+                    />
+                  </div>
+                </div>
 
                 <div>
                   <label
@@ -444,16 +701,23 @@ function InquiryModal({
                     value={note}
                     onChange={(event) => setNote(event.target.value)}
                     rows={3}
-                    placeholder="Pickup date, occasion, Soft or Bright preference, anything to avoid..."
+                    placeholder="Occasion, Soft or Bright preference, anything to avoid..."
                     className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-sm text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50 resize-none"
                   />
                 </div>
 
+                {submitError && (
+                  <p className="text-sm text-terracotta" role="alert">
+                    {submitError}
+                  </p>
+                )}
+
                 <button
                   type="submit"
-                  className="w-full px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors"
+                  disabled={submitting}
+                  className="w-full px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors disabled:opacity-60"
                 >
-                  Send bouquet request
+                  {submitting ? "Sending…" : "Send bouquet request"}
                 </button>
               </form>
             </>
@@ -467,28 +731,38 @@ function InquiryModal({
 export function BouquetInquiry({
   bouquetId,
   bouquetTitle,
-  bouquetPrice,
-  contactEmail,
 }: BouquetInquiryProps) {
-  const defaults = getBouquetPreferences(bouquetId, bouquetPrice);
+  const defaults = getBouquetPreferences(bouquetId);
   const [open, setOpen] = useState(false);
   const [color, setColor] = useState<ColorId>(defaults.color);
-  const [size, setSize] = useState<SizeId>(defaults.size);
   const [presentation, setPresentation] = useState<PresentationId>(defaults.presentation);
   const [quantity, setQuantity] = useState<QuantityId>(defaults.quantity);
+  const [pickupDate, setPickupDate] = useState<PickupDateId>("");
+  const [customDateNote, setCustomDateNote] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
   const [note, setNote] = useState("");
   const [submitted, setSubmitted] = useState(false);
-
-  const email = getContactEmail(contactEmail);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const dayOptions = useMemo(() => getUpcomingDays(), [open]);
 
   function applyDefaults() {
-    const preferences = getBouquetPreferences(bouquetId, bouquetPrice);
+    const preferences = getBouquetPreferences(bouquetId);
+    const days = getUpcomingDays();
     setColor(preferences.color);
-    setSize(preferences.size);
     setPresentation(preferences.presentation);
     setQuantity(preferences.quantity);
+    setPickupDate(getDefaultPickupDate(days));
+    setCustomDateNote("");
+    setCustomerName("");
+    setCustomerEmail("");
+    setCustomerPhone("");
     setNote("");
     setSubmitted(false);
+    setSubmitting(false);
+    setSubmitError(null);
   }
 
   function handleOpen() {
@@ -501,20 +775,48 @@ export function BouquetInquiry({
     applyDefaults();
   }
 
-  function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+    setSubmitError(null);
+    setSubmitting(true);
+
     const message = buildMessage(
       bouquetTitle,
       color,
-      size,
       presentation,
       quantity,
+      pickupDate,
+      customDateNote,
       note,
-      bouquetPrice
+      { dayOptions }
     );
     const subject = `Bouquet request: ${bouquetTitle}`;
-    window.location.href = buildMailtoUrl(email, subject, message);
-    setSubmitted(true);
+
+    try {
+      const response = await fetch("/api/bouquet-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject,
+          message,
+          customerName,
+          customerEmail,
+          customerPhone,
+        }),
+      });
+      const data = (await response.json().catch(() => ({}))) as { error?: string };
+
+      if (!response.ok) {
+        setSubmitError(data.error || "Could not send the request. Please try again.");
+        return;
+      }
+
+      setSubmitted(true);
+    } catch {
+      setSubmitError("Could not send the request. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -532,45 +834,67 @@ export function BouquetInquiry({
         open={open}
         onClose={handleClose}
         title={`Something like ${bouquetTitle}`}
-        description="Pick a few preferences and we'll open your email with the request ready to send to Rhoda."
+        description="Pick a few preferences and send your request straight to Rhoda."
         presentation={presentation}
         setPresentation={setPresentation}
-        showPresentation
         quantity={quantity}
         setQuantity={setQuantity}
         color={color}
         setColor={setColor}
-        size={size}
-        setSize={setSize}
+        pickupDate={pickupDate}
+        setPickupDate={setPickupDate}
+        customDateNote={customDateNote}
+        setCustomDateNote={setCustomDateNote}
+        dayOptions={dayOptions}
+        customerName={customerName}
+        setCustomerName={setCustomerName}
+        customerEmail={customerEmail}
+        setCustomerEmail={setCustomerEmail}
+        customerPhone={customerPhone}
+        setCustomerPhone={setCustomerPhone}
         note={note}
         setNote={setNote}
         submitted={submitted}
+        submitting={submitting}
+        submitError={submitError}
         onSubmit={handleSubmit}
-        email={email}
-        bouquetPrice={bouquetPrice}
       />
     </>
   );
 }
 
-/** Home-page finish cards: sleeve, vase, mason jar, bucket, custom → color + size. */
+/** Home-page finish cards: sleeve, vase, mason jar, bucket, custom. */
 export function FinishRequestPicker({ contactEmail }: { contactEmail?: string }) {
-  const email = getContactEmail(contactEmail);
+  void contactEmail;
   const [open, setOpen] = useState(false);
   const [presentation, setPresentation] = useState<PresentationId>("sleeve");
   const [color, setColor] = useState<ColorId>(DEFAULT_PREFERENCES.color);
-  const [size, setSize] = useState<SizeId>(DEFAULT_PREFERENCES.size);
   const [quantity, setQuantity] = useState<QuantityId>(DEFAULT_PREFERENCES.quantity);
+  const [pickupDate, setPickupDate] = useState<PickupDateId>("");
+  const [customDateNote, setCustomDateNote] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
   const [note, setNote] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const dayOptions = useMemo(() => getUpcomingDays(), [open]);
 
   function resetForm(nextPresentation: PresentationId = presentation) {
+    const days = getUpcomingDays();
     setPresentation(nextPresentation);
     setColor(DEFAULT_PREFERENCES.color);
-    setSize(DEFAULT_PREFERENCES.size);
     setQuantity(DEFAULT_PREFERENCES.quantity);
+    setPickupDate(getDefaultPickupDate(days));
+    setCustomDateNote("");
+    setCustomerName("");
+    setCustomerEmail("");
+    setCustomerPhone("");
     setNote("");
     setSubmitted(false);
+    setSubmitting(false);
+    setSubmitError(null);
   }
 
   function handlePick(id: PresentationId) {
@@ -583,39 +907,62 @@ export function FinishRequestPicker({ contactEmail }: { contactEmail?: string })
     resetForm();
   }
 
-  function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+    setSubmitError(null);
+    setSubmitting(true);
+
     const presentationLabel =
       PRESENTATION_OPTIONS.find((o) => o.id === presentation)?.label ?? presentation;
     const message = buildMessage(
       presentationLabel,
       color,
-      size,
       presentation,
       quantity,
+      pickupDate,
+      customDateNote,
       note,
-      undefined,
-      { finishFirst: true }
+      { finishFirst: true, dayOptions }
     );
     const subject = `Bouquet request: ${presentationLabel}`;
-    window.location.href = buildMailtoUrl(email, subject, message);
-    setSubmitted(true);
+
+    try {
+      const response = await fetch("/api/bouquet-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject,
+          message,
+          customerName,
+          customerEmail,
+          customerPhone,
+        }),
+      });
+      const data = (await response.json().catch(() => ({}))) as { error?: string };
+
+      if (!response.ok) {
+        setSubmitError(data.error || "Could not send the request. Please try again.");
+        return;
+      }
+
+      setSubmitted(true);
+    } catch {
+      setSubmitError("Could not send the request. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   const presentationLabel =
     PRESENTATION_OPTIONS.find((o) => o.id === presentation)?.label ?? "Bouquet";
 
   return (
-    <div className="mt-12 md:mt-16">
+    <div>
       <div className="mb-8">
-        <p className="text-sage text-sm uppercase tracking-[0.2em] mb-2">Choose a finish</p>
+        <p className="text-sage text-sm uppercase tracking-[0.2em] mb-2">Request a bouquet</p>
         <h3 className="font-display text-2xl md:text-3xl text-charcoal mb-2">
-          How would you like your bouquet?
+          Choose an arrangement option.
         </h3>
-        <p className="text-warm-brown/80 text-sm md:text-base max-w-2xl">
-          Pick a finish, then choose colour and size. We&apos;ll open an email to Rhoda with your
-          request ready to send.
-        </p>
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
@@ -624,9 +971,9 @@ export function FinishRequestPicker({ contactEmail }: { contactEmail?: string })
             key={option.id}
             type="button"
             onClick={() => handlePick(option.id)}
-            className="group text-left rounded-2xl border border-sage/15 bg-cream overflow-hidden hover:border-sage/40 transition-colors"
+            className="group text-left rounded-2xl border border-sage/15 bg-white overflow-hidden hover:border-sage/40 transition-colors"
           >
-            <span className="relative block aspect-[4/3] bg-cream-dark">
+            <span className="relative block aspect-[3/4] overflow-hidden rounded-b-2xl bg-cream-dark">
               <Image
                 src={option.imageSrc}
                 alt={option.label}
@@ -647,20 +994,30 @@ export function FinishRequestPicker({ contactEmail }: { contactEmail?: string })
         open={open}
         onClose={handleClose}
         title={presentationLabel}
-        description="Choose colour and size — then send your request to Rhoda."
+        description="Choose colour and timing — then send your request to Rhoda."
         presentation={presentation}
-        showPresentation={false}
+        setPresentation={setPresentation}
         quantity={quantity}
         setQuantity={setQuantity}
         color={color}
         setColor={setColor}
-        size={size}
-        setSize={setSize}
+        pickupDate={pickupDate}
+        setPickupDate={setPickupDate}
+        customDateNote={customDateNote}
+        setCustomDateNote={setCustomDateNote}
+        dayOptions={dayOptions}
+        customerName={customerName}
+        setCustomerName={setCustomerName}
+        customerEmail={customerEmail}
+        setCustomerEmail={setCustomerEmail}
+        customerPhone={customerPhone}
+        setCustomerPhone={setCustomerPhone}
         note={note}
         setNote={setNote}
         submitted={submitted}
+        submitting={submitting}
+        submitError={submitError}
         onSubmit={handleSubmit}
-        email={email}
       />
     </div>
   );

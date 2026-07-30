@@ -82,9 +82,6 @@ export function BouquetGrid({ bouquets, showAll = false, contactEmail }: Bouquet
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
           <div>
-            <p className="text-sage text-sm uppercase tracking-[0.2em] mb-3">
-              Seasonal offerings
-            </p>
             <h2 className="font-display text-4xl md:text-5xl text-charcoal">
               Bouquets for laid-back occasions
             </h2>

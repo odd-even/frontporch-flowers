@@ -1,5 +1,5 @@
 import { Hero } from "@/components/Hero";
-import { BouquetGrid } from "@/components/BouquetCard";
+import { FinishRequestPicker } from "@/components/BouquetInquiry";
 import { WorkshopsSection } from "@/components/WorkshopCard";
 import { AboutTeaser, PickYourOwnTeaser } from "@/components/AboutTeaser";
 import { PaymentOptions } from "@/components/PaymentOptions";
@@ -7,7 +7,6 @@ import { FacebookFeed } from "@/components/FacebookFeed";
 import { getContactEmail } from "@/lib/email";
 import { getFacebookPageUrl } from "@/lib/facebook";
 import {
-  getBouquets,
   getPickYourOwnEvents,
   getSiteSettings,
   getWorkshops,
@@ -17,9 +16,8 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [settings, bouquets, workshops, events] = await Promise.all([
+  const [settings, workshops, events] = await Promise.all([
     getSiteSettings(),
-    getBouquets(),
     getWorkshops(),
     getPickYourOwnEvents(),
   ]);
@@ -33,7 +31,11 @@ export default async function HomePage() {
   return (
     <>
       <Hero tagline={settings.tagline} />
-      <BouquetGrid bouquets={bouquets} contactEmail={getContactEmail(settings.email)} />
+      <section id="bouquets" className="py-20 md:py-28">
+        <div className="max-w-6xl mx-auto px-6">
+          <FinishRequestPicker contactEmail={getContactEmail(settings.email)} />
+        </div>
+      </section>
       <PaymentOptions etransferEmail={etransferEmail} phone={phone} />
       <AboutTeaser aboutText={settings.aboutText} />
       <PickYourOwnTeaser

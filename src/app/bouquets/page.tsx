@@ -21,7 +21,6 @@ export default async function BouquetsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Seasonal offerings"
         title="Bouquets"
         description="Each bouquet is a one-of-a-kind gathering of backyard blooms — loose, whimsical, and woven with local grasses and whatever wild things are calling that day. Perfect for laid-back celebrations, kitchen tables, and gifting."
       />

@@ -20,22 +20,15 @@ export function AboutTeaser({ aboutText }: { aboutText?: string }) {
           </div>
 
           <div>
-            <p className="text-sage text-sm uppercase tracking-[0.2em] mb-3">
+            <p className="text-sage text-sm uppercase tracking-[0.2em] mb-4">
               Meet Rhoda
             </p>
-            <h2 className="font-display text-4xl md:text-5xl text-charcoal mb-6 leading-tight">
-              Grown in the backyard,
-              <br />
-              <span className="font-accent text-5xl md:text-6xl text-terracotta">arranged with whimsy</span>
+            <h2 className="font-accent text-4xl md:text-5xl text-terracotta leading-snug mb-6">
+              I grow flowers in my backyard and make seasonal bouquets for local pickup.
             </h2>
-            <p className="text-warm-brown/80 leading-relaxed mb-6">
-              {aboutText ||
-                "Hi, I'm Rhoda. I grow flowers in my backyard and make seasonal bouquets for local pickup. Each one is cut from what's blooming that week."}
-            </p>
             <p className="text-warm-brown/80 leading-relaxed">
-              I also host pick-your-own days and a few seasonal workshops when the garden
-              has enough to share — wreath making, bouquet arranging, and similar days in
-              the yard.
+              {aboutText ||
+                "Each bouquet is cut from what's blooming that week. I also host pick-your-own days and seasonal workshops when the garden has enough to share."}
             </p>
           </div>
         </div>

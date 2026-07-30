@@ -105,9 +105,9 @@ export const fallbackBouquets: Bouquet[] = [
 ];
 
 export const fallbackSettings: SiteSettings = {
-  tagline: "Wild & whimsical bouquets, grown with love in the backyard.",
+  tagline: "",
   aboutText:
-    "Hi, I'm Rhoda. I grow flowers in my backyard and make seasonal bouquets for local pickup. Each one is cut from what's blooming that week — garden flowers, grasses, and whatever else is ready to cut.",
+    "Each bouquet is cut from what's blooming that week. I also host pick-your-own days and seasonal workshops when the garden has enough to share.",
   instagramHandle: "front_porchflowers",
   facebookPageUrl: "https://www.facebook.com/people/Front-Porch-Flowers/61580626863252/",
   email: "hello@frontporchflowers.ca",
