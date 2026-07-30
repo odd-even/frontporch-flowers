@@ -10,6 +10,12 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "platform-lookaside.fbsbx.com" },
     ],
   },
+  async redirects() {
+    return [
+      { source: "/workshops", destination: "/events", permanent: true },
+      { source: "/pick-your-own", destination: "/events", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

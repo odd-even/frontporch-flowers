@@ -87,7 +87,7 @@ export function PickYourOwnTeaser({
         <div>
           {nextEvent ? (
             <Link
-              href="/pick-your-own"
+              href="/events#pick-your-own"
               className="inline-flex items-center gap-2 px-8 py-3.5 bg-sage text-cream rounded-full font-medium hover:bg-sage-dark transition-colors"
             >
               See all dates

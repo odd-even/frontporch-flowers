@@ -37,13 +37,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/workshops" className="hover:text-cream transition-colors">
-                  Workshops
-                </Link>
-              </li>
-              <li>
-                <Link href="/pick-your-own" className="hover:text-cream transition-colors">
-                  Pick Your Own
+                <Link href="/events" className="hover:text-cream transition-colors">
+                  Events
                 </Link>
               </li>
             </ul>

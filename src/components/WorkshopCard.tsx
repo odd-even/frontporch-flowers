@@ -102,10 +102,10 @@ export function WorkshopsSection({
           </div>
           {!showAll && display.length > 0 && (
             <Link
-              href="/workshops"
+              href="/events"
               className="text-terracotta font-medium hover:text-terracotta-dark transition-colors flex items-center gap-2"
             >
-              All workshops
+              All events
               <span aria-hidden="true">&rarr;</span>
             </Link>
           )}

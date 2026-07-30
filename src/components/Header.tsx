@@ -6,8 +6,7 @@ import { useState } from "react";
 
 const navLinks = [
   { href: "/gallery", label: "Gallery" },
-  { href: "/workshops", label: "Workshops" },
-  { href: "/pick-your-own", label: "Pick Your Own" },
+  { href: "/events", label: "Events" },
 ];
 
 export function Header() {
