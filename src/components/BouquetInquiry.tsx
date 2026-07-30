@@ -650,9 +650,10 @@ function InquiryModal({
                     <input
                       id="customer-name"
                       type="text"
+                      required
                       value={customerName}
                       onChange={(event) => setCustomerName(event.target.value)}
-                      placeholder="Name (optional)"
+                      placeholder="Name"
                       autoComplete="name"
                       className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-sm text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
                     />
@@ -701,7 +702,7 @@ function InquiryModal({
                     value={note}
                     onChange={(event) => setNote(event.target.value)}
                     rows={3}
-                    placeholder="Occasion, Soft or Bright preference, anything to avoid..."
+                    placeholder="Occasion, anything to avoid, delivery notes..."
                     className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-sm text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50 resize-none"
                   />
                 </div>

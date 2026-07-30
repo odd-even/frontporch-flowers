@@ -47,12 +47,6 @@ export function Hero({ tagline }: HeroProps) {
             >
               Order a bouquet
             </Link>
-            <Link
-              href="/events"
-              className="px-8 py-3.5 border border-cream/40 text-cream rounded-full font-medium hover:bg-cream/10 transition-colors"
-            >
-              Upcoming Events
-            </Link>
           </div>
         </div>
       </div>

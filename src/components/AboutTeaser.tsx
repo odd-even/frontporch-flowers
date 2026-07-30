@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getAboutPhoto } from "@/lib/photos.server";
+import { getAboutPhoto, getAllPhotos, getPickYourOwnPhoto, getWorkshopPhotos } from "@/lib/photos.server";
 
 export function AboutTeaser({ aboutText }: { aboutText?: string }) {
   const photo = getAboutPhoto();
@@ -23,8 +23,12 @@ export function AboutTeaser({ aboutText }: { aboutText?: string }) {
             <p className="text-sage text-sm uppercase tracking-[0.2em] mb-4">
               Meet Rhoda
             </p>
-            <h2 className="font-accent text-4xl md:text-5xl text-terracotta leading-snug mb-6">
-              I grow flowers in my backyard and make seasonal bouquets for local pickup.
+            <h2 className="font-accent text-4xl md:text-5xl text-terracotta leading-[1.15] mb-6 text-balance">
+              I grow flowers in my backyard
+              <br />
+              and make seasonal bouquets
+              <br />
+              for local pickup.
             </h2>
             <p className="text-warm-brown/80 leading-relaxed">
               {aboutText ||
@@ -37,73 +41,83 @@ export function AboutTeaser({ aboutText }: { aboutText?: string }) {
   );
 }
 
-export function PickYourOwnTeaser({
-  nextEvent,
-  facebookUrl,
-}: {
-  nextEvent?: { title: string; date: string; startTime: string; endTime: string };
-  facebookUrl?: string;
-}) {
-  const facebookHref = facebookUrl || "https://www.facebook.com/people/Front-Porch-Flowers/61580626863252/";
+export function EventsTeaser() {
+  const pyoPhoto =
+    getAllPhotos().find(
+      (photo) => photo.src === "/photos/615466887_122118881559020895_1273262402101944493_n.jpg"
+    ) ||
+    getPickYourOwnPhoto();
+
+  const workshopPhoto =
+    getAllPhotos().find(
+      (photo) =>
+        photo.src ===
+        "/photos/wreath workshop/590752628_122113192107020895_7718133177270323166_n.jpg"
+    ) ||
+    getWorkshopPhotos()[0] ||
+    pyoPhoto;
+
+  const cards = [
+    {
+      href: "/events#pick-your-own",
+      title: "Pick Your Own",
+      hint: "Announcements coming soon",
+      image: pyoPhoto,
+    },
+    {
+      href: "/events#workshops",
+      title: "Workshops",
+      hint: "Announcements coming soon",
+      image: workshopPhoto,
+    },
+  ] as const;
 
   return (
     <section className="py-20 md:py-28 bg-sage/10">
-      <div className="max-w-6xl mx-auto px-6 text-center">
-        <p className="text-sage-dark text-sm uppercase tracking-[0.2em] mb-3">
-          In the garden
-        </p>
-        <h2 className="font-display text-4xl md:text-5xl text-charcoal mb-4">
-          Pick your own flowers
-        </h2>
-        <p className="text-warm-brown/80 max-w-xl mx-auto mb-8">
-          On select dates, wander the rows and fill a bucket with whatever speaks to you.
-        </p>
-
-        {nextEvent ? (
-          <div className="inline-block bg-cream rounded-2xl px-8 py-6 mb-8 border border-sage/15">
-            <p className="text-sm text-sage-dark uppercase tracking-wider mb-1">Next date</p>
-            <p className="font-display text-2xl text-charcoal">{nextEvent.title}</p>
-            <p className="text-warm-brown/70 text-sm mt-1">
-              {new Date(nextEvent.date + "T12:00:00").toLocaleDateString("en-US", {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-              })}{" "}
-              &middot; {nextEvent.startTime} – {nextEvent.endTime}
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+          <div>
+            <p className="text-sage-dark text-sm uppercase tracking-[0.2em] mb-3">
+              In the garden
+            </p>
+            <h2 className="font-display text-4xl md:text-5xl text-charcoal">Events</h2>
+            <p className="text-warm-brown/80 max-w-xl mt-3">
+              Pick-your-own days and seasonal workshops — dates are announced on social.
             </p>
           </div>
-        ) : (
-          <div className="inline-block bg-cream rounded-2xl px-8 py-6 mb-8 border border-sage/15">
-            <p className="text-sm text-sage-dark uppercase tracking-wider mb-1">
-              Dates coming soon
-            </p>
-            <p className="font-display text-2xl text-charcoal">No date announced yet</p>
-            <p className="text-warm-brown/70 text-sm mt-1">
-              Pick-your-own days are posted on Facebook when they&apos;re scheduled.
-            </p>
-          </div>
-        )}
+          <Link
+            href="/events"
+            className="text-terracotta font-medium hover:text-terracotta-dark transition-colors inline-flex items-center gap-2 shrink-0"
+          >
+            All events
+            <span aria-hidden="true">&rarr;</span>
+          </Link>
+        </div>
 
-        <div>
-          {nextEvent ? (
+        <div className="grid sm:grid-cols-2 gap-4 md:gap-6">
+          {cards.map((card) => (
             <Link
-              href="/events#pick-your-own"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-sage text-cream rounded-full font-medium hover:bg-sage-dark transition-colors"
+              key={card.href}
+              href={card.href}
+              className="group text-left rounded-2xl border border-sage/15 bg-cream overflow-hidden hover:border-sage/40 transition-colors"
             >
-              See all dates
-              <span aria-hidden="true">&rarr;</span>
+              <span className="relative block aspect-[4/3] overflow-hidden bg-cream-dark">
+                <Image
+                  src={card.image.src}
+                  alt={card.image.alt}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                />
+              </span>
+              <span className="block px-5 py-4">
+                <span className="block font-display text-2xl text-charcoal mb-1">
+                  {card.title}
+                </span>
+                <span className="block text-sm text-warm-brown/70">{card.hint}</span>
+              </span>
             </Link>
-          ) : (
-            <a
-              href={facebookHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-sage text-cream rounded-full font-medium hover:bg-sage-dark transition-colors"
-            >
-              Check Facebook for dates
-              <span aria-hidden="true">&rarr;</span>
-            </a>
-          )}
+          ))}
         </div>
       </div>
     </section>

@@ -56,9 +56,9 @@ export async function POST(request: Request) {
     const customerEmail = body.customerEmail?.trim() ?? "";
     const customerPhone = body.customerPhone?.trim() ?? "";
 
-    if (!subject || !message || !customerEmail) {
+    if (!subject || !message || !customerName || !customerEmail) {
       return NextResponse.json(
-        { error: "Name is optional, but email and request details are required." },
+        { error: "Name, email, and request details are required." },
         { status: 400 }
       );
     }
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
     }
 
     const contactLines = [
-      customerName ? `Customer name: ${customerName}` : null,
+      `Customer name: ${customerName}`,
       `Customer email: ${customerEmail}`,
       customerPhone ? `Customer phone: ${customerPhone}` : null,
     ].filter(Boolean);
