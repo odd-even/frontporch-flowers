@@ -63,12 +63,12 @@ export function Header() {
       </div>
 
       {open && (
-        <nav className="md:hidden border-t border-sage/20 bg-cream px-6 py-4 flex flex-col gap-4">
+        <nav className="md:hidden fixed inset-0 top-[73px] bg-cream z-40 px-6 py-8 flex flex-col gap-6 overflow-y-auto">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-warm-brown hover:text-terracotta transition-colors py-2"
+              className="text-2xl font-medium text-warm-brown hover:text-terracotta transition-colors py-3"
               onClick={() => setOpen(false)}
             >
               {link.label}
@@ -78,9 +78,10 @@ export function Header() {
             href="https://www.instagram.com/front_porchflowers"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sage-dark font-medium"
+            className="mt-4 text-center text-sm font-medium px-6 py-3 bg-sage text-cream rounded-full hover:bg-sage-dark transition-colors"
+            onClick={() => setOpen(false)}
           >
-            @front_porchflowers
+            Follow Along
           </a>
         </nav>
       )}
