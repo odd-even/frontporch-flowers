@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AcceptedPaymentLogos, InteracLogo } from "@/components/PaymentLogos";
 
 const PAY_HASH = "pay";
 
@@ -174,6 +175,9 @@ export function PaymentOptions({
                   <p className="text-xs uppercase tracking-widest text-sage-dark mb-2">
                     Interac e-Transfer
                   </p>
+                  <div className="mb-3">
+                    <InteracLogo />
+                  </div>
                   <div className="flex flex-wrap items-center gap-3">
                     <a
                       href={`mailto:${etransferEmail}`}
@@ -204,15 +208,10 @@ export function PaymentOptions({
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-widest text-sage-dark mb-2">
+                  <p className="text-xs uppercase tracking-widest text-sage-dark mb-3">
                     Accepted
                   </p>
-                  <ul className="space-y-1.5 text-charcoal">
-                    <li>Visa</li>
-                    <li>Mastercard</li>
-                    <li>Interac e-Transfer</li>
-                    <li>Cash</li>
-                  </ul>
+                  <AcceptedPaymentLogos />
                 </div>
               </div>
 
