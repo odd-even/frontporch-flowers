@@ -1,33 +1,64 @@
-import { WorkshopsSection } from "@/components/WorkshopCard";
 import { PageHeader } from "@/components/AboutTeaser";
 import { PhotoGallery } from "@/components/PhotoGallery";
-import { getWorkshops, getSiteSettings } from "@/lib/queries";
+import { getSiteSettings } from "@/lib/queries";
 import { getWorkshopPhotos } from "@/lib/photos.server";
 import { getFacebookPageUrl } from "@/lib/facebook";
 
 export const metadata = {
   title: "Workshops | Front Porch Flowers",
   description:
-    "Seasonal workshops — wreath making, wild bouquet arranging, and more. Gather with friends in the garden.",
+    "Seasonal workshops in the garden — check Facebook and Instagram for announcements, dates, and how to reserve a spot.",
 };
 
 export default async function WorkshopsPage() {
-  const [workshops, settings] = await Promise.all([getWorkshops(), getSiteSettings()]);
+  const settings = await getSiteSettings();
   const workshopPhotos = getWorkshopPhotos();
   const facebookUrl = getFacebookPageUrl(settings.facebookPageUrl);
+  const instagramHandle = settings.instagramHandle || "front_porchflowers";
+  const instagramUrl = `https://www.instagram.com/${instagramHandle}`;
 
   return (
     <>
       <PageHeader
         eyebrow="Gather & create"
         title="Workshops"
-        description="Occasional hands-on workshops in the garden — wreath making, bouquet arranging, and similar days when the garden has enough to share. All materials included. Just bring your creativity and a willingness to get your hands a little dirty."
+        description="Occasional hands-on workshops in the garden — wreath making, bouquet arranging, and similar days when the garden has enough to share. All materials included."
       />
-      <WorkshopsSection
-        workshops={workshops}
-        showAll
-        facebookUrl={facebookUrl}
-      />
+
+      <section className="pb-20 md:pb-28">
+        <div className="max-w-2xl mx-auto px-6 text-center">
+          <div className="bg-cream rounded-2xl px-8 py-10 border border-sage/15">
+            <p className="text-sm text-sage-dark uppercase tracking-wider mb-2">Stay tuned</p>
+            <h2 className="font-display text-2xl md:text-3xl text-charcoal mb-3">
+              Check for announcements on social
+            </h2>
+            <p className="text-warm-brown/70 text-sm mb-6 leading-relaxed">
+              Workshop dates are shared on Facebook and Instagram when they&apos;re ready —
+              including details and how to reserve a spot.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a
+                href={facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-8 py-3.5 bg-sage text-cream rounded-full font-medium hover:bg-sage-dark transition-colors"
+              >
+                Facebook
+                <span aria-hidden="true">&rarr;</span>
+              </a>
+              <a
+                href={instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-8 py-3.5 border border-sage/30 text-sage-dark rounded-full font-medium hover:border-sage hover:bg-sage/5 transition-colors"
+              >
+                Instagram
+                <span aria-hidden="true">&rarr;</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {workshopPhotos.length > 0 && (
         <section className="py-16 md:py-24 bg-cream-dark/30">
@@ -43,27 +74,6 @@ export default async function WorkshopsPage() {
           </div>
         </section>
       )}
-
-      <section className="py-16">
-        <div className="max-w-2xl mx-auto px-6 text-center">
-          <h2 className="font-display text-2xl text-charcoal mb-4">
-            How to sign up
-          </h2>
-          <p className="text-warm-brown/80 mb-6">
-            Check for announcements on social — workshop dates are shared on Facebook and
-            Instagram when they&apos;re ready. Message Rhoda there to reserve a spot.
-          </p>
-          <a
-            href={facebookUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-sage text-cream rounded-full font-medium hover:bg-sage-dark transition-colors"
-          >
-            See Facebook page
-            <span aria-hidden="true">&rarr;</span>
-          </a>
-        </div>
-      </section>
     </>
   );
 }
