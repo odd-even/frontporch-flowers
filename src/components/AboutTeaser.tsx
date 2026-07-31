@@ -64,7 +64,7 @@ export function EventsTeaser() {
   ] as const;
 
   return (
-    <section className="py-20 md:py-28 bg-sage/10">
+    <section id="events" className="scroll-mt-24 py-20 md:py-28 bg-sage/10">
       <div className="max-w-6xl mx-auto px-6">
         <div className="mb-10">
           <p className="text-sage-dark text-sm uppercase tracking-[0.2em] mb-3">

@@ -13,7 +13,7 @@ import {
 } from "@/lib/seo";
 
 const laborUnion = localFont({
-  src: "../fonts/LaborUnion-Regular.woff",
+  src: "../fonts/LaborUnion-Small.otf",
   variable: "--font-labor-union",
   display: "swap",
 });
