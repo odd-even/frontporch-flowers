@@ -3,9 +3,9 @@ import { PageHeader } from "@/components/AboutTeaser";
 import { getAllPhotos } from "@/lib/photos.server";
 
 export const metadata = {
-  title: "Gallery | Front Porch Flowers",
+  title: "Gallery",
   description:
-    "Photos from Rhoda's backyard — wild bouquets, garden blooms, wreath workshops, and pick-your-own days.",
+    "Photos of locally grown cut flowers, bouquets, and garden days from Front Porch Flowers in Woodstock, New Brunswick.",
 };
 
 export default function GalleryPage() {

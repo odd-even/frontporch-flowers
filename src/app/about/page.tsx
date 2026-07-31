@@ -1,13 +1,14 @@
 import Image from "next/image";
 import { PageHeader } from "@/components/AboutTeaser";
+import { FacebookIcon } from "@/components/SocialIcons";
 import { getSiteSettings } from "@/lib/queries";
 import { getAboutPhoto } from "@/lib/photos.server";
 import { getFacebookPageUrl } from "@/lib/facebook";
 
 export const metadata = {
-  title: "About | Front Porch Flowers",
+  title: "About",
   description:
-    "Meet Rhoda — she grows wild and whimsical flowers in her backyard and crafts bouquets for laid-back occasions.",
+    "Meet Rhoda of Front Porch Flowers in Woodstock, NB — she grows cut flowers in her backyard and crafts seasonal bouquets for local pickup.",
 };
 
 export default async function AboutPage() {
@@ -45,11 +46,11 @@ export default async function AboutPage() {
 
               <p>
                 Front Porch Flowers started the way the best things do — organically. Rhoda
-                began growing flowers in her backyard because she loved having fresh blooms
-                on the table. Friends started asking for bouquets. Then came the workshops,
-                the pick-your-own days, and a little community of people who appreciate
-                flowers that look like they were gathered on a walk, not arranged in a
-                studio.
+                began growing flowers in her Woodstock, New Brunswick backyard because she
+                loved having fresh blooms on the table. Friends started asking for
+                bouquets. Then came the workshops, the pick-your-own days, and a little
+                community of people who appreciate flowers that look like they were
+                gathered on a walk, not arranged in a studio.
               </p>
 
               <p>
@@ -68,7 +69,7 @@ export default async function AboutPage() {
                 {[
                   {
                     title: "Locally grown",
-                    text: "Every stem comes from Rhoda's backyard or nearby growers. No flown-in imports.",
+                    text: "Every stem comes from Rhoda's Woodstock backyard or nearby growers. No flown-in imports.",
                   },
                   {
                     title: "Wild & whimsical",
@@ -99,8 +100,8 @@ export default async function AboutPage() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors"
                 >
+                  <FacebookIcon className="w-5 h-5" />
                   Reserve on Facebook
-                  <span aria-hidden="true">&rarr;</span>
                 </a>
               </div>
             </div>

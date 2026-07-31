@@ -114,7 +114,7 @@ export function getPhotoAt(index: number, category?: PhotoCategory): SitePhoto |
 
 const HERO_PHOTO_SRC = "/photos/cdec773ead7de4f1fdb9fcd798bdd9f8.png";
 
-const PICK_YOUR_OWN_PHOTO_SRC = "/photos/706d1a0e22bfb79deb54ddb65fb3f1a4.jpg";
+const PICK_YOUR_OWN_PHOTO_SRC = "/photos/gardening/pick-your-own-cover.jpg";
 
 export function getHeroPhoto(): SitePhoto {
   return (
@@ -144,7 +144,7 @@ export function getPickYourOwnPhoto(): SitePhoto {
   return (
     getAllPhotos().find((photo) => photo.src === PICK_YOUR_OWN_PHOTO_SRC) || {
       src: PICK_YOUR_OWN_PHOTO_SRC,
-      alt: "Pick-your-own flowers in Rhoda's backyard garden",
+      alt: "Front Porch Flowers greenhouse and garden in Woodstock, NB",
       category: "gardening",
       subcategory: "gardening",
     }

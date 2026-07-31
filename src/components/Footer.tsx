@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { FacebookIcon, InstagramIcon } from "@/components/SocialIcons";
 import { getFacebookPageUrl } from "@/lib/facebook";
 
 export function Footer() {
@@ -21,8 +22,9 @@ export function Footer() {
             </Link>
             <div className="min-w-0 pt-1">
               <p className="text-cream/70 text-sm leading-relaxed">
-                Local grasses, seed heads, and whatever&apos;s blooming.
+                Locally grown cut flowers and bouquets in Woodstock, New Brunswick.
               </p>
+              <p className="text-cream/50 text-xs mt-2">Local pickup available</p>
             </div>
           </div>
 
@@ -37,8 +39,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/events" className="hover:text-cream transition-colors">
-                  Events
+                <Link href="/about" className="hover:text-cream transition-colors">
+                  About
                 </Link>
               </li>
             </ul>
@@ -54,8 +56,9 @@ export function Footer() {
                   href={facebookUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-cream transition-colors"
+                  className="inline-flex items-center gap-2 hover:text-cream transition-colors"
                 >
+                  <FacebookIcon className="w-3.5 h-3.5" />
                   Facebook — reservations
                 </a>
               </li>
@@ -64,8 +67,9 @@ export function Footer() {
                   href="https://www.instagram.com/front_porchflowers"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-cream transition-colors"
+                  className="inline-flex items-center gap-2 hover:text-cream transition-colors"
                 >
+                  <InstagramIcon className="w-3.5 h-3.5" />
                   @front_porchflowers
                 </a>
               </li>
@@ -82,7 +86,9 @@ export function Footer() {
         </div>
 
         <div className="mt-10 pt-8 border-t border-cream/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-cream/50">
-          <p>&copy; {new Date().getFullYear()} Front Porch Flowers. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} Front Porch Flowers · Woodstock, NB
+          </p>
           <p className="font-accent text-xl text-cream/50">
             grown in the backyard, arranged with whimsy
           </p>

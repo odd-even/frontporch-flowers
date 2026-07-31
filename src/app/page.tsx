@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Hero } from "@/components/Hero";
 import { FinishRequestPicker } from "@/components/BouquetInquiry";
 import { AboutTeaser, EventsTeaser } from "@/components/AboutTeaser";
@@ -5,9 +6,18 @@ import { PaymentOptions } from "@/components/PaymentOptions";
 import { FacebookFeed } from "@/components/FacebookFeed";
 import { getContactEmail } from "@/lib/email";
 import { getSiteSettings } from "@/lib/queries";
+import { LOCAL_SEO, SITE_NAME } from "@/lib/seo";
 
 /** Keep Facebook posts fresh; homepage is server-rendered with env-backed Graph API. */
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: `${SITE_NAME} | Cut Flowers & Bouquets in Woodstock, NB`,
+  },
+  description: LOCAL_SEO.description,
+  alternates: { canonical: "/" },
+};
 
 export default async function HomePage() {
   const settings = await getSiteSettings();

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FacebookIcon } from "@/components/SocialIcons";
 import type { Workshop } from "@/lib/types";
 import { formatShortDate } from "@/lib/utils";
 import { getFacebookPageUrl } from "@/lib/facebook";
@@ -59,8 +60,8 @@ export function WorkshopCard({ workshop }: WorkshopCardProps) {
         rel="noopener noreferrer"
         className="inline-flex items-center gap-2 text-sm font-medium text-sage-dark hover:text-terracotta transition-colors"
       >
+        <FacebookIcon />
         Reserve via Facebook
-        <span aria-hidden="true">&rarr;</span>
       </a>
     </article>
   );
@@ -102,10 +103,10 @@ export function WorkshopsSection({
           </div>
           {!showAll && display.length > 0 && (
             <Link
-              href="/events"
+              href="/gallery"
               className="text-terracotta font-medium hover:text-terracotta-dark transition-colors flex items-center gap-2"
             >
-              All events
+              Gallery
               <span aria-hidden="true">&rarr;</span>
             </Link>
           )}
@@ -135,8 +136,8 @@ export function WorkshopsSection({
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-8 py-3.5 bg-sage text-cream rounded-full font-medium hover:bg-sage-dark transition-colors"
             >
+              <FacebookIcon className="w-5 h-5" />
               See Facebook page
-              <span aria-hidden="true">&rarr;</span>
             </a>
           </div>
         )}

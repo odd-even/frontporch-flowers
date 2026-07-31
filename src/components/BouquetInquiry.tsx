@@ -452,17 +452,15 @@ function PresentationChooser({
               key={option.id}
               type="button"
               onClick={() => onChange(option.id)}
-              className={`group text-center transition-opacity ${
-                isSelected ? "opacity-100" : "opacity-35 hover:opacity-70"
-              }`}
+              className="group text-center"
               aria-label={option.label}
               aria-pressed={isSelected}
             >
               <span
-                className={`relative block w-full aspect-[3/4] overflow-hidden rounded-lg border bg-cream ${
+                className={`relative block w-full aspect-[3/4] overflow-hidden rounded-lg border bg-cream transition-opacity ${
                   isSelected
-                    ? "border-sage ring-1 ring-sage/40"
-                    : "border-sage/15 group-hover:border-sage/40"
+                    ? "border-sage ring-1 ring-sage/40 opacity-100"
+                    : "border-sage/15 opacity-40 group-hover:opacity-70 group-hover:border-sage/40"
                 }`}
               >
                 <Image
@@ -475,7 +473,7 @@ function PresentationChooser({
               </span>
               <span
                 className={`mt-1.5 block text-[10px] sm:text-xs leading-tight ${
-                  isSelected ? "font-medium text-charcoal" : "text-warm-brown/70"
+                  isSelected ? "font-medium text-charcoal" : "text-warm-brown"
                 }`}
               >
                 {option.shortLabel}
@@ -864,9 +862,11 @@ export function BouquetInquiry({
   );
 }
 
-/** Home-page finish cards: sleeve, vase, mason jar, bucket, custom. */
-export function FinishRequestPicker({ contactEmail }: { contactEmail?: string }) {
-  void contactEmail;
+function BouquetOrderSession({
+  children,
+}: {
+  children: (openOrder: (presentation?: PresentationId) => void) => React.ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const [presentation, setPresentation] = useState<PresentationId>("sleeve");
   const [color, setColor] = useState<ColorId>(DEFAULT_PREFERENCES.color);
@@ -898,8 +898,8 @@ export function FinishRequestPicker({ contactEmail }: { contactEmail?: string })
     setSubmitError(null);
   }
 
-  function handlePick(id: PresentationId) {
-    resetForm(id);
+  function openOrder(nextPresentation: PresentationId = DEFAULT_PREFERENCES.presentation) {
+    resetForm(nextPresentation);
     setOpen(true);
   }
 
@@ -958,39 +958,8 @@ export function FinishRequestPicker({ contactEmail }: { contactEmail?: string })
     PRESENTATION_OPTIONS.find((o) => o.id === presentation)?.label ?? "Bouquet";
 
   return (
-    <div>
-      <div className="mb-8">
-        <p className="text-sage text-sm uppercase tracking-[0.2em] mb-2">Request a bouquet</p>
-        <h3 className="font-display text-2xl md:text-3xl text-charcoal mb-2">
-          Choose an arrangement option.
-        </h3>
-      </div>
-
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-        {PRESENTATION_OPTIONS.map((option) => (
-          <button
-            key={option.id}
-            type="button"
-            onClick={() => handlePick(option.id)}
-            className="group text-left rounded-2xl border border-sage/15 bg-white overflow-hidden hover:border-sage/40 transition-colors"
-          >
-            <span className="relative block aspect-[3/4] overflow-hidden rounded-b-2xl bg-cream-dark">
-              <Image
-                src={option.imageSrc}
-                alt={option.label}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
-            </span>
-            <span className="block px-5 py-4">
-              <span className="block font-display text-xl text-charcoal mb-1">{option.label}</span>
-              <span className="block text-sm text-warm-brown/70">{option.hint}</span>
-            </span>
-          </button>
-        ))}
-      </div>
-
+    <>
+      {children(openOrder)}
       <InquiryModal
         open={open}
         onClose={handleClose}
@@ -1020,6 +989,64 @@ export function FinishRequestPicker({ contactEmail }: { contactEmail?: string })
         submitError={submitError}
         onSubmit={handleSubmit}
       />
-    </div>
+    </>
+  );
+}
+
+/** Opens the bouquet request modal — used in the site header. */
+export function OrderBouquetControls({
+  children,
+}: {
+  children: (openOrder: () => void) => React.ReactNode;
+}) {
+  return (
+    <BouquetOrderSession>
+      {(openOrder) => children(() => openOrder())}
+    </BouquetOrderSession>
+  );
+}
+
+/** Home-page finish cards: sleeve, vase, mason jar, bucket, custom. */
+export function FinishRequestPicker({ contactEmail }: { contactEmail?: string }) {
+  void contactEmail;
+
+  return (
+    <BouquetOrderSession>
+      {(openOrder) => (
+        <div>
+          <div className="mb-8">
+            <p className="text-sage text-sm uppercase tracking-[0.2em] mb-2">Request a bouquet</p>
+            <h3 className="font-display text-2xl md:text-3xl text-charcoal mb-2">
+              Choose an arrangement option.
+            </h3>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+            {PRESENTATION_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                onClick={() => openOrder(option.id)}
+                className="group text-left rounded-2xl border border-sage/15 bg-white overflow-hidden hover:border-sage/40 transition-colors"
+              >
+                <span className="relative block aspect-[3/4] overflow-hidden rounded-b-2xl bg-cream-dark">
+                  <Image
+                    src={option.imageSrc}
+                    alt={option.label}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                </span>
+                <span className="block px-5 py-4">
+                  <span className="block font-display text-xl text-charcoal mb-1">{option.label}</span>
+                  <span className="block text-sm text-warm-brown/70">{option.hint}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </BouquetOrderSession>
   );
 }

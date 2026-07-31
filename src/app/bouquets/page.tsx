@@ -4,9 +4,9 @@ import { getBouquets, getSiteSettings } from "@/lib/queries";
 import { buildMailtoUrl, getContactEmail } from "@/lib/email";
 
 export const metadata = {
-  title: "Bouquets | Front Porch Flowers",
+  title: "Bouquets & Cut Flowers",
   description:
-    "Wild and whimsical bouquets grown in Rhoda's backyard. Local grasses, seed heads, and seasonal blooms for laid-back occasions.",
+    "Order locally grown cut flowers and wild whimsical bouquets in Woodstock, NB. Seasonal backyard blooms for local pickup from Front Porch Flowers.",
 };
 
 export default async function BouquetsPage() {
@@ -22,7 +22,7 @@ export default async function BouquetsPage() {
     <>
       <PageHeader
         title="Bouquets"
-        description="Each bouquet is a one-of-a-kind gathering of backyard blooms — loose, whimsical, and woven with local grasses and whatever wild things are calling that day. Perfect for laid-back celebrations, kitchen tables, and gifting."
+        description="Each bouquet is a one-of-a-kind gathering of backyard blooms grown in Woodstock, NB — loose, whimsical, and woven with local grasses and whatever wild things are calling that day. Perfect for laid-back celebrations, kitchen tables, and gifting."
       />
       <BouquetGrid bouquets={bouquets} showAll contactEmail={contactEmail} />
 
