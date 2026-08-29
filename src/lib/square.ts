@@ -15,6 +15,11 @@ export function isSquareConfigured() {
   return Boolean(process.env.SQUARE_ACCESS_TOKEN && process.env.SQUARE_LOCATION_ID);
 }
 
+/** Ready to take payment: fixed Square link and/or API credentials. */
+export function isEventCheckoutReady(event: PickYourOwnEvent) {
+  return Boolean(event.priceCents && (event.squarePaymentLinkUrl || isSquareConfigured()));
+}
+
 export function getSiteOrigin() {
   const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
   if (fromEnv) return fromEnv;
@@ -146,7 +151,7 @@ export async function createEventCheckoutLink({
   customerName?: string;
   customerEmail?: string;
 }): Promise<{ url: string; paymentLinkId?: string }> {
-  if (event.squarePaymentLinkUrl && quantity === 1) {
+  if (event.squarePaymentLinkUrl) {
     return { url: event.squarePaymentLinkUrl };
   }
 

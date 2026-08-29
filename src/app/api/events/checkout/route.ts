@@ -16,16 +16,6 @@ type CheckoutBody = {
 };
 
 export async function POST(request: Request) {
-  if (!isSquareConfigured()) {
-    return NextResponse.json(
-      {
-        error:
-          "Online booking isn’t connected yet. Please message Front Porch Flowers on Facebook to reserve.",
-      },
-      { status: 503 }
-    );
-  }
-
   let body: CheckoutBody;
   try {
     body = (await request.json()) as CheckoutBody;
@@ -47,12 +37,6 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
-  if (!customerName) {
-    return NextResponse.json({ error: "Name is required." }, { status: 400 });
-  }
-  if (!customerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
-    return NextResponse.json({ error: "A valid email is required." }, { status: 400 });
-  }
 
   const events = await getPickYourOwnEvents();
   const event = events.find((item) => item._id === eventId);
@@ -65,6 +49,28 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
+
+  // Fixed Square payment link — no API credentials or guest form required.
+  if (event.squarePaymentLinkUrl) {
+    return NextResponse.json({ url: event.squarePaymentLinkUrl });
+  }
+
+  if (!isSquareConfigured()) {
+    return NextResponse.json(
+      {
+        error:
+          "Online booking isn’t connected yet. Please message Front Porch Flowers on Facebook to reserve.",
+      },
+      { status: 503 }
+    );
+  }
+  if (!customerName) {
+    return NextResponse.json({ error: "Name is required." }, { status: 400 });
+  }
+  if (!customerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
+    return NextResponse.json({ error: "A valid email is required." }, { status: 400 });
+  }
+
   const capacity = event.spotsAvailable ?? null;
   if (capacity != null) {
     let booked: number;

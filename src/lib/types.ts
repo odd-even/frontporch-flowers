@@ -62,6 +62,7 @@ export const fallbackEvents: PickYourOwnEvent[] = [
     spotsAvailable: 8,
     priceCents: 6500,
     currency: "CAD",
+    squarePaymentLinkUrl: "https://square.link/u/CrXwEatf",
   },
 ];
 

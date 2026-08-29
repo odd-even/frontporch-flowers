@@ -2,7 +2,7 @@ import { EventBookingForm } from "@/components/EventBookingForm";
 import { EventCountdown } from "@/components/EventCountdown";
 import { EventImageRotator } from "@/components/EventImageRotator";
 import type { SitePhoto } from "@/lib/photos.shared";
-import { getEventCapacity, isSquareConfigured } from "@/lib/square";
+import { getEventCapacity, isEventCheckoutReady } from "@/lib/square";
 import type { PickYourOwnEvent } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
@@ -21,7 +21,8 @@ export async function PickYourOwnFeatured({
   const weekday = eventDate.toLocaleDateString("en-CA", { weekday: "short" });
   const month = eventDate.toLocaleDateString("en-CA", { month: "short" });
   const day = eventDate.getDate();
-  const squareReady = isSquareConfigured() && Boolean(event.priceCents);
+  const squareReady = isEventCheckoutReady(event);
+  const paymentLinkUrl = event.squarePaymentLinkUrl;
   const capacity = await getEventCapacity(event);
   const maxQuantity = Math.min(
     capacity.remaining > 0 ? capacity.remaining : capacity.capacity || 8,
@@ -179,7 +180,7 @@ export async function PickYourOwnFeatured({
           </ul>
 
           {event.priceCents ? (
-            capacity.soldOut && squareReady ? (
+            capacity.soldOut && squareReady && !paymentLinkUrl ? (
               <div className="rounded-2xl bg-sage/10 px-5 py-4">
                 <p className="font-medium text-charcoal">Sold out</p>
                 <p className="mt-1 text-sm text-warm-brown/75 leading-relaxed">
@@ -195,6 +196,15 @@ export async function PickYourOwnFeatured({
                   if you’d like to join a waitlist.
                 </p>
               </div>
+            ) : paymentLinkUrl ? (
+              <a
+                href={paymentLinkUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex w-full sm:w-fit items-center justify-center px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors"
+              >
+                Reserve your spot
+              </a>
             ) : (
               <EventBookingForm
                 eventId={event._id}
