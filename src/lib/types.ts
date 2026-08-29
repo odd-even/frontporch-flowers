@@ -19,6 +19,12 @@ export interface PickYourOwnEvent {
   endTime: string;
   description?: string;
   spotsAvailable?: number;
+  /** Price per person in the smallest currency unit (e.g. cents). */
+  priceCents?: number;
+  /** Display currency for Square checkout (CAD for NB). */
+  currency?: "CAD" | "USD";
+  /** Optional override: fixed Square payment link (no quantity). */
+  squarePaymentLinkUrl?: string;
 }
 
 export interface Bouquet {
@@ -44,7 +50,20 @@ export interface SiteSettings {
 
 export const fallbackWorkshops: Workshop[] = [];
 
-export const fallbackEvents: PickYourOwnEvent[] = [];
+export const fallbackEvents: PickYourOwnEvent[] = [
+  {
+    _id: "pyo-sept-12-2026",
+    title: "Pick & Arrange Your Own Bouquet",
+    date: "2026-09-12",
+    startTime: "1:00 PM",
+    endTime: "3:00 PM",
+    description:
+      "Pick your stems and arrange a bouquet to take home. Vase and floral tea included.",
+    spotsAvailable: 8,
+    priceCents: 6500,
+    currency: "CAD",
+  },
+];
 
 export const fallbackBouquets: Bouquet[] = [
   {
@@ -112,5 +131,5 @@ export const fallbackSettings: SiteSettings = {
   facebookPageUrl: "https://www.facebook.com/people/Front-Porch-Flowers/61580626863252/",
   email: "hello@frontporchflowers.ca",
   phone: "+15064253850",
-  location: "Woodstock, New Brunswick — local pickup",
+  location: "Bedell, New Brunswick — local pickup",
 };

@@ -8,7 +8,7 @@ import { getFacebookPageUrl } from "@/lib/facebook";
 export const metadata = {
   title: "About",
   description:
-    "Meet Rhoda of Front Porch Flowers in Woodstock, NB — she grows cut flowers in her backyard and crafts seasonal bouquets for local pickup.",
+    "Meet Rhoda of Front Porch Flowers in Bedell, NB — she grows cut flowers in her backyard and crafts seasonal bouquets for local pickup.",
 };
 
 export default async function AboutPage() {
@@ -46,7 +46,7 @@ export default async function AboutPage() {
 
               <p>
                 Front Porch Flowers started the way the best things do — organically. Rhoda
-                began growing flowers in her Woodstock, New Brunswick backyard because she
+                began growing flowers in her Bedell, New Brunswick backyard because she
                 loved having fresh blooms on the table. Friends started asking for
                 bouquets. Then came the workshops, the pick-your-own days, and a little
                 community of people who appreciate flowers that look like they were
@@ -69,7 +69,7 @@ export default async function AboutPage() {
                 {[
                   {
                     title: "Locally grown",
-                    text: "Every stem comes from Rhoda's Woodstock backyard or nearby growers. No flown-in imports.",
+                    text: "Every stem comes from Rhoda's Bedell backyard or nearby growers. No flown-in imports.",
                   },
                   {
                     title: "Wild & whimsical",

@@ -40,6 +40,25 @@ export default defineType({
       title: "Capacity (optional)",
       type: "number",
     }),
+    defineField({
+      name: "priceCents",
+      title: "Price per person (cents)",
+      type: "number",
+      description: "e.g. 2500 for $25.00 CAD. Required for Square prepaid booking.",
+    }),
+    defineField({
+      name: "currency",
+      title: "Currency",
+      type: "string",
+      options: { list: ["CAD", "USD"] },
+      initialValue: "CAD",
+    }),
+    defineField({
+      name: "squarePaymentLinkUrl",
+      title: "Square payment link (optional override)",
+      type: "url",
+      description: "Optional fixed Square link if not using dynamic checkout.",
+    }),
   ],
   orderings: [
     {

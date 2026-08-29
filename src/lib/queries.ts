@@ -10,7 +10,7 @@ import {
 } from "./types";
 
 const eventsQuery = `*[_type == "pickYourOwnEvent"] | order(date asc) {
-  _id, title, date, startTime, endTime, description, spotsAvailable
+  _id, title, date, startTime, endTime, description, spotsAvailable, priceCents, currency, squarePaymentLinkUrl
 }`;
 
 const bouquetsQuery = `*[_type == "bouquet" && _id != "wild-meadow"] | order(_createdAt desc) {
@@ -35,10 +35,17 @@ export async function getPickYourOwnEvents(): Promise<PickYourOwnEvent[]> {
       .sort((a, b) => a.date.localeCompare(b.date));
   }
 
+  function mergeWithFallback(remote: PickYourOwnEvent[]) {
+    const byId = new Map<string, PickYourOwnEvent>();
+    for (const event of remote) byId.set(event._id, event);
+    for (const event of fallbackEvents) byId.set(event._id, event);
+    return [...byId.values()];
+  }
+
   if (!isSanityConfigured) return upcomingOnly(fallbackEvents);
   try {
     const data = await client.fetch<PickYourOwnEvent[]>(eventsQuery);
-    return upcomingOnly(data?.length ? data : fallbackEvents);
+    return upcomingOnly(mergeWithFallback(data || []));
   } catch {
     return upcomingOnly(fallbackEvents);
   }

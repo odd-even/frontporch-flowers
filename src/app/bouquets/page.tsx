@@ -6,7 +6,7 @@ import { buildMailtoUrl, getContactEmail } from "@/lib/email";
 export const metadata = {
   title: "Bouquets & Cut Flowers",
   description:
-    "Order locally grown cut flowers and wild whimsical bouquets in Woodstock, NB. Seasonal backyard blooms for local pickup from Front Porch Flowers.",
+    "Order locally grown cut flowers and wild whimsical bouquets in Bedell, NB. Seasonal backyard blooms for local pickup from Front Porch Flowers.",
 };
 
 export default async function BouquetsPage() {
@@ -22,7 +22,7 @@ export default async function BouquetsPage() {
     <>
       <PageHeader
         title="Bouquets"
-        description="Each bouquet is a one-of-a-kind gathering of backyard blooms grown in Woodstock, NB — loose, whimsical, and woven with local grasses and whatever wild things are calling that day. Perfect for laid-back celebrations, kitchen tables, and gifting."
+        description="Each bouquet is a one-of-a-kind gathering of backyard blooms grown in Bedell, NB — loose, whimsical, and woven with local grasses and whatever wild things are calling that day. Perfect for laid-back celebrations, kitchen tables, and gifting."
       />
       <BouquetGrid bouquets={bouquets} showAll contactEmail={contactEmail} />
 

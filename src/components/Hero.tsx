@@ -26,7 +26,7 @@ export function Hero({ tagline }: HeroProps) {
       <div className="relative max-w-6xl mx-auto px-6 py-24 w-full">
         <div className="max-w-2xl">
           <p className="text-sage-light text-sm uppercase tracking-[0.3em] mb-6 font-medium">
-            Cut flowers · Woodstock, NB
+            Cut flowers · Bedell, NB
           </p>
           <h1 className="font-display text-5xl md:text-7xl text-cream leading-[1.1] mb-6">
             Wild &amp; whimsical

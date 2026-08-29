@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: {
-    absolute: `${SITE_NAME} | Cut Flowers & Bouquets in Woodstock, NB`,
+    absolute: `${SITE_NAME} | Cut Flowers & Bouquets in Bedell, NB`,
   },
   description: LOCAL_SEO.description,
   alternates: { canonical: "/" },

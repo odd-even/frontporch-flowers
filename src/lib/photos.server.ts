@@ -11,6 +11,7 @@ const FOLDER_CATEGORY: Record<string, PhotoCategory> = {
   rhoda: "gardening",
   "hydrangia workshop": "workshops",
   "wreath workshop": "workshops",
+  "bouquet workshop": "workshops",
 };
 
 const ALT_BY_CATEGORY: Record<PhotoCategory, string> = {
@@ -36,6 +37,9 @@ function altForPhoto(relativePath: string, category: PhotoCategory): string {
   }
   if (folder === "wreath workshop") {
     return "Wreath making workshop at Front Porch Flowers";
+  }
+  if (folder === "bouquet workshop") {
+    return "Pick and arrange bouquet workshop at Front Porch Flowers";
   }
   if (folder === "rhoda") {
     return "Rhoda of Front Porch Flowers";
@@ -144,7 +148,7 @@ export function getPickYourOwnPhoto(): SitePhoto {
   return (
     getAllPhotos().find((photo) => photo.src === PICK_YOUR_OWN_PHOTO_SRC) || {
       src: PICK_YOUR_OWN_PHOTO_SRC,
-      alt: "Front Porch Flowers greenhouse and garden in Woodstock, NB",
+      alt: "Front Porch Flowers greenhouse and garden in Bedell, NB",
       category: "gardening",
       subcategory: "gardening",
     }
@@ -153,6 +157,24 @@ export function getPickYourOwnPhoto(): SitePhoto {
 
 export function getWorkshopPhotos(): SitePhoto[] {
   return getPhotosByCategory("workshops");
+}
+
+/** Cover + gallery images for the pick-and-arrange bouquet workshop. */
+export function getBouquetWorkshopPhotos(): SitePhoto[] {
+  return getAllPhotos()
+    .filter((photo) => photo.subcategory === "bouquet workshop")
+    .sort((a, b) => a.src.localeCompare(b.src));
+}
+
+export function getBouquetWorkshopCoverPhoto(): SitePhoto {
+  const photos = getBouquetWorkshopPhotos();
+  // Prefer the finished vase bouquet as the booking card image
+  return (
+    photos.find((photo) => photo.src.includes("pick-arrange-1")) ||
+    photos[0] ||
+    getWorkshopPhotos()[0] ||
+    getPickYourOwnPhoto()
+  );
 }
 
 const INSTAGRAM_ALT_OVERRIDES: Record<string, string> = {
