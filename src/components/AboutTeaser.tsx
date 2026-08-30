@@ -1,39 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
+import { AboutTeaserScroll } from "@/components/AboutTeaserScroll";
 import { PickYourOwnFeatured } from "@/components/PickYourOwnFeatured";
 import { getFacebookPageUrl } from "@/lib/facebook";
-import { getAboutPhoto, getBouquetWorkshopPhotos, getPickYourOwnPhoto } from "@/lib/photos.server";
+import {
+  getAboutStripPhotos,
+  getBouquetWorkshopPhotos,
+  getPickYourOwnPhoto,
+} from "@/lib/photos.server";
 import { getPickYourOwnEvents, getSiteSettings } from "@/lib/queries";
 
 export function AboutTeaser({ aboutText }: { aboutText?: string }) {
-  const photo = getAboutPhoto();
-
   return (
-    <section id="about" className="scroll-mt-24 py-20 md:py-28 bg-cream">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
-          <div className="relative aspect-[4/5] rounded-2xl overflow-hidden">
-            <Image
-              src={photo.src}
-              alt={photo.alt}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
-          </div>
-
-          <div>
-            <p className="text-sage text-sm uppercase tracking-[0.2em] mb-4">
-              Meet Rhoda · Woodstock, NB
-            </p>
-            <p className="text-warm-brown/80 leading-relaxed text-lg">
-              {aboutText ||
-                "Each bouquet is cut from what's blooming that week in Woodstock, New Brunswick. I also host pick-your-own days and seasonal workshops when the garden has enough to share."}
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
+    <AboutTeaserScroll aboutText={aboutText} sidePhotos={getAboutStripPhotos()} />
   );
 }
 

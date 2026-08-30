@@ -454,53 +454,73 @@ function PresentationChooser({
   value: PresentationId;
   onChange: (id: PresentationId) => void;
 }) {
+  const selected =
+    PRESENTATION_OPTIONS.find((option) => option.id === value) || PRESENTATION_OPTIONS[0];
+
   return (
     <fieldset>
       <legend className="text-sm font-medium text-charcoal mb-3">Arrangement</legend>
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-        {PRESENTATION_OPTIONS.map((option) => {
-          const isSelected = option.id === value;
-          return (
-            <button
-              key={option.id}
-              type="button"
-              onClick={() => onChange(option.id)}
-              className="group text-center"
-              aria-label={option.label}
-              aria-pressed={isSelected}
-            >
-              <span
-                className={`relative block w-full aspect-[3/4] overflow-hidden rounded-lg border bg-cream transition-opacity ${
-                  isSelected
-                    ? "border-sage ring-1 ring-sage/40 opacity-100"
-                    : "border-sage/15 opacity-40 group-hover:opacity-70 group-hover:border-sage/40"
-                }`}
-              >
-                <Image
-                  src={option.imageSrc}
-                  alt=""
-                  fill
-                  className="object-cover"
-                  sizes="80px"
-                />
-              </span>
-              <span
-                className={`mt-1.5 block text-[10px] sm:text-xs leading-tight ${
-                  isSelected ? "font-medium text-charcoal" : "text-warm-brown"
-                }`}
-              >
-                {option.shortLabel}
-              </span>
-              <span
-                className={`mt-0.5 block text-[10px] sm:text-xs leading-tight ${
-                  isSelected ? "text-terracotta font-medium" : "text-warm-brown/70"
-                }`}
-              >
-                {option.price}
-              </span>
-            </button>
-          );
-        })}
+      <div className="overflow-hidden rounded-2xl border border-sage/20 bg-cream">
+        <div className="grid grid-cols-[minmax(0,11.5rem)_1fr] sm:grid-cols-[minmax(0,14rem)_1fr] items-stretch">
+          <div className="relative min-h-full bg-cream-dark">
+            <Image
+              key={selected.id}
+              src={selected.imageSrc}
+              alt={selected.label}
+              fill
+              className="object-cover transition-opacity duration-300"
+              sizes="224px"
+            />
+          </div>
+
+          <div
+            className="flex flex-col divide-y divide-sage/15 border-l border-sage/15"
+            role="listbox"
+            aria-label="Arrangement options"
+          >
+            {PRESENTATION_OPTIONS.map((option) => {
+              const isSelected = option.id === value;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  onClick={() => onChange(option.id)}
+                  className={`flex flex-1 items-center justify-between gap-3 px-3.5 py-2.5 text-left transition-colors ${
+                    isSelected
+                      ? "bg-sage/12 text-charcoal"
+                      : "text-warm-brown hover:bg-sage/5 hover:text-charcoal"
+                  }`}
+                >
+                  <span className="min-w-0">
+                    <span
+                      className={`block text-sm leading-tight ${
+                        isSelected ? "font-medium" : "font-normal"
+                      }`}
+                    >
+                      {option.shortLabel}
+                    </span>
+                    <span
+                      className={`mt-0.5 block text-[11px] leading-tight ${
+                        isSelected ? "text-warm-brown/75" : "text-warm-brown/55"
+                      }`}
+                    >
+                      {option.hint}
+                    </span>
+                  </span>
+                  <span
+                    className={`shrink-0 text-xs tabular-nums ${
+                      isSelected ? "font-medium text-terracotta" : "text-warm-brown/65"
+                    }`}
+                  >
+                    {option.price}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </fieldset>
   );
@@ -582,14 +602,14 @@ function InquiryModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6 bg-charcoal/60"
+      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-6 bg-charcoal/60"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="bouquet-inquiry-title"
     >
       <div
-        className="relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-cream rounded-t-3xl sm:rounded-3xl shadow-xl"
+        className="relative w-full sm:max-w-xl max-h-[92vh] overflow-y-auto bg-cream rounded-t-3xl sm:rounded-3xl shadow-xl"
         onClick={(event) => event.stopPropagation()}
       >
         <button

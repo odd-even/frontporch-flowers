@@ -148,11 +148,56 @@ export function getHeroPhoto(): SitePhoto {
 
 export function getAboutPhoto(): SitePhoto {
   return (
-    getAllPhotos().find((photo) => photo.subcategory === "rhoda") ||
+    getRhodaPhotos()[0] ||
     getPhotosByCategory("gardening")[0] ||
     getPhotoAt(0, "bouquets") ||
     getHeroPhoto()
   );
+}
+
+export function getRhodaPhotos(): SitePhoto[] {
+  return getAllPhotos()
+    .filter((photo) => photo.subcategory === "rhoda")
+    .sort((a, b) => a.src.localeCompare(b.src));
+}
+
+/** Rhoda portraits plus garden photos for the Meet Rhoda scroll strip. */
+export function getAboutStripPhotos(): SitePhoto[] {
+  const rhoda = getRhodaPhotos();
+  const used = new Set(rhoda.map((photo) => photo.src));
+
+  const GREENHOUSE_SRCS = [
+    PICK_YOUR_OWN_PHOTO_SRC,
+    "/photos/gardening/684852749_122131780233020895_5762345005324446283_n.jpg",
+  ] as const;
+
+  const bySrc = new Map(getAllPhotos().map((photo) => [photo.src, photo]));
+  const greenhouse: SitePhoto[] = [];
+
+  for (const src of GREENHOUSE_SRCS) {
+    if (used.has(src)) continue;
+    const photo =
+      bySrc.get(src) ||
+      (src === PICK_YOUR_OWN_PHOTO_SRC ? getPickYourOwnPhoto() : undefined);
+    if (!photo) continue;
+    used.add(src);
+    greenhouse.push(photo);
+  }
+
+  const garden = getPhotosByCategory("gardening")
+    .filter((photo) => !used.has(photo.src))
+    .sort((a, b) => a.src.localeCompare(b.src));
+
+  const more = [...greenhouse, ...garden].slice(0, 12);
+  const mid = Math.ceil(more.length / 2);
+  const rhodaMid = Math.ceil(rhoda.length / 2);
+
+  return [
+    ...more.slice(0, mid),
+    ...rhoda.slice(0, rhodaMid),
+    ...rhoda.slice(rhodaMid),
+    ...more.slice(mid),
+  ];
 }
 
 export function getGardenPhoto(): SitePhoto {

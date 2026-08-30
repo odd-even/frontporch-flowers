@@ -43,11 +43,6 @@ export function Footer() {
                   Events
                 </Link>
               </li>
-              <li>
-                <Link href="/about" className="hover:text-cream transition-colors">
-                  About
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -90,12 +85,9 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-8 border-t border-cream/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-cream/50">
+        <div className="mt-10 pt-8 border-t border-cream/10 text-xs text-cream/50">
           <p>
             &copy; {new Date().getFullYear()} Front Porch Flowers · Woodstock, NB
-          </p>
-          <p className="font-accent text-xl text-cream/50">
-            grown in the backyard, arranged with whimsy
           </p>
         </div>
       </div>
