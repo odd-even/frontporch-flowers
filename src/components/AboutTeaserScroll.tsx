@@ -5,14 +5,13 @@ import { useEffect, useRef } from "react";
 import type { SitePhoto } from "@/lib/photos.shared";
 
 type Props = {
-  aboutText?: string;
   sidePhotos: SitePhoto[];
 };
 
 const CARD =
   "relative w-[min(72vw,18rem)] sm:w-[min(40vw,20rem)] aspect-square shrink-0 rounded-3xl overflow-hidden";
 
-export function AboutTeaserScroll({ aboutText, sidePhotos }: Props) {
+export function AboutTeaserScroll({ sidePhotos }: Props) {
   const sectionRef = useRef<HTMLElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const stripRef = useRef<HTMLDivElement>(null);
@@ -140,9 +139,9 @@ export function AboutTeaserScroll({ aboutText, sidePhotos }: Props) {
             </p>
             <span className="block w-full h-px bg-white/45 mb-2.5" aria-hidden />
             <p className="w-full text-center text-white/85 leading-snug text-[0.8rem] sm:text-[0.85rem]">
-              I love sharing beauty with the world.{" "}
-              {aboutText ||
-                "Each bouquet is cut from what's blooming that week. I also host pick-your-own days and seasonal workshops when the garden has enough to share."}
+              I love sharing beauty with the world. Each bouquet is cut from
+              what&apos;s blooming that week. I also host pick-your-own days and
+              seasonal workshops when the garden has enough to share.
             </p>
           </div>
 

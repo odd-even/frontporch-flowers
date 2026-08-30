@@ -31,8 +31,8 @@ export default async function HomePage() {
 
   return (
     <>
-      <Hero tagline={settings.tagline} photos={heroPhotos} />
-      <AboutTeaser aboutText={settings.aboutText} />
+      <Hero photos={heroPhotos} />
+      <AboutTeaser />
       <section id="bouquets" className="scroll-mt-24 py-20 md:py-28">
         <div className="max-w-6xl mx-auto px-6">
           <FinishRequestPicker contactEmail={getContactEmail(settings.email)} />

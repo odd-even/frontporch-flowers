@@ -10,10 +10,8 @@ import {
 } from "@/lib/photos.server";
 import { getPickYourOwnEvents, getSiteSettings } from "@/lib/queries";
 
-export function AboutTeaser({ aboutText }: { aboutText?: string }) {
-  return (
-    <AboutTeaserScroll aboutText={aboutText} sidePhotos={getAboutStripPhotos()} />
-  );
+export function AboutTeaser() {
+  return <AboutTeaserScroll sidePhotos={getAboutStripPhotos()} />;
 }
 
 export async function EventsTeaser() {
