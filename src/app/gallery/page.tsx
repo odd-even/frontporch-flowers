@@ -5,7 +5,7 @@ import { getAllPhotos } from "@/lib/photos.server";
 export const metadata = {
   title: "Gallery",
   description:
-    "Photos of locally grown cut flowers, bouquets, and garden days from Front Porch Flowers in Bedell, New Brunswick.",
+    "Photos of locally grown cut flowers, bouquets, and garden days from Front Porch Flowers in Woodstock, New Brunswick.",
 };
 
 export default function GalleryPage() {

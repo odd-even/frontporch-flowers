@@ -33,17 +33,17 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} | Cut Flowers & Bouquets in Bedell, NB`,
-    template: `%s | ${SITE_NAME} Bedell NB`,
+    default: `${SITE_NAME} | Cut Flowers & Bouquets in Woodstock, NB`,
+    template: `%s | ${SITE_NAME} Woodstock NB`,
   },
   description: LOCAL_SEO.description,
   keywords: [
-    "cut flowers Bedell NB",
-    "cut flowers Bedell New Brunswick",
-    "flower farm Bedell NB",
-    "local bouquets Bedell",
+    "cut flowers Woodstock NB",
+    "cut flowers Woodstock New Brunswick",
+    "flower farm Woodstock NB",
+    "local bouquets Woodstock",
     "seasonal flowers New Brunswick",
-    "pick your own flowers Bedell",
+    "pick your own flowers Woodstock",
     "Front Porch Flowers",
   ],
   authors: [{ name: "Rhoda", url: SITE_URL }],
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: `${SITE_NAME} | Cut Flowers in Bedell, NB`,
+    title: `${SITE_NAME} | Cut Flowers in Woodstock, NB`,
     description: LOCAL_SEO.shortDescription,
     type: "website",
     locale: "en_CA",
@@ -61,18 +61,18 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     images: [
       {
-        url: absoluteUrl("/photos/boquets/hero-bouquet.jpg"),
+        url: absoluteUrl("/photos/boquets/hero-img-4252.jpg"),
         width: 1200,
         height: 630,
-        alt: "Wild whimsical cut flower bouquets by Front Porch Flowers in Bedell, NB",
+        alt: "Wild whimsical cut flower bouquets by Front Porch Flowers in Woodstock, NB",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} | Cut Flowers in Bedell, NB`,
+    title: `${SITE_NAME} | Cut Flowers in Woodstock, NB`,
     description: LOCAL_SEO.shortDescription,
-    images: [absoluteUrl("/photos/boquets/hero-bouquet.jpg")],
+    images: [absoluteUrl("/photos/boquets/hero-img-4252.jpg")],
   },
   robots: {
     index: true,

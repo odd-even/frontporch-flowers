@@ -46,10 +46,6 @@ export function Header() {
     };
   }, [open]);
 
-  const navLinkClass = onHero
-    ? "text-sm font-medium text-cream/90 hover:text-cream transition-colors tracking-wide"
-    : "text-sm font-medium text-warm-brown hover:text-terracotta transition-colors tracking-wide";
-
   return (
     <>
       <header
@@ -66,12 +62,12 @@ export function Header() {
             {!open && isHome ? (
               <>
                 <div
-                  className="pointer-events-none absolute inset-x-0 top-0 h-28 md:h-32 backdrop-blur-xl bg-gradient-to-b from-charcoal/72 via-charcoal/32 via-terracotta/10 to-dusty-rose/18 [mask-image:linear-gradient(to_bottom,black_0%,black_38%,transparent_100%)] transition-opacity duration-150"
+                  className="pointer-events-none absolute inset-x-0 top-0 h-40 md:h-48 backdrop-blur-sm bg-gradient-to-b from-charcoal/32 via-charcoal/12 to-transparent [mask-image:linear-gradient(to_bottom,black_0%,black_35%,transparent_100%)] transition-opacity duration-150"
                   style={{ opacity: 1 - scrollProgress }}
                   aria-hidden="true"
                 />
                 <div
-                  className="pointer-events-none absolute inset-x-0 top-0 h-28 md:h-32 bg-dusty-rose/14 mix-blend-soft-light [mask-image:linear-gradient(to_bottom,black_0%,black_38%,transparent_100%)] transition-opacity duration-150"
+                  className="pointer-events-none absolute inset-x-0 top-0 h-40 md:h-48 bg-dusty-rose/6 mix-blend-soft-light [mask-image:linear-gradient(to_bottom,black_0%,black_35%,transparent_100%)] transition-opacity duration-150"
                   style={{ opacity: 1 - scrollProgress }}
                   aria-hidden="true"
                 />
@@ -104,12 +100,22 @@ export function Header() {
               </Link>
 
               <nav className="hidden md:flex items-center gap-6">
-                <SectionNav isHome={isHome} onHero={onHero} />
-                {navLinks.map((link) => (
-                  <Link key={link.href} href={link.href} className={navLinkClass}>
-                    {link.label}
-                  </Link>
-                ))}
+                <div className="flex items-center">
+                  <SectionNav isHome={isHome} onHero={onHero} />
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`relative z-10 px-3 py-1.5 text-sm font-medium tracking-wide rounded-full whitespace-nowrap transition-colors duration-200 ${
+                        onHero
+                          ? "text-cream/70 hover:text-cream"
+                          : "text-warm-brown hover:text-terracotta"
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
                 <a
                   href="https://www.instagram.com/front_porchflowers"
                   target="_blank"

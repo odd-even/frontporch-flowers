@@ -5,6 +5,7 @@ import { AboutTeaser, EventsTeaser } from "@/components/AboutTeaser";
 import { PaymentOptions } from "@/components/PaymentOptions";
 import { FacebookFeed } from "@/components/FacebookFeed";
 import { getContactEmail } from "@/lib/email";
+import { getHeroPhotos } from "@/lib/photos.server";
 import { getSiteSettings } from "@/lib/queries";
 import { LOCAL_SEO, SITE_NAME } from "@/lib/seo";
 
@@ -13,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: {
-    absolute: `${SITE_NAME} | Cut Flowers & Bouquets in Bedell, NB`,
+    absolute: `${SITE_NAME} | Cut Flowers & Bouquets in Woodstock, NB`,
   },
   description: LOCAL_SEO.description,
   alternates: { canonical: "/" },
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   const settings = await getSiteSettings();
+  const heroPhotos = getHeroPhotos();
 
   const etransferEmail =
     process.env.NEXT_PUBLIC_ETRANSFER_EMAIL || "rhoda@frontporchflowers.ca";
@@ -29,7 +31,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Hero tagline={settings.tagline} />
+      <Hero tagline={settings.tagline} photos={heroPhotos} />
       <AboutTeaser aboutText={settings.aboutText} />
       <section id="bouquets" className="scroll-mt-24 py-20 md:py-28">
         <div className="max-w-6xl mx-auto px-6">

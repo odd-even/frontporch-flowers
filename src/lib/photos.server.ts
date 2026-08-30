@@ -116,19 +116,34 @@ export function getPhotoAt(index: number, category?: PhotoCategory): SitePhoto |
   return pool[index % pool.length];
 }
 
-const HERO_PHOTO_SRC = "/photos/boquets/hero-bouquet.jpg";
+const HERO_PHOTO_SRCS = [
+  "/photos/boquets/hero-img-4252.jpg",
+  "/photos/boquets/hero-IMG_4187.jpg",
+  "/photos/boquets/hero-IMG_4193.jpg",
+] as const;
+
+const HERO_PHOTO_SRC = HERO_PHOTO_SRCS[0];
 
 const PICK_YOUR_OWN_PHOTO_SRC = "/photos/gardening/pick-your-own-cover.jpg";
 
-export function getHeroPhoto(): SitePhoto {
-  return (
-    getAllPhotos().find((photo) => photo.src === HERO_PHOTO_SRC) || {
-      src: HERO_PHOTO_SRC,
-      alt: "Wild whimsical bouquet by Front Porch Flowers",
-      category: "general",
-      subcategory: "general",
-    }
+function heroPhotoFallback(src: string): SitePhoto {
+  return {
+    src,
+    alt: "Wild whimsical bouquet by Front Porch Flowers",
+    category: "general",
+    subcategory: "general",
+  };
+}
+
+export function getHeroPhotos(): SitePhoto[] {
+  const bySrc = new Map(getAllPhotos().map((photo) => [photo.src, photo]));
+  return HERO_PHOTO_SRCS.map(
+    (src) => bySrc.get(src) || heroPhotoFallback(src)
   );
+}
+
+export function getHeroPhoto(): SitePhoto {
+  return getHeroPhotos()[0] || heroPhotoFallback(HERO_PHOTO_SRC);
 }
 
 export function getAboutPhoto(): SitePhoto {
@@ -148,7 +163,7 @@ export function getPickYourOwnPhoto(): SitePhoto {
   return (
     getAllPhotos().find((photo) => photo.src === PICK_YOUR_OWN_PHOTO_SRC) || {
       src: PICK_YOUR_OWN_PHOTO_SRC,
-      alt: "Front Porch Flowers greenhouse and garden in Bedell, NB",
+      alt: "Front Porch Flowers greenhouse and garden in Woodstock, NB",
       category: "gardening",
       subcategory: "gardening",
     }

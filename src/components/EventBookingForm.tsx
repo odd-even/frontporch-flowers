@@ -151,7 +151,7 @@ export function EventBookingForm({
             <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6">
               <div>
                 <p className="text-sage text-xs uppercase tracking-[0.2em] mb-2">
-                  Pick &amp; arrange workshop
+                  Stem &amp; Style
                 </p>
                 <h2
                   id="event-booking-title"

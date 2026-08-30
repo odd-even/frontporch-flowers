@@ -24,11 +24,11 @@ export function AboutTeaser({ aboutText }: { aboutText?: string }) {
 
           <div>
             <p className="text-sage text-sm uppercase tracking-[0.2em] mb-4">
-              Meet Rhoda · Bedell, NB
+              Meet Rhoda · Woodstock, NB
             </p>
             <p className="text-warm-brown/80 leading-relaxed text-lg">
               {aboutText ||
-                "Each bouquet is cut from what's blooming that week in Bedell, New Brunswick. I also host pick-your-own days and seasonal workshops when the garden has enough to share."}
+                "Each bouquet is cut from what's blooming that week in Woodstock, New Brunswick. I also host pick-your-own days and seasonal workshops when the garden has enough to share."}
             </p>
           </div>
         </div>
@@ -59,7 +59,7 @@ export async function EventsTeaser() {
             <h2 className="font-display text-4xl md:text-5xl text-charcoal">Events</h2>
             <p className="text-warm-brown/80 max-w-xl mt-3">
               {nextPyo
-                ? "Next up: a pick-and-arrange bouquet workshop in the garden."
+                ? "Next up: Stem & Style — pick and arrange your own bouquet in the garden."
                 : "Pick-your-own days and seasonal workshops — dates are announced on social."}
             </p>
           </div>

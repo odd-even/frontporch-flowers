@@ -53,12 +53,12 @@ export const fallbackWorkshops: Workshop[] = [];
 export const fallbackEvents: PickYourOwnEvent[] = [
   {
     _id: "pyo-sept-12-2026",
-    title: "Pick & Arrange Your Own Bouquet",
+    title: "Stem & Style",
     date: "2026-09-12",
     startTime: "4:00 PM",
     endTime: "6:00 PM",
     description:
-      "Pick your stems and arrange a bouquet to take home. Vase and floral tea included.",
+      "Pick and arrange your own bouquet. Vase and floral tea included.",
     spotsAvailable: 8,
     priceCents: 6500,
     currency: "CAD",
@@ -132,5 +132,5 @@ export const fallbackSettings: SiteSettings = {
   facebookPageUrl: "https://www.facebook.com/people/Front-Porch-Flowers/61580626863252/",
   email: "hello@frontporchflowers.ca",
   phone: "+15064253850",
-  location: "Bedell, New Brunswick — local pickup",
+  location: "Woodstock, New Brunswick — local pickup",
 };

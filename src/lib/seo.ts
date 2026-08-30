@@ -2,7 +2,7 @@ export const SITE_URL = "https://www.frontporchflowers.ca";
 export const SITE_NAME = "Front Porch Flowers";
 
 export const LOCAL_SEO = {
-  city: "Bedell",
+  city: "Woodstock",
   region: "New Brunswick",
   regionCode: "NB",
   country: "CA",
@@ -10,9 +10,9 @@ export const LOCAL_SEO = {
   phone: "+15064253850",
   email: "hello@frontporchflowers.ca",
   description:
-    "Locally grown cut flowers and wild whimsical bouquets in Bedell, NB. Backyard blooms by Rhoda for local pickup, plus seasonal workshops and pick-your-own garden days.",
+    "Locally grown cut flowers and wild whimsical bouquets in Woodstock, NB. Backyard blooms by Rhoda for local pickup, plus seasonal workshops and pick-your-own garden days.",
   shortDescription:
-    "Cut flowers and seasonal bouquets grown in Bedell, New Brunswick — local pickup available.",
+    "Cut flowers and seasonal bouquets grown in Woodstock, New Brunswick — local pickup available.",
 } as const;
 
 export function absoluteUrl(path = "/"): string {
@@ -54,7 +54,7 @@ export function getLocalBusinessJsonLd(options?: {
     areaServed: [
       {
         "@type": "City",
-        name: "Bedell",
+        name: "Woodstock",
         containedInPlace: {
           "@type": "AdministrativeArea",
           name: "New Brunswick",
@@ -67,8 +67,8 @@ export function getLocalBusinessJsonLd(options?: {
     ],
     geo: {
       "@type": "GeoCoordinates",
-      latitude: 46.083,
-      longitude: -67.633,
+      latitude: 46.1528,
+      longitude: -67.5986,
     },
     sameAs: [
       facebookUrl,
@@ -80,7 +80,7 @@ export function getLocalBusinessJsonLd(options?: {
       "locally grown flowers",
       "pick your own flowers",
       "flower workshops",
-      "Bedell NB",
+      "Woodstock NB",
     ],
   };
 }

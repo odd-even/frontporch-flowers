@@ -112,13 +112,15 @@ export const PRESENTATION_OPTIONS = [
     label: "In a sleeve",
     shortLabel: "Sleeve",
     hint: "wrapped for carrying",
-    imageSrc: "/photos/boquets/sleeve-arrangement.png",
+    price: "$25",
+    imageSrc: "/photos/boquets/sleeve-arrangement.jpg",
   },
   {
     id: "vase",
     label: "In a vase",
     shortLabel: "Vase",
     hint: "ready to place",
+    price: "$45",
     imageSrc: "/photos/boquets/vase-arrangement.png",
   },
   {
@@ -126,21 +128,32 @@ export const PRESENTATION_OPTIONS = [
     label: "In a mason jar",
     shortLabel: "Mason jar",
     hint: "casual & charming",
-    imageSrc: "/photos/boquets/mason-jar-arrangement.png",
+    price: "$18",
+    imageSrc: "/photos/boquets/mason-jar-arrangement.jpg",
+  },
+  {
+    id: "gift-bag-posie",
+    label: "Gift bag posie",
+    shortLabel: "Gift bag",
+    hint: "ready to gift",
+    price: "$20",
+    imageSrc: "/photos/boquets/gift-bag-posie.jpg",
   },
   {
     id: "bucket",
     label: "In a bucket",
     shortLabel: "Bucket",
     hint: "garden-gather style",
-    imageSrc: "/photos/boquets/bucket-arrangement.png",
+    price: "Get in touch",
+    imageSrc: "/photos/boquets/bucket-img-3993.jpg",
   },
   {
     id: "custom",
     label: "Custom",
     shortLabel: "Custom",
     hint: "your own idea",
-    imageSrc: "/photos/boquets/547207860_122098033839020895_4924931008274506536_n.jpg",
+    price: "Get in touch",
+    imageSrc: "/photos/boquets/custom-arrangement.jpg",
   },
 ] as const;
 
@@ -230,8 +243,8 @@ function buildMessage(
   options?: { finishFirst?: boolean; dayOptions?: DayOption[] }
 ) {
   const colorLabel = COLOR_OPTIONS.find((o) => o.id === color)?.label ?? color;
-  const presentationLabel =
-    PRESENTATION_OPTIONS.find((o) => o.id === presentation)?.label ?? presentation;
+  const presentationOption = PRESENTATION_OPTIONS.find((o) => o.id === presentation);
+  const presentationLabel = presentationOption?.label ?? presentation;
   const quantityLabel = QUANTITY_OPTIONS.find((o) => o.id === quantity)?.label ?? quantity;
   const pickupLabel = formatPickupLabel(
     pickupDate,
@@ -248,7 +261,7 @@ function buildMessage(
     "",
     `Quantity: ${quantityLabel}`,
     `Color scheme: ${colorLabel}`,
-    `Presentation: ${presentationLabel}`,
+    `Presentation: ${presentationLabel}${presentationOption?.price ? ` (${presentationOption.price})` : ""}`,
     `Pickup / ready by: ${pickupLabel}`,
   ];
 
@@ -444,7 +457,7 @@ function PresentationChooser({
   return (
     <fieldset>
       <legend className="text-sm font-medium text-charcoal mb-3">Arrangement</legend>
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
         {PRESENTATION_OPTIONS.map((option) => {
           const isSelected = option.id === value;
           return (
@@ -477,6 +490,13 @@ function PresentationChooser({
                 }`}
               >
                 {option.shortLabel}
+              </span>
+              <span
+                className={`mt-0.5 block text-[10px] sm:text-xs leading-tight ${
+                  isSelected ? "text-terracotta font-medium" : "text-warm-brown/70"
+                }`}
+              >
+                {option.price}
               </span>
             </button>
           );
@@ -1006,7 +1026,7 @@ export function OrderBouquetControls({
   );
 }
 
-/** Home-page finish cards: sleeve, vase, mason jar, bucket, custom. */
+/** Home-page finish cards: sleeve, vase, mason jar, bucket, gift bag posie, custom. */
 export function FinishRequestPicker({ contactEmail }: { contactEmail?: string }) {
   void contactEmail;
 
@@ -1027,20 +1047,50 @@ export function FinishRequestPicker({ contactEmail }: { contactEmail?: string })
                 key={option.id}
                 type="button"
                 onClick={() => openOrder(option.id)}
-                className="group text-left rounded-2xl border border-sage/15 bg-white overflow-hidden hover:border-sage/40 transition-colors"
+                className="group relative aspect-[3/4] overflow-hidden rounded-2xl text-left ring-1 ring-sage/15 hover:ring-sage/40 transition-all"
               >
-                <span className="relative block aspect-[3/4] overflow-hidden rounded-b-2xl bg-cream-dark">
-                  <Image
-                    src={option.imageSrc}
-                    alt={option.label}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
-                </span>
-                <span className="block px-5 py-4">
-                  <span className="block font-display text-xl text-charcoal mb-1">{option.label}</span>
-                  <span className="block text-sm text-warm-brown/70">{option.hint}</span>
+                <Image
+                  src={option.imageSrc}
+                  alt={option.label}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                />
+                <span
+                  className="pointer-events-none absolute inset-x-0 bottom-0 h-[38%] backdrop-blur-2xl backdrop-saturate-150"
+                  style={{
+                    WebkitMaskImage:
+                      "linear-gradient(to top, black 0%, black 25%, transparent 100%)",
+                    maskImage:
+                      "linear-gradient(to top, black 0%, black 25%, transparent 100%)",
+                  }}
+                  aria-hidden="true"
+                />
+                <span
+                  className="pointer-events-none absolute inset-x-0 bottom-0 h-[34%] bg-gradient-to-t from-charcoal/50 via-charcoal/15 to-transparent"
+                  aria-hidden="true"
+                />
+                <span className="absolute inset-x-0 bottom-0 z-10 px-5 pb-5 pt-6">
+                  <span className="flex items-end justify-between gap-3">
+                    <span className="min-w-0">
+                      <span className="block font-display text-xl text-cream drop-shadow-sm mb-1">
+                        {option.label}
+                      </span>
+                      <span className="block text-sm text-cream/85 drop-shadow-sm">
+                        {option.hint}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-right drop-shadow-sm">
+                      <span className="block text-base font-medium text-cream tabular-nums leading-none">
+                        {option.price}
+                      </span>
+                      {option.price !== "Get in touch" ? (
+                        <span className="block text-[11px] text-cream/70 leading-tight mt-1">
+                          pickup
+                        </span>
+                      ) : null}
+                    </span>
+                  </span>
                 </span>
               </button>
             ))}

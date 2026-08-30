@@ -12,7 +12,7 @@ import {
 export const metadata = {
   title: "Events",
   description:
-    "Pick-your-own garden days and seasonal workshops at Front Porch Flowers in Bedell, NB. Reserve your spot for the next visit.",
+    "Pick-your-own garden days and seasonal workshops at Front Porch Flowers in Woodstock, NB. Reserve your spot for the next visit.",
 };
 
 export default async function EventsPage() {
@@ -37,7 +37,7 @@ export default async function EventsPage() {
         title="Events"
         description={
           nextPyo
-            ? "Come pick and arrange your own bouquet — next workshop is ready to reserve."
+            ? "Come for Stem & Style — pick and arrange your own bouquet. Next workshop is ready to reserve."
             : "Workshops and pick-your-own days — announcements coming soon on social."
         }
       />

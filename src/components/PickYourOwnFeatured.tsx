@@ -15,6 +15,9 @@ interface PickYourOwnFeaturedProps {
 /** Hero-style two-line title: display lead + accent second line. */
 function workshopTitleLines(title: string) {
   const normalized = title.replace(/\s+/g, " ").trim();
+  if (/stem\s*&\s*style/i.test(normalized)) {
+    return { lead: "Stem & Style", accent: "Pick and arrange your own bouquet" };
+  }
   if (/pick.*arrange.*your own bouquet/i.test(normalized)) {
     return { lead: "Pick & arrange", accent: "your own bouquet" };
   }
@@ -95,7 +98,7 @@ export async function PickYourOwnFeatured({
             {titleLines.accent ? (
               <>
                 <br />
-                <span className="font-accent text-5xl md:text-6xl text-terracotta">
+                <span className="mt-2 block font-body text-sm md:text-base font-normal tracking-wide text-warm-brown/75 normal-case">
                   {titleLines.accent}
                 </span>
               </>

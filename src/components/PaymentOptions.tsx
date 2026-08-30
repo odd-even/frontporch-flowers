@@ -108,7 +108,7 @@ export function PaymentOptions({
   }
 
   return (
-    <section id="pay" className="py-16 md:py-20 bg-brand-wash">
+    <section id="pay" className="py-16 md:py-20 bg-brand-wash scroll-mt-24">
       <div className="max-w-6xl mx-auto px-6 text-center">
         <p className="text-sage-dark text-sm uppercase tracking-[0.2em] mb-3">
           Checkout
@@ -137,13 +137,13 @@ export function PaymentOptions({
           aria-labelledby="payment-options-title"
         >
           <div
-            className="relative w-full sm:max-w-md max-h-[92vh] overflow-y-auto bg-cream rounded-t-3xl sm:rounded-3xl shadow-xl"
+            className="relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-cream rounded-t-3xl sm:rounded-3xl shadow-xl"
             onClick={(event) => event.stopPropagation()}
           >
             <button
               type="button"
               onClick={close}
-              className="absolute top-4 right-4 p-2 text-warm-brown/60 hover:text-charcoal transition-colors"
+              className="absolute top-4 right-4 z-10 p-2 text-warm-brown/60 hover:text-charcoal transition-colors"
               aria-label="Close"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -170,15 +170,18 @@ export function PaymentOptions({
                 Send an e-Transfer anytime, or pay with card or cash in person.
               </p>
 
-              <div className="space-y-6">
-                <div>
+              <div className="grid gap-3 sm:gap-4">
+                <article className="rounded-2xl border border-sage/15 bg-white p-5 flex flex-col">
                   <p className="text-xs uppercase tracking-widest text-sage-dark mb-3">
                     Interac e-Transfer
                   </p>
-                  <div className="mb-3">
+                  <div className="mb-4">
                     <InteracPaymentLogo />
                   </div>
-                  <div className="flex flex-wrap items-center gap-3">
+                  <p className="text-sm text-warm-brown/75 leading-relaxed mb-3">
+                    Send payment anytime to the email below.
+                  </p>
+                  <div className="mt-auto flex flex-wrap items-center gap-3">
                     <a
                       href={`mailto:${etransferEmail}`}
                       className="font-medium text-charcoal break-all hover:text-terracotta transition-colors"
@@ -193,32 +196,30 @@ export function PaymentOptions({
                       {copied ? "Copied" : "Copy"}
                     </button>
                   </div>
-                </div>
+                </article>
 
-                <div>
+                <article className="rounded-2xl border border-sage/15 bg-white p-5">
                   <p className="text-xs uppercase tracking-widest text-sage-dark mb-3">
                     In person
                   </p>
                   <InPersonPaymentLogos />
-                </div>
-
-                <div>
-                  <p className="text-xs uppercase tracking-widest text-sage-dark mb-2">
-                    Contact
-                  </p>
-                  <a
-                    href={telHref(phone)}
-                    className="font-medium text-charcoal hover:text-terracotta transition-colors"
-                  >
-                    {phoneDisplay}
-                  </a>
-                </div>
+                </article>
               </div>
+
+              <p className="mt-5 text-sm text-warm-brown/70">
+                Questions?{" "}
+                <a
+                  href={telHref(phone)}
+                  className="font-medium text-charcoal hover:text-terracotta transition-colors"
+                >
+                  {phoneDisplay}
+                </a>
+              </p>
 
               <button
                 type="button"
                 onClick={close}
-                className="mt-8 btn w-full bg-sage text-cream hover:bg-sage-dark"
+                className="mt-6 btn w-full bg-sage text-cream hover:bg-sage-dark"
               >
                 Done
               </button>

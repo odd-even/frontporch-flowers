@@ -22,7 +22,7 @@ export function Footer() {
             </Link>
             <div className="min-w-0 pt-1">
               <p className="text-cream/70 text-sm leading-relaxed">
-                Locally grown cut flowers and bouquets in Bedell, New Brunswick.
+                Locally grown cut flowers and bouquets in Woodstock, New Brunswick.
               </p>
               <p className="text-cream/50 text-xs mt-2">Local pickup available</p>
             </div>
@@ -92,7 +92,7 @@ export function Footer() {
 
         <div className="mt-10 pt-8 border-t border-cream/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-cream/50">
           <p>
-            &copy; {new Date().getFullYear()} Front Porch Flowers · Bedell, NB
+            &copy; {new Date().getFullYear()} Front Porch Flowers · Woodstock, NB
           </p>
           <p className="font-accent text-xl text-cream/50">
             grown in the backyard, arranged with whimsy
