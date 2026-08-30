@@ -98,7 +98,7 @@ export default async function AboutPage() {
                   href={facebookUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors"
+                  className="btn gap-2 bg-terracotta text-cream hover:bg-terracotta-dark"
                 >
                   <FacebookIcon className="w-5 h-5" />
                   Reserve on Facebook

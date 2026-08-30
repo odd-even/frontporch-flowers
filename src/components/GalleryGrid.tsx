@@ -23,7 +23,7 @@ export function GalleryGrid({ photos }: GalleryGridProps) {
             key={item.id}
             type="button"
             onClick={() => setFilter(item.id)}
-            className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
+            className={`btn px-4 py-1.5 transition-colors ${
               filter === item.id
                 ? "bg-sage text-cream"
                 : "bg-cream-dark text-warm-brown hover:bg-sage/20"

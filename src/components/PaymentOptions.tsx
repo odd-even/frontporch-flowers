@@ -108,7 +108,7 @@ export function PaymentOptions({
   }
 
   return (
-    <section id="pay" className="py-16 md:py-20 bg-sage/10">
+    <section id="pay" className="py-16 md:py-20 bg-brand-wash">
       <div className="max-w-6xl mx-auto px-6 text-center">
         <p className="text-sage-dark text-sm uppercase tracking-[0.2em] mb-3">
           Checkout
@@ -122,7 +122,7 @@ export function PaymentOptions({
         <button
           type="button"
           onClick={openModal}
-          className="inline-flex items-center gap-2 px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors"
+          className="btn gap-2 bg-terracotta text-cream hover:bg-terracotta-dark"
         >
           View payment options
         </button>
@@ -218,7 +218,7 @@ export function PaymentOptions({
               <button
                 type="button"
                 onClick={close}
-                className="mt-8 w-full px-8 py-3.5 bg-sage text-cream rounded-full font-medium hover:bg-sage-dark transition-colors"
+                className="mt-8 btn w-full bg-sage text-cream hover:bg-sage-dark"
               >
                 Done
               </button>

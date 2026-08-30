@@ -60,7 +60,7 @@ export default async function EventsPage() {
                   href={facebookUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-sage text-cream rounded-full text-sm font-medium hover:bg-sage-dark transition-colors"
+                  className="btn gap-2 px-4 py-2 bg-sage text-cream hover:bg-sage-dark"
                 >
                   <FacebookIcon />
                   Facebook
@@ -69,7 +69,7 @@ export default async function EventsPage() {
                   href={instagramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 border border-sage/30 text-sage-dark rounded-full text-sm font-medium hover:border-sage hover:bg-sage/5 transition-colors"
+                  className="btn gap-2 px-4 py-2 border border-sage/30 text-sage-dark hover:border-sage hover:bg-sage/5"
                 >
                   <InstagramIcon />
                   Instagram

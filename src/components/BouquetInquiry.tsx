@@ -594,7 +594,7 @@ function InquiryModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-8 py-3 bg-sage text-cream rounded-full font-medium hover:bg-sage-dark transition-colors"
+                className="btn bg-sage text-cream hover:bg-sage-dark"
               >
                 Done
               </button>
@@ -714,7 +714,7 @@ function InquiryModal({
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors disabled:opacity-60"
+                  className="btn w-full bg-terracotta text-cream hover:bg-terracotta-dark disabled:opacity-60"
                 >
                   {submitting ? "Sending…" : "Send bouquet request"}
                 </button>

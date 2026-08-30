@@ -107,7 +107,7 @@ export function EventBookingForm({
         href={facebookUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex w-full sm:w-fit items-center justify-center gap-2 px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors"
+        className="btn w-full sm:w-fit bg-terracotta text-cream hover:bg-terracotta-dark"
       >
         <FacebookIcon className="w-5 h-5" />
         Reserve your spot
@@ -120,7 +120,7 @@ export function EventBookingForm({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex w-full sm:w-fit items-center justify-center px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors"
+        className="btn w-full sm:w-fit bg-terracotta text-cream hover:bg-terracotta-dark"
       >
         Reserve your spot
       </button>
@@ -239,7 +239,7 @@ export function EventBookingForm({
               <button
                 type="submit"
                 disabled={submitting}
-                className="inline-flex w-full items-center justify-center gap-2 px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors disabled:opacity-60"
+                className="btn w-full bg-terracotta text-cream hover:bg-terracotta-dark disabled:opacity-60"
               >
                 {submitting ? "Starting checkout…" : `Pay ${totalLabel}`}
               </button>

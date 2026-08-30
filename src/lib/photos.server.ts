@@ -116,7 +116,7 @@ export function getPhotoAt(index: number, category?: PhotoCategory): SitePhoto |
   return pool[index % pool.length];
 }
 
-const HERO_PHOTO_SRC = "/photos/cdec773ead7de4f1fdb9fcd798bdd9f8.png";
+const HERO_PHOTO_SRC = "/photos/boquets/hero-bouquet.jpg";
 
 const PICK_YOUR_OWN_PHOTO_SRC = "/photos/gardening/pick-your-own-cover.jpg";
 

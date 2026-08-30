@@ -53,7 +53,7 @@ export async function FacebookFeed({ pageUrl }: FacebookFeedProps) {
             href={facebookUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 px-8 py-3.5 bg-cream text-charcoal rounded-full font-medium hover:bg-cream-dark transition-colors"
+            className="btn gap-3 bg-cream text-charcoal hover:bg-cream-dark"
           >
             <FacebookIcon className="w-5 h-5" />
             Facebook
@@ -62,14 +62,14 @@ export async function FacebookFeed({ pageUrl }: FacebookFeedProps) {
             href="https://www.instagram.com/front_porchflowers"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 px-8 py-3.5 bg-cream text-charcoal rounded-full font-medium hover:bg-cream-dark transition-colors"
+            className="btn gap-3 bg-cream text-charcoal hover:bg-cream-dark"
           >
             <InstagramIcon className="w-5 h-5" />
             Instagram
           </a>
           <Link
             href="/gallery"
-            className="inline-flex items-center gap-2 px-8 py-3.5 border border-cream/30 text-cream rounded-full font-medium hover:bg-cream/10 transition-colors"
+            className="btn gap-2 border border-cream/30 text-cream hover:bg-cream/10"
           >
             View full gallery
             <span aria-hidden="true">&rarr;</span>

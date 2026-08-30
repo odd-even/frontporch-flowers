@@ -12,6 +12,22 @@ interface PickYourOwnFeaturedProps {
   facebookUrl: string;
 }
 
+/** Hero-style two-line title: display lead + accent second line. */
+function workshopTitleLines(title: string) {
+  const normalized = title.replace(/\s+/g, " ").trim();
+  if (/pick.*arrange.*your own bouquet/i.test(normalized)) {
+    return { lead: "Pick & arrange", accent: "your own bouquet" };
+  }
+  const splitAt = normalized.search(/\s+your\s+/i);
+  if (splitAt > 0) {
+    return {
+      lead: normalized.slice(0, splitAt),
+      accent: normalized.slice(splitAt + 1),
+    };
+  }
+  return { lead: normalized, accent: null };
+}
+
 export async function PickYourOwnFeatured({
   event,
   photos,
@@ -35,7 +51,9 @@ export async function PickYourOwnFeatured({
       ? `Limited to ${capacity.capacity} · prepaid`
       : `${capacity.remaining} of ${capacity.capacity} left · prepaid`;
 
-  const includes = ["Vase included"];
+  const titleLines = workshopTitleLines(event.title);
+
+  const includes = ["Vase included", "Floral tea"];
 
   return (
     <article className="overflow-hidden rounded-3xl border border-sage/15 bg-cream shadow-[0_20px_60px_-40px_rgba(60,50,40,0.45)]">
@@ -69,14 +87,19 @@ export async function PickYourOwnFeatured({
         </div>
 
         <div className="flex flex-col justify-center px-6 py-7 sm:px-8 md:px-10 md:py-10">
-          <div className="flex flex-wrap items-center gap-2.5 mb-2">
+          <div className="flex flex-wrap items-center gap-2.5 mb-4">
             <EventCountdown date={event.date} startTime={event.startTime} />
-            <p className="text-sage-dark text-sm uppercase tracking-[0.2em]">
-              Workshop
-            </p>
           </div>
-          <h3 className="font-display text-3xl md:text-[2.5rem] text-charcoal mb-3 leading-[1.05]">
-            {event.title}
+          <h3 className="font-display text-4xl md:text-5xl text-charcoal leading-[1.1] mb-3">
+            {titleLines.lead}
+            {titleLines.accent ? (
+              <>
+                <br />
+                <span className="font-accent text-5xl md:text-6xl text-terracotta">
+                  {titleLines.accent}
+                </span>
+              </>
+            ) : null}
           </h3>
 
           <div className="mb-4 flex flex-col gap-1.5">
@@ -201,7 +224,7 @@ export async function PickYourOwnFeatured({
                 href={paymentLinkUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex w-full sm:w-fit items-center justify-center px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors"
+                className="btn w-full sm:w-fit bg-terracotta text-cream hover:bg-terracotta-dark"
               >
                 Reserve your spot
               </a>

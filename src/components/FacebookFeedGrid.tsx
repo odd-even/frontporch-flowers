@@ -69,7 +69,7 @@ function PostMedia({
         alt={message.slice(0, 100) || "Front Porch Flowers on Facebook"}
         fill
         className="object-cover"
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
       />
     );
 
@@ -282,7 +282,7 @@ export function FacebookFeedGrid({
 
   return (
     <div className="mb-10">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {posts.map((post) => (
           <FacebookPostCard
             key={post.id}
@@ -300,7 +300,7 @@ export function FacebookFeedGrid({
             type="button"
             onClick={loadMore}
             disabled={isPending}
-            className="inline-flex items-center gap-2 px-8 py-3.5 border border-cream/30 text-cream rounded-full font-medium hover:bg-cream/10 transition-colors disabled:opacity-60 disabled:cursor-wait"
+            className="btn gap-2 border border-cream/30 text-cream hover:bg-cream/10 disabled:opacity-60 disabled:cursor-wait"
           >
             {isPending ? "Loading…" : "Load more"}
           </button>

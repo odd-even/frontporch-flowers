@@ -1,21 +1,31 @@
 @import "tailwindcss";
 
+/* Brand palette: see src/lib/brand-colors.ts (sampled from public/brand/gradient.png) */
 @theme inline {
   --font-display: var(--font-labor-union), Georgia, serif;
   --font-accent: var(--font-script), cursive;
   --font-body: var(--font-poppins), system-ui, sans-serif;
 
+  /* Neutrals */
   --color-cream: #faf6f0;
-  --color-cream-dark: #f0e8dc;
-  --color-sage: #8b9a7d;
-  --color-sage-dark: #6b7a5d;
-  --color-sage-light: #b5c4a8;
-  --color-terracotta: #c4785a;
-  --color-terracotta-dark: #a85f42;
-  --color-dusty-rose: #d4a5a5;
+  --color-cream-dark: #f0ebe0;
   --color-warm-brown: #5c4a3d;
   --color-charcoal: #2d2926;
-  --color-moss: #4a5d3f;
+
+  /* Gradient corners */
+  --color-brand-pink: #e99695;
+  --color-brand-yellow: #e8e2b0;
+  --color-brand-teal: #b2d2d0;
+  --color-brand-green: #a8c1af;
+
+  /* Semantic — derived from gradient */
+  --color-sage: #8fa896;
+  --color-sage-dark: #6d8574;
+  --color-sage-light: #a8c1af;
+  --color-terracotta: #c97a6b;
+  --color-terracotta-dark: #a86255;
+  --color-dusty-rose: #dba8a6;
+  --color-moss: #5c7564;
 }
 
 @layer base {
@@ -29,6 +39,12 @@
 
   ::selection {
     @apply bg-sage-light/40 text-charcoal;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full font-medium text-sm px-6 py-2.5 transition-colors;
   }
 }
 
@@ -47,5 +63,35 @@
 
   .font-accent {
     font-family: var(--font-accent);
+  }
+
+  .bg-brand-gradient {
+    background-image: url("/brand/gradient.png");
+    background-size: cover;
+    background-position: center;
+  }
+
+  .bg-brand-wash {
+    background-image:
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-cream) 96%, transparent),
+        color-mix(in srgb, var(--color-cream) 98%, transparent)
+      ),
+      url("/brand/gradient.png");
+    background-size: cover;
+    background-position: center;
+  }
+
+  .bg-brand-wash-header {
+    background-image:
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-cream) 92%, transparent),
+        color-mix(in srgb, var(--color-cream) 96%, transparent)
+      ),
+      url("/brand/gradient.png");
+    background-size: cover;
+    background-position: center;
   }
 }

@@ -37,7 +37,7 @@ export default async function BouquetsPage() {
           </p>
           <a
             href={orderMailto}
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors"
+            className="btn gap-2 bg-terracotta text-cream hover:bg-terracotta-dark"
           >
             Order by email
             <span aria-hidden="true">&rarr;</span>

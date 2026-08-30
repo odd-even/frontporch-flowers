@@ -34,7 +34,7 @@ export default async function WorkshopThanksPage() {
   return (
     <main className="relative overflow-hidden">
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(143,163,130,0.18),_transparent_55%),radial-gradient(ellipse_at_bottom_right,_rgba(196,114,84,0.10),_transparent_45%)]"
+        className="pointer-events-none absolute inset-0 bg-brand-wash"
         aria-hidden="true"
       />
 
@@ -180,13 +180,13 @@ export default async function WorkshopThanksPage() {
               href={VENUE_MAPS_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-8 py-3.5 bg-terracotta text-cream rounded-full font-medium hover:bg-terracotta-dark transition-colors"
+              className="btn bg-terracotta text-cream hover:bg-terracotta-dark"
             >
               Get directions
             </a>
             <Link
               href="/#events"
-              className="inline-flex items-center px-8 py-3.5 border border-sage/30 text-sage-dark rounded-full font-medium hover:bg-sage/5 transition-colors"
+              className="btn border border-sage/30 text-sage-dark hover:bg-sage/5"
             >
               Back to events
             </Link>

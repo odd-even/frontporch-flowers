@@ -9,7 +9,7 @@ export function AboutTeaser({ aboutText }: { aboutText?: string }) {
   const photo = getAboutPhoto();
 
   return (
-    <section className="py-20 md:py-28">
+    <section id="about" className="scroll-mt-24 py-20 md:py-28 bg-cream">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
           <div className="relative aspect-[4/5] rounded-2xl overflow-hidden">
@@ -26,14 +26,7 @@ export function AboutTeaser({ aboutText }: { aboutText?: string }) {
             <p className="text-sage text-sm uppercase tracking-[0.2em] mb-4">
               Meet Rhoda · Bedell, NB
             </p>
-            <h2 className="font-accent text-4xl md:text-5xl text-terracotta leading-[1.15] mb-6 text-balance">
-              I grow flowers in my backyard
-              <br />
-              and make seasonal bouquets
-              <br />
-              for local pickup.
-            </h2>
-            <p className="text-warm-brown/80 leading-relaxed">
+            <p className="text-warm-brown/80 leading-relaxed text-lg">
               {aboutText ||
                 "Each bouquet is cut from what's blooming that week in Bedell, New Brunswick. I also host pick-your-own days and seasonal workshops when the garden has enough to share."}
             </p>
@@ -56,7 +49,7 @@ export async function EventsTeaser() {
   const facebookUrl = getFacebookPageUrl(settings.facebookPageUrl);
 
   return (
-    <section id="events" className="scroll-mt-24 py-20 md:py-28 bg-sage/10">
+    <section id="events" className="scroll-mt-24 py-20 md:py-28 bg-brand-wash">
       <div className="max-w-6xl mx-auto px-6">
         <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
@@ -128,7 +121,7 @@ export function PageHeader({
   description?: string;
 }) {
   return (
-    <div className="bg-cream-dark/40 border-b border-sage/15 py-16 md:py-24">
+    <div className="bg-brand-wash-header border-b border-sage/15 py-16 md:py-24">
       <div className="max-w-6xl mx-auto px-6">
         {eyebrow && (
           <p className="text-sage text-sm uppercase tracking-[0.2em] mb-3">{eyebrow}</p>

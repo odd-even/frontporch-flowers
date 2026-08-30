@@ -55,8 +55,8 @@ export const fallbackEvents: PickYourOwnEvent[] = [
     _id: "pyo-sept-12-2026",
     title: "Pick & Arrange Your Own Bouquet",
     date: "2026-09-12",
-    startTime: "1:00 PM",
-    endTime: "3:00 PM",
+    startTime: "4:00 PM",
+    endTime: "6:00 PM",
     description:
       "Pick your stems and arrange a bouquet to take home. Vase and floral tea included.",
     spotsAvailable: 8,

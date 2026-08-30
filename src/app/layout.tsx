@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     images: [
       {
-        url: absoluteUrl("/photos/cdec773ead7de4f1fdb9fcd798bdd9f8.png"),
+        url: absoluteUrl("/photos/boquets/hero-bouquet.jpg"),
         width: 1200,
         height: 630,
         alt: "Wild whimsical cut flower bouquets by Front Porch Flowers in Bedell, NB",
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${SITE_NAME} | Cut Flowers in Bedell, NB`,
     description: LOCAL_SEO.shortDescription,
-    images: [absoluteUrl("/photos/cdec773ead7de4f1fdb9fcd798bdd9f8.png")],
+    images: [absoluteUrl("/photos/boquets/hero-bouquet.jpg")],
   },
   robots: {
     index: true,

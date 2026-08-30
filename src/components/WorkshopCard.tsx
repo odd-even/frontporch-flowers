@@ -134,7 +134,7 @@ export function WorkshopsSection({
               href={facebookHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-sage text-cream rounded-full font-medium hover:bg-sage-dark transition-colors"
+              className="btn gap-2 bg-sage text-cream hover:bg-sage-dark"
             >
               <FacebookIcon className="w-5 h-5" />
               See Facebook page
