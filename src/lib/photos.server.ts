@@ -117,8 +117,8 @@ export function getPhotoAt(index: number, category?: PhotoCategory): SitePhoto |
 }
 
 const HERO_PHOTO_SRCS = [
+  "/photos/boquets/hero-evi3.webp",
   "/photos/boquets/hero-img-4252.jpg",
-  "/photos/boquets/hero-IMG_4187.jpg",
   "/photos/boquets/hero-IMG_4193.jpg",
 ] as const;
 

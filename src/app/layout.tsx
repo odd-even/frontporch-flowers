@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     images: [
       {
-        url: absoluteUrl("/photos/boquets/hero-img-4252.jpg"),
+        url: absoluteUrl("/photos/boquets/hero-evi3.webp"),
         width: 1200,
         height: 630,
         alt: "Wild whimsical cut flower bouquets by Front Porch Flowers in Woodstock, NB",
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${SITE_NAME} | Cut Flowers in Woodstock, NB`,
     description: LOCAL_SEO.shortDescription,
-    images: [absoluteUrl("/photos/boquets/hero-img-4252.jpg")],
+    images: [absoluteUrl("/photos/boquets/hero-evi3.webp")],
   },
   robots: {
     index: true,
