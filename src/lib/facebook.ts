@@ -252,6 +252,41 @@ function mapPosts(items: GraphPost[]): FacebookPost[] {
     .filter((post): post is FacebookPost => post !== null);
 }
 
+function mediaDedupeKey(url: string): string {
+  try {
+    const parsed = new URL(url);
+    return `${parsed.origin}${parsed.pathname}`;
+  } catch {
+    return url.split("?")[0] || url;
+  }
+}
+
+/** Drop near-duplicate photo posts (same media, blank caption) when a captioned twin exists. */
+function dedupeFacebookPosts(posts: FacebookPost[]): FacebookPost[] {
+  const byMedia = new Map<string, FacebookPost>();
+  const order: string[] = [];
+
+  for (const post of posts) {
+    const mediaKey = mediaDedupeKey(post.mediaUrl || post.id);
+    const existing = byMedia.get(mediaKey);
+    if (!existing) {
+      byMedia.set(mediaKey, post);
+      order.push(mediaKey);
+      continue;
+    }
+
+    const existingHasMessage = Boolean(existing.message?.trim());
+    const nextHasMessage = Boolean(post.message?.trim());
+
+    // Prefer the captioned version over a blank duplicate of the same photo.
+    if (!existingHasMessage && nextHasMessage) {
+      byMedia.set(mediaKey, post);
+    }
+  }
+
+  return order.map((key) => byMedia.get(key)!);
+}
+
 export async function getFacebookPostsPage({
   limit = 8,
   after,
@@ -288,7 +323,7 @@ export async function getFacebookPostsPage({
   let nextCursor: string | null = null;
   let attempts = 0;
 
-  while (collected.length < limit && attempts < 4) {
+  while (dedupeFacebookPosts(collected).length < limit && attempts < 4) {
     attempts += 1;
     const afterPart = cursor ? `&after=${encodeURIComponent(cursor)}` : "";
 
@@ -317,7 +352,7 @@ export async function getFacebookPostsPage({
   }
 
   return {
-    posts: collected,
+    posts: dedupeFacebookPosts(collected).slice(0, limit),
     nextCursor,
   };
 }

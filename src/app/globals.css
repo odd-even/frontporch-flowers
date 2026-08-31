@@ -15,6 +15,7 @@
   /* Gradient corners */
   --color-brand-pink: #e99695;
   --color-brand-yellow: #e8e2b0;
+  --color-brand-blue: #9fc4d8;
   --color-brand-teal: #b2d2d0;
   --color-brand-green: #a8c1af;
 
@@ -69,6 +70,78 @@
     background-image: url("/brand/gradient.png");
     background-size: cover;
     background-position: center;
+  }
+
+  /* CSS-only brand mesh — large overlapping corners so colors blend into each other */
+  .bg-brand-mesh {
+    background-image:
+      radial-gradient(
+        ellipse 115% 95% at 0% 0%,
+        var(--color-brand-pink) 0%,
+        color-mix(in srgb, var(--color-brand-pink) 55%, transparent) 38%,
+        transparent 68%
+      ),
+      radial-gradient(
+        ellipse 115% 95% at 100% 0%,
+        var(--color-brand-yellow) 0%,
+        color-mix(in srgb, var(--color-brand-yellow) 50%, transparent) 38%,
+        transparent 68%
+      ),
+      radial-gradient(
+        ellipse 115% 95% at 0% 100%,
+        var(--color-brand-blue) 0%,
+        color-mix(in srgb, var(--color-brand-blue) 55%, transparent) 38%,
+        transparent 68%
+      ),
+      radial-gradient(
+        ellipse 115% 95% at 100% 100%,
+        var(--color-brand-green) 0%,
+        color-mix(in srgb, var(--color-brand-green) 55%, transparent) 38%,
+        transparent 68%
+      ),
+      radial-gradient(
+        ellipse 90% 70% at 50% 50%,
+        color-mix(in srgb, var(--color-brand-teal) 45%, transparent) 0%,
+        transparent 70%
+      );
+  }
+
+  /* Continuous charcoal + mesh for feed → footer (fixed so sections share one wash) */
+  .bg-site-dark-band {
+    background-color: var(--color-charcoal);
+    background-image:
+      radial-gradient(
+        ellipse 120% 100% at 0% 0%,
+        color-mix(in srgb, var(--color-brand-pink) 85%, transparent) 0%,
+        color-mix(in srgb, var(--color-brand-pink) 40%, transparent) 42%,
+        transparent 72%
+      ),
+      radial-gradient(
+        ellipse 120% 100% at 100% 0%,
+        color-mix(in srgb, var(--color-brand-yellow) 75%, transparent) 0%,
+        color-mix(in srgb, var(--color-brand-yellow) 35%, transparent) 42%,
+        transparent 72%
+      ),
+      radial-gradient(
+        ellipse 120% 100% at 0% 100%,
+        color-mix(in srgb, var(--color-brand-blue) 85%, transparent) 0%,
+        color-mix(in srgb, var(--color-brand-blue) 40%, transparent) 42%,
+        transparent 72%
+      ),
+      radial-gradient(
+        ellipse 120% 100% at 100% 100%,
+        color-mix(in srgb, var(--color-brand-green) 80%, transparent) 0%,
+        color-mix(in srgb, var(--color-brand-green) 40%, transparent) 42%,
+        transparent 72%
+      ),
+      radial-gradient(
+        ellipse 95% 75% at 50% 55%,
+        color-mix(in srgb, var(--color-brand-teal) 50%, transparent) 0%,
+        transparent 75%
+      );
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
   }
 
   .bg-brand-wash {

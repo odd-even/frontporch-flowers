@@ -7,6 +7,7 @@ import { FacebookFeed } from "@/components/FacebookFeed";
 import { getContactEmail } from "@/lib/email";
 import { getHeroPhotos } from "@/lib/photos.server";
 import { getSiteSettings } from "@/lib/queries";
+import { isSquareConfigured } from "@/lib/square";
 import { LOCAL_SEO, SITE_NAME } from "@/lib/seo";
 
 /** Keep Facebook posts fresh; homepage is server-rendered with env-backed Graph API. */
@@ -35,7 +36,10 @@ export default async function HomePage() {
       <AboutTeaser />
       <section id="bouquets" className="scroll-mt-24 py-20 md:py-28">
         <div className="max-w-6xl mx-auto px-6">
-          <FinishRequestPicker contactEmail={getContactEmail(settings.email)} />
+          <FinishRequestPicker
+            contactEmail={getContactEmail(settings.email)}
+            squareReady={isSquareConfigured()}
+          />
         </div>
       </section>
       <PaymentOptions etransferEmail={etransferEmail} phone={phone} />

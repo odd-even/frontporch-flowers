@@ -191,14 +191,14 @@ export async function PickYourOwnFeatured({
                 <span className="block text-xs uppercase tracking-wider text-terracotta mb-1">
                   Price
                 </span>
-                <span className="font-display text-2xl leading-none text-charcoal">
+                <span className="font-body text-2xl leading-none font-medium text-charcoal">
                   {new Intl.NumberFormat("en-CA", {
                     style: "currency",
                     currency: event.currency || "CAD",
                     maximumFractionDigits: 0,
                   }).format(event.priceCents / 100)}
                 </span>
-                <span className="ml-1.5 text-sm font-medium text-charcoal/70">
+                <span className="ml-1.5 font-body text-sm font-medium text-charcoal/70">
                   per person
                 </span>
               </li>

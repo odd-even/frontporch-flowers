@@ -95,6 +95,80 @@ function bouquetPhotoKey(src: string): string {
   return src.replace(/-1(?=\.[^.]+$)/, "");
 }
 
+/** Facebook export pairs: `..._n.jpg` and `..._n-1.jpg` are near-duplicates. */
+function galleryDedupeKey(src: string): string {
+  if (/_n-1\.[^.]+$/.test(src)) {
+    return bouquetPhotoKey(src);
+  }
+  return src;
+}
+
+/** Banner crops and other near-duplicates — keep out of the public gallery. */
+const EXCLUDED_FROM_GALLERY = new Set([
+  "/photos/boquets/hero-evi3.webp",
+  "/photos/boquets/hero-img-4252.jpg",
+  "/photos/boquets/hero-IMG_4193.jpg",
+  "/photos/boquets/bucket-img-3993.jpg",
+  "/photos/706d1a0e22bfb79deb54ddb65fb3f1a4.jpg",
+]);
+
+/** Featured first in the homepage scroll and gallery grid. */
+const GALLERY_PINNED_SRCS = [
+  "/photos/gardening/pick-your-own-cover.jpg",
+] as const;
+
+function photoMtimeMs(src: string): number {
+  const relative = decodeURIComponent(src.replace(/^\/photos\//, ""));
+  const filePath = path.join(process.cwd(), "public/photos", relative);
+  try {
+    return fs.statSync(filePath).mtimeMs;
+  } catch {
+    return 0;
+  }
+}
+
+function pinPhotosFirst(photos: SitePhoto[], pinnedSrcs: readonly string[]): SitePhoto[] {
+  const pinned: SitePhoto[] = [];
+  const rest: SitePhoto[] = [];
+  const pinSet = new Set(pinnedSrcs);
+
+  for (const src of pinnedSrcs) {
+    const match = photos.find((photo) => photo.src === src);
+    if (match) pinned.push(match);
+  }
+
+  for (const photo of photos) {
+    if (!pinSet.has(photo.src)) rest.push(photo);
+  }
+
+  return [...pinned, ...rest];
+}
+
+export function getGalleryPhotos(): SitePhoto[] {
+  const all = getAllPhotos().filter((photo) => !EXCLUDED_FROM_GALLERY.has(photo.src));
+  const byKey = new Map<string, SitePhoto>();
+
+  for (const photo of all) {
+    const key = galleryDedupeKey(photo.src);
+    const existing = byKey.get(key);
+    if (!existing) {
+      byKey.set(key, photo);
+      continue;
+    }
+    // Prefer the non `-1` export when both exist.
+    if (/_n-1\.[^.]+$/.test(existing.src) && !/_n-1\.[^.]+$/.test(photo.src)) {
+      byKey.set(key, photo);
+    }
+  }
+
+  const kept = new Set([...byKey.values()].map((photo) => photo.src));
+  const deduped = all
+    .filter((photo) => kept.has(photo.src))
+    .sort((a, b) => photoMtimeMs(b.src) - photoMtimeMs(a.src));
+
+  return pinPhotosFirst(deduped, GALLERY_PINNED_SRCS);
+}
+
 export function getDistinctBouquetPhotoSrcs(count: number): string[] {
   const photos = getPhotosByCategory("bouquets");
   const seen = new Set<string>();
@@ -125,6 +199,12 @@ const HERO_PHOTO_SRCS = [
 const HERO_PHOTO_SRC = HERO_PHOTO_SRCS[0];
 
 const PICK_YOUR_OWN_PHOTO_SRC = "/photos/gardening/pick-your-own-cover.jpg";
+
+/** Omit from the Meet Rhoda scroll — duplicate seed packs, etc. */
+const EXCLUDED_FROM_ABOUT_STRIP = new Set([
+  "/photos/gardening/619252661_122119491681020895_5001416612745842382_n.jpg",
+  "/photos/706d1a0e22bfb79deb54ddb65fb3f1a4.jpg",
+]);
 
 function heroPhotoFallback(src: string): SitePhoto {
   return {
@@ -185,19 +265,25 @@ export function getAboutStripPhotos(): SitePhoto[] {
   }
 
   const garden = getPhotosByCategory("gardening")
-    .filter((photo) => !used.has(photo.src))
+    .filter((photo) => !used.has(photo.src) && !EXCLUDED_FROM_ABOUT_STRIP.has(photo.src))
     .sort((a, b) => a.src.localeCompare(b.src));
 
-  const more = [...greenhouse, ...garden].slice(0, 12);
+  const more = [...greenhouse, ...garden]
+    .filter((photo) => !EXCLUDED_FROM_ABOUT_STRIP.has(photo.src))
+    .slice(0, 12);
   const mid = Math.ceil(more.length / 2);
   const rhodaMid = Math.ceil(rhoda.length / 2);
 
-  return [
-    ...more.slice(0, mid),
-    ...rhoda.slice(0, rhodaMid),
-    ...rhoda.slice(rhodaMid),
-    ...more.slice(mid),
-  ];
+  // Greenhouse-with-rainbow leads the strip (just below the homepage banner).
+  return pinPhotosFirst(
+    [
+      ...more.slice(0, mid),
+      ...rhoda.slice(0, rhodaMid),
+      ...rhoda.slice(rhodaMid),
+      ...more.slice(mid),
+    ],
+    GALLERY_PINNED_SRCS
+  );
 }
 
 export function getGardenPhoto(): SitePhoto {

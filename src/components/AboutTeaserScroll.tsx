@@ -133,11 +133,12 @@ export function AboutTeaserScroll({ sidePhotos }: Props) {
             data-meet
             className={`${CARD} bg-brand-gradient [background-size:100%_100%] px-6 py-6 sm:px-7 sm:py-7 flex flex-col items-stretch justify-center text-left text-white`}
           >
-            <p className="w-full text-center text-sm text-white/80 mb-2">Hello, I&apos;m</p>
-            <p className="w-full text-center font-accent text-5xl sm:text-6xl leading-none mb-2">
+            <p className="w-full text-center text-sm text-white/80 mb-2">
+              Hello, I&apos;m
+            </p>
+            <p className="w-full text-center font-display text-3xl sm:text-4xl leading-none mb-2.5">
               Rhoda
             </p>
-            <span className="block w-full h-px bg-white/45 mb-2.5" aria-hidden />
             <p className="w-full text-center text-white/85 leading-snug text-[0.8rem] sm:text-[0.85rem]">
               I love sharing beauty with the world. Each bouquet is cut from
               what&apos;s blooming that week. I also host pick-your-own days and

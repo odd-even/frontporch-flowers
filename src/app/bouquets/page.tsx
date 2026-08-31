@@ -2,6 +2,7 @@ import { BouquetGrid } from "@/components/BouquetCard";
 import { PageHeader } from "@/components/AboutTeaser";
 import { getBouquets, getSiteSettings } from "@/lib/queries";
 import { buildMailtoUrl, getContactEmail } from "@/lib/email";
+import { isSquareConfigured } from "@/lib/square";
 
 export const metadata = {
   title: "Bouquets & Cut Flowers",
@@ -24,7 +25,12 @@ export default async function BouquetsPage() {
         title="Bouquets"
         description="Each bouquet is a one-of-a-kind gathering of backyard blooms grown in Woodstock, NB — loose, whimsical, and woven with local grasses and whatever wild things are calling that day. Perfect for laid-back celebrations, kitchen tables, and gifting."
       />
-      <BouquetGrid bouquets={bouquets} showAll contactEmail={contactEmail} />
+      <BouquetGrid
+        bouquets={bouquets}
+        showAll
+        contactEmail={contactEmail}
+        squareReady={isSquareConfigured()}
+      />
 
       <section className="py-16 bg-cream-dark/30">
         <div className="max-w-2xl mx-auto px-6 text-center">

@@ -7,7 +7,9 @@ export const BRAND_GRADIENT = {
   pink: "#e99695",
   /** Top-right — pale butter */
   yellow: "#e8e2b0",
-  /** Bottom-left — powder teal */
+  /** Bottom-left — powder sky blue */
+  blue: "#9fc4d8",
+  /** Bottom-center — powder teal */
   teal: "#b2d2d0",
   /** Bottom-right — muted sage */
   green: "#a8c1af",
@@ -50,6 +52,7 @@ export const BRAND_CSS_VARS = {
   moss: "--color-moss",
   brandPink: "--color-brand-pink",
   brandYellow: "--color-brand-yellow",
+  brandBlue: "--color-brand-blue",
   brandTeal: "--color-brand-teal",
   brandGreen: "--color-brand-green",
 } as const;

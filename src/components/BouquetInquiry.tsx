@@ -1,7 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  bouquetOrderTotalCents,
+  canCheckoutBouquet,
+  formatCents,
+} from "@/lib/bouquet-pricing";
 
 const CUSTOM_DATE_ID = "custom" as const;
 const SAME_DAY_CUTOFF_HOUR = 10;
@@ -230,6 +235,86 @@ interface BouquetInquiryProps {
   bouquetTitle: string;
   bouquetPrice?: string;
   contactEmail?: string;
+  squareReady?: boolean;
+}
+
+async function submitBouquetEmail({
+  subject,
+  message,
+  customerName,
+  customerEmail,
+  customerPhone,
+}: {
+  subject: string;
+  message: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+}) {
+  const response = await fetch("/api/bouquet-request", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      subject,
+      message,
+      customerName,
+      customerEmail,
+      customerPhone,
+    }),
+  });
+  const data = (await response.json().catch(() => ({}))) as { error?: string };
+
+  if (!response.ok) {
+    throw new Error(data.error || "Could not send the request. Please try again.");
+  }
+}
+
+async function submitBouquetPay({
+  presentation,
+  quantity,
+  color,
+  pickupDate,
+  customDateNote,
+  note,
+  customerName,
+  customerEmail,
+  customerPhone,
+}: {
+  presentation: PresentationId;
+  quantity: QuantityId;
+  color: ColorId;
+  pickupDate: PickupDateId;
+  customDateNote: string;
+  note: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+}) {
+  const response = await fetch("/api/bouquets/checkout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      presentationId: presentation,
+      quantity,
+      color,
+      pickupDate,
+      customDateNote,
+      customerName,
+      customerEmail,
+      customerPhone,
+      note,
+    }),
+  });
+  const data = (await response.json().catch(() => ({}))) as {
+    url?: string;
+    error?: string;
+  };
+
+  if (!response.ok || !data.url) {
+    throw new Error(data.error || "Could not start checkout. Please try again.");
+  }
+
+  window.location.href = data.url;
 }
 
 function buildMessage(
@@ -552,8 +637,12 @@ function InquiryModal({
   setNote,
   submitted,
   submitting,
+  submittingMode,
   submitError,
-  onSubmit,
+  onSubmitEmail,
+  onSubmitPay,
+  canPay,
+  totalLabel,
 }: {
   open: boolean;
   onClose: () => void;
@@ -580,9 +669,15 @@ function InquiryModal({
   setNote: (value: string) => void;
   submitted: boolean;
   submitting: boolean;
+  submittingMode: "email" | "pay" | null;
   submitError: string | null;
-  onSubmit: (event: React.FormEvent) => void;
+  onSubmitEmail: () => void;
+  onSubmitPay?: () => void;
+  canPay: boolean;
+  totalLabel: string | null;
 }) {
+  const formRef = useRef<HTMLFormElement>(null);
+
   useEffect(() => {
     if (!open) return;
 
@@ -650,7 +745,14 @@ function InquiryModal({
               </h2>
               <p className="text-warm-brown/80 text-sm mb-6">{description}</p>
 
-              <form onSubmit={onSubmit} className="space-y-6">
+              <form
+                ref={formRef}
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  onSubmitEmail();
+                }}
+                className="space-y-6"
+              >
                 {setPresentation && (
                   <PresentationChooser value={presentation} onChange={setPresentation} />
                 )}
@@ -751,13 +853,50 @@ function InquiryModal({
                   </p>
                 )}
 
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="btn w-full bg-terracotta text-cream hover:bg-terracotta-dark disabled:opacity-60"
-                >
-                  {submitting ? "Sending…" : "Send bouquet request"}
-                </button>
+                {canPay && totalLabel ? (
+                  <div className="rounded-2xl bg-sage/10 px-4 py-3.5 flex items-center justify-between gap-3">
+                    <p className="text-sm font-medium text-charcoal">Total</p>
+                    <p className="text-lg font-medium text-charcoal tabular-nums">{totalLabel}</p>
+                  </div>
+                ) : null}
+
+                <div className="space-y-3">
+                  {canPay && onSubmitPay && totalLabel ? (
+                    <button
+                      type="button"
+                      disabled={submitting}
+                      onClick={() => {
+                        if (!formRef.current?.reportValidity()) return;
+                        onSubmitPay();
+                      }}
+                      className="btn w-full bg-terracotta text-cream hover:bg-terracotta-dark disabled:opacity-60"
+                    >
+                      {submitting && submittingMode === "pay"
+                        ? "Starting checkout…"
+                        : `Pay ${totalLabel} now`}
+                    </button>
+                  ) : null}
+
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className={`btn w-full disabled:opacity-60 ${
+                      canPay
+                        ? "border border-sage/30 text-sage-dark hover:bg-sage/5"
+                        : "bg-terracotta text-cream hover:bg-terracotta-dark"
+                    }`}
+                  >
+                    {submitting && submittingMode === "email"
+                      ? "Sending…"
+                      : "Send bouquet request"}
+                  </button>
+                </div>
+
+                {canPay ? (
+                  <p className="text-center text-xs text-warm-brown/55">
+                    Pay now with Square, or send a request for Rhoda to follow up by email.
+                  </p>
+                ) : null}
               </form>
             </>
           )}
@@ -770,6 +909,7 @@ function InquiryModal({
 export function BouquetInquiry({
   bouquetId,
   bouquetTitle,
+  squareReady = false,
 }: BouquetInquiryProps) {
   const defaults = getBouquetPreferences(bouquetId);
   const [open, setOpen] = useState(false);
@@ -784,8 +924,12 @@ export function BouquetInquiry({
   const [note, setNote] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submittingMode, setSubmittingMode] = useState<"email" | "pay" | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const dayOptions = useMemo(() => getUpcomingDays(), [open]);
+  const canPay = squareReady && canCheckoutBouquet(presentation, quantity);
+  const totalCents = bouquetOrderTotalCents(presentation, quantity);
+  const totalLabel = totalCents != null ? formatCents(totalCents) : null;
 
   function applyDefaults() {
     const preferences = getBouquetPreferences(bouquetId);
@@ -801,6 +945,7 @@ export function BouquetInquiry({
     setNote("");
     setSubmitted(false);
     setSubmitting(false);
+    setSubmittingMode(null);
     setSubmitError(null);
   }
 
@@ -814,10 +959,10 @@ export function BouquetInquiry({
     applyDefaults();
   }
 
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
+  async function handleSubmitEmail() {
     setSubmitError(null);
     setSubmitting(true);
+    setSubmittingMode("email");
 
     const message = buildMessage(
       bouquetTitle,
@@ -832,29 +977,49 @@ export function BouquetInquiry({
     const subject = `Bouquet request: ${bouquetTitle}`;
 
     try {
-      const response = await fetch("/api/bouquet-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          subject,
-          message,
-          customerName,
-          customerEmail,
-          customerPhone,
-        }),
+      await submitBouquetEmail({
+        subject,
+        message,
+        customerName,
+        customerEmail,
+        customerPhone,
       });
-      const data = (await response.json().catch(() => ({}))) as { error?: string };
-
-      if (!response.ok) {
-        setSubmitError(data.error || "Could not send the request. Please try again.");
-        return;
-      }
-
       setSubmitted(true);
-    } catch {
-      setSubmitError("Could not send the request. Please try again.");
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error ? error.message : "Could not complete the request."
+      );
     } finally {
       setSubmitting(false);
+      setSubmittingMode(null);
+    }
+  }
+
+  async function handleSubmitPay() {
+    if (!canPay) return;
+
+    setSubmitError(null);
+    setSubmitting(true);
+    setSubmittingMode("pay");
+
+    try {
+      await submitBouquetPay({
+        presentation,
+        quantity,
+        color,
+        pickupDate,
+        customDateNote,
+        note,
+        customerName,
+        customerEmail,
+        customerPhone,
+      });
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error ? error.message : "Could not complete the request."
+      );
+      setSubmitting(false);
+      setSubmittingMode(null);
     }
   }
 
@@ -873,7 +1038,11 @@ export function BouquetInquiry({
         open={open}
         onClose={handleClose}
         title={`Something like ${bouquetTitle}`}
-        description="Pick a few preferences and send your request straight to Rhoda."
+        description={
+          canPay
+            ? "Pick your preferences — pay now with Square, or send a request for Rhoda to follow up."
+            : "Pick a few preferences and send your request straight to Rhoda."
+        }
         presentation={presentation}
         setPresentation={setPresentation}
         quantity={quantity}
@@ -895,16 +1064,22 @@ export function BouquetInquiry({
         setNote={setNote}
         submitted={submitted}
         submitting={submitting}
+        submittingMode={submittingMode}
         submitError={submitError}
-        onSubmit={handleSubmit}
+        onSubmitEmail={handleSubmitEmail}
+        onSubmitPay={canPay ? handleSubmitPay : undefined}
+        canPay={canPay}
+        totalLabel={totalLabel}
       />
     </>
   );
 }
 
 function BouquetOrderSession({
+  squareReady = false,
   children,
 }: {
+  squareReady?: boolean;
   children: (openOrder: (presentation?: PresentationId) => void) => React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -919,8 +1094,12 @@ function BouquetOrderSession({
   const [note, setNote] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submittingMode, setSubmittingMode] = useState<"email" | "pay" | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const dayOptions = useMemo(() => getUpcomingDays(), [open]);
+  const canPay = squareReady && canCheckoutBouquet(presentation, quantity);
+  const totalCents = bouquetOrderTotalCents(presentation, quantity);
+  const totalLabel = totalCents != null ? formatCents(totalCents) : null;
 
   function resetForm(nextPresentation: PresentationId = presentation) {
     const days = getUpcomingDays();
@@ -935,6 +1114,7 @@ function BouquetOrderSession({
     setNote("");
     setSubmitted(false);
     setSubmitting(false);
+    setSubmittingMode(null);
     setSubmitError(null);
   }
 
@@ -948,10 +1128,10 @@ function BouquetOrderSession({
     resetForm();
   }
 
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
+  async function handleSubmitEmail() {
     setSubmitError(null);
     setSubmitting(true);
+    setSubmittingMode("email");
 
     const presentationLabel =
       PRESENTATION_OPTIONS.find((o) => o.id === presentation)?.label ?? presentation;
@@ -968,29 +1148,49 @@ function BouquetOrderSession({
     const subject = `Bouquet request: ${presentationLabel}`;
 
     try {
-      const response = await fetch("/api/bouquet-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          subject,
-          message,
-          customerName,
-          customerEmail,
-          customerPhone,
-        }),
+      await submitBouquetEmail({
+        subject,
+        message,
+        customerName,
+        customerEmail,
+        customerPhone,
       });
-      const data = (await response.json().catch(() => ({}))) as { error?: string };
-
-      if (!response.ok) {
-        setSubmitError(data.error || "Could not send the request. Please try again.");
-        return;
-      }
-
       setSubmitted(true);
-    } catch {
-      setSubmitError("Could not send the request. Please try again.");
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error ? error.message : "Could not complete the request."
+      );
     } finally {
       setSubmitting(false);
+      setSubmittingMode(null);
+    }
+  }
+
+  async function handleSubmitPay() {
+    if (!canPay) return;
+
+    setSubmitError(null);
+    setSubmitting(true);
+    setSubmittingMode("pay");
+
+    try {
+      await submitBouquetPay({
+        presentation,
+        quantity,
+        color,
+        pickupDate,
+        customDateNote,
+        note,
+        customerName,
+        customerEmail,
+        customerPhone,
+      });
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error ? error.message : "Could not complete the request."
+      );
+      setSubmitting(false);
+      setSubmittingMode(null);
     }
   }
 
@@ -1004,7 +1204,11 @@ function BouquetOrderSession({
         open={open}
         onClose={handleClose}
         title={presentationLabel}
-        description="Choose colour and timing — then send your request to Rhoda."
+        description={
+          canPay
+            ? "Choose colour and timing — pay now with Square, or send a request for Rhoda to follow up."
+            : "Choose colour and timing — then send your request to Rhoda."
+        }
         presentation={presentation}
         setPresentation={setPresentation}
         quantity={quantity}
@@ -1026,8 +1230,12 @@ function BouquetOrderSession({
         setNote={setNote}
         submitted={submitted}
         submitting={submitting}
+        submittingMode={submittingMode}
         submitError={submitError}
-        onSubmit={handleSubmit}
+        onSubmitEmail={handleSubmitEmail}
+        onSubmitPay={canPay ? handleSubmitPay : undefined}
+        canPay={canPay}
+        totalLabel={totalLabel}
       />
     </>
   );
@@ -1035,29 +1243,39 @@ function BouquetOrderSession({
 
 /** Opens the bouquet request modal — used in the site header. */
 export function OrderBouquetControls({
+  squareReady = false,
   children,
 }: {
+  squareReady?: boolean;
   children: (openOrder: () => void) => React.ReactNode;
 }) {
   return (
-    <BouquetOrderSession>
+    <BouquetOrderSession squareReady={squareReady}>
       {(openOrder) => children(() => openOrder())}
     </BouquetOrderSession>
   );
 }
 
 /** Home-page finish cards: sleeve, vase, mason jar, bucket, gift bag posie, custom. */
-export function FinishRequestPicker({ contactEmail }: { contactEmail?: string }) {
+export function FinishRequestPicker({
+  contactEmail,
+  squareReady = false,
+}: {
+  contactEmail?: string;
+  squareReady?: boolean;
+}) {
   void contactEmail;
 
   return (
-    <BouquetOrderSession>
+    <BouquetOrderSession squareReady={squareReady}>
       {(openOrder) => (
         <div>
           <div className="mb-8">
-            <p className="text-sage text-sm uppercase tracking-[0.2em] mb-2">Request a bouquet</p>
+            <p className="text-sage text-sm uppercase tracking-[0.2em] mb-2">
+              Choose an arrangement option
+            </p>
             <h3 className="font-display text-2xl md:text-3xl text-charcoal mb-2">
-              Choose an arrangement option.
+              Order a bouquet
             </h3>
           </div>
 

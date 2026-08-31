@@ -7,8 +7,8 @@ export function Footer() {
   const facebookUrl = getFacebookPageUrl();
 
   return (
-    <footer className="bg-charcoal text-cream mt-auto">
-      <div className="max-w-6xl mx-auto px-6 py-14 md:py-16">
+    <footer className="relative bg-site-dark-band text-cream mt-auto border-t border-cream/20">
+      <div className="relative max-w-6xl mx-auto px-6 pt-14 pb-10 md:pt-16 md:pb-10">
         <div className="grid md:grid-cols-3 gap-10 md:gap-12 items-start">
           <div className="flex gap-5 items-start">
             <Link href="/" className="shrink-0 group">
@@ -84,8 +84,10 @@ export function Footer() {
             </ul>
           </div>
         </div>
+      </div>
 
-        <div className="mt-10 pt-8 border-t border-cream/10 text-xs text-cream/50">
+      <div className="relative border-t border-cream/10">
+        <div className="max-w-6xl mx-auto px-6 py-8 text-xs text-cream/50">
           <p>
             &copy; {new Date().getFullYear()} Front Porch Flowers · Woodstock, NB
           </p>

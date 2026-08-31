@@ -23,8 +23,14 @@ export async function FacebookFeed({ pageUrl }: FacebookFeedProps) {
   const fallbackPhotos = getInstagramFallbackPhotos();
 
   return (
-    <section className="py-20 md:py-28 bg-charcoal text-cream">
-      <div className="max-w-6xl mx-auto px-6 text-center">
+    <section className="relative bg-site-dark-band py-20 md:py-28 text-cream">
+      {/* Keep most of the section solid charcoal; mesh only near the footer */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-[92%] bg-gradient-to-b from-charcoal from-70% via-charcoal/95 via-85% to-transparent"
+        aria-hidden="true"
+      />
+
+      <div className="relative max-w-6xl mx-auto px-6 text-center">
         <p className="text-sage-light text-sm uppercase tracking-[0.2em] mb-3">
           From the garden
         </p>

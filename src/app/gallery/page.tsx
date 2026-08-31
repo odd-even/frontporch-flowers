@@ -1,6 +1,6 @@
 import { GalleryGrid } from "@/components/GalleryGrid";
 import { PageHeader } from "@/components/AboutTeaser";
-import { getAllPhotos } from "@/lib/photos.server";
+import { getGalleryPhotos } from "@/lib/photos.server";
 
 export const metadata = {
   title: "Gallery",
@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 export default function GalleryPage() {
-  const photos = getAllPhotos();
+  const photos = getGalleryPhotos();
 
   return (
     <>

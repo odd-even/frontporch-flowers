@@ -53,7 +53,7 @@ export function Hero({ tagline, photos }: HeroProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-charcoal/92 via-charcoal/45 via-terracotta/8 to-dusty-rose/12" />
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-6 pb-12 md:pb-16 pt-24 w-full">
+        <div className="relative w-full px-6 md:px-8 lg:px-10 pb-12 md:pb-16 pt-24">
           <div className="max-w-2xl flex flex-col items-start">
             <p className="mb-6 rounded-full bg-cream/15 backdrop-blur-sm border border-cream/20 px-3.5 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-cream/90">
               Woodstock, NB
@@ -82,7 +82,7 @@ export function Hero({ tagline, photos }: HeroProps) {
         </div>
 
         {slides.length > 1 ? (
-          <div className="absolute bottom-8 right-6 z-10 flex gap-1.5 md:bottom-10 md:right-8">
+          <div className="absolute bottom-8 right-6 z-10 flex gap-1.5 md:bottom-10 md:right-8 lg:right-10">
             {slides.map((photo, i) => (
               <button
                 key={photo.src}

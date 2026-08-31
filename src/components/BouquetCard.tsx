@@ -8,9 +8,10 @@ interface BouquetCardProps {
   bouquet: Bouquet;
   imageSrc: string;
   contactEmail?: string;
+  squareReady?: boolean;
 }
 
-export function BouquetCard({ bouquet, imageSrc, contactEmail }: BouquetCardProps) {
+export function BouquetCard({ bouquet, imageSrc, contactEmail, squareReady = false }: BouquetCardProps) {
   return (
     <article className="group">
       <div className="relative aspect-[3/4] overflow-hidden rounded-2xl mb-4 bg-cream-dark">
@@ -53,6 +54,7 @@ export function BouquetCard({ bouquet, imageSrc, contactEmail }: BouquetCardProp
         bouquetTitle={bouquet.title}
         bouquetPrice={bouquet.price}
         contactEmail={contactEmail}
+        squareReady={squareReady}
       />
     </article>
   );
@@ -62,9 +64,10 @@ interface BouquetGridProps {
   bouquets: Bouquet[];
   showAll?: boolean;
   contactEmail?: string;
+  squareReady?: boolean;
 }
 
-export function BouquetGrid({ bouquets, showAll = false, contactEmail }: BouquetGridProps) {
+export function BouquetGrid({ bouquets, showAll = false, contactEmail, squareReady = false }: BouquetGridProps) {
   const seasonal = bouquets.filter((b) => b._id !== "for-your-event");
   const display = showAll
     ? seasonal
@@ -95,11 +98,14 @@ export function BouquetGrid({ bouquets, showAll = false, contactEmail }: Bouquet
               bouquet={bouquet}
               imageSrc={distinctPhotoSrcs[i] || fallbackSrc}
               contactEmail={resolvedContactEmail}
+              squareReady={squareReady}
             />
           ))}
         </div>
 
-        {!showAll && <FinishRequestPicker contactEmail={resolvedContactEmail} />}
+        {!showAll && (
+          <FinishRequestPicker contactEmail={resolvedContactEmail} squareReady={squareReady} />
+        )}
       </div>
     </section>
   );

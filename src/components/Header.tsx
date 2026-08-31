@@ -85,7 +85,7 @@ export function Header() {
               />
             ) : null}
 
-            <div className="relative max-w-6xl mx-auto px-6 py-2.5 md:py-3 flex items-center justify-between">
+            <div className="relative w-full px-6 md:px-8 lg:px-10 py-2.5 md:py-3 flex items-center justify-between">
               <Link href="/" className="group shrink-0" onClick={() => setOpen(false)}>
                 <Image
                   src="/logo-header.svg"

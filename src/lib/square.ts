@@ -4,7 +4,24 @@ import { randomUUID } from "crypto";
 import { unstable_noStore as noStore } from "next/cache";
 import { SquareClient, SquareEnvironment, SquareError, type Order } from "square";
 import { SITE_URL } from "@/lib/seo";
+import {
+  bouquetOrderTotalCents,
+  canCheckoutBouquet,
+  getPresentationPriceCents,
+  PRESENTATION_LABELS,
+} from "@/lib/bouquet-pricing";
 import type { PickYourOwnEvent } from "@/lib/types";
+
+export type BouquetCheckoutInput = {
+  presentationId: string;
+  quantity: number;
+  colorLabel: string;
+  pickupLabel: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  note?: string;
+};
 
 /** Unpaid payment-link orders count toward capacity for this long (in-progress checkouts). */
 const OPEN_HOLD_MS = 30 * 60 * 1000;
@@ -31,6 +48,14 @@ export function getSiteOrigin() {
 /** Square referenceId max length is 40 — keep checkout + capacity tally in sync. */
 export function eventOrderReferenceId(eventId: string) {
   return eventId.slice(0, 40);
+}
+
+export function bouquetOrderReferenceId(presentationId: string) {
+  return `bouq-${presentationId}`.slice(0, 40);
+}
+
+export function isBouquetCheckoutReady(presentationId: string, quantity: string) {
+  return canCheckoutBouquet(presentationId, quantity) && isSquareConfigured();
 }
 
 function getSquareClient() {
@@ -203,6 +228,96 @@ export async function createEventCheckoutLink({
       prePopulatedData: {
         ...(customerEmail ? { buyerEmail: customerEmail.trim() } : {}),
         // Nudge Square Checkout toward Canada for phone/address defaults
+        buyerAddress: {
+          country: "CA",
+          administrativeDistrictLevel1: "NB",
+          locality: "Bedell",
+        },
+      },
+    });
+
+    const url = response.paymentLink?.url;
+    if (!url) {
+      throw new Error("Square did not return a checkout URL.");
+    }
+
+    return {
+      url,
+      paymentLinkId: response.paymentLink?.id,
+    };
+  } catch (error) {
+    if (error instanceof SquareError) {
+      const detail =
+        error.errors?.map((item) => item.detail || item.code).filter(Boolean).join("; ") ||
+        error.message;
+      throw new Error(detail || "Square checkout failed.");
+    }
+    throw error;
+  }
+}
+
+export async function createBouquetCheckoutLink(
+  input: BouquetCheckoutInput
+): Promise<{ url: string; paymentLinkId?: string }> {
+  if (!isSquareConfigured()) {
+    throw new Error("Square payments are not configured yet.");
+  }
+
+  const unitCents = getPresentationPriceCents(input.presentationId);
+  if (!unitCents || unitCents <= 0) {
+    throw new Error("This arrangement does not have a prepaid price set.");
+  }
+
+  const quantityLabel = String(input.quantity);
+  const totalCents = bouquetOrderTotalCents(input.presentationId, quantityLabel);
+  if (totalCents == null || totalCents <= 0) {
+    throw new Error("Could not calculate order total.");
+  }
+
+  const locationId = process.env.SQUARE_LOCATION_ID!;
+  const currency = "CAD";
+  const origin = getSiteOrigin();
+  const client = getSquareClient();
+  const presentationLabel =
+    PRESENTATION_LABELS[input.presentationId] || input.presentationId;
+  const lineName = `${presentationLabel} bouquet (prepaid)`;
+
+  const detailNote = [
+    `Pickup: ${input.pickupLabel}`,
+    `Colour: ${input.colorLabel}`,
+    input.customerPhone?.trim() ? `Phone: ${input.customerPhone.trim()}` : null,
+    input.note?.trim() ? input.note.trim() : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  try {
+    const response = await client.checkout.paymentLinks.create({
+      idempotencyKey: randomUUID(),
+      description: `${lineName} × ${input.quantity}`,
+      order: {
+        locationId,
+        referenceId: bouquetOrderReferenceId(input.presentationId),
+        lineItems: [
+          {
+            name: lineName,
+            quantity: quantityLabel,
+            note: detailNote,
+            basePriceMoney: {
+              amount: BigInt(unitCents),
+              currency,
+            },
+          },
+        ],
+      },
+      checkoutOptions: {
+        allowTipping: false,
+        askForShippingAddress: false,
+        redirectUrl: `${origin}/bouquets/thanks?presentation=${encodeURIComponent(input.presentationId)}&quantity=${encodeURIComponent(quantityLabel)}`,
+      },
+      paymentNote: `Front Porch Flowers · ${lineName} × ${input.quantity}`,
+      prePopulatedData: {
+        buyerEmail: input.customerEmail.trim(),
         buyerAddress: {
           country: "CA",
           administrativeDistrictLevel1: "NB",
