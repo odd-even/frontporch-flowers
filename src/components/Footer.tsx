@@ -8,7 +8,7 @@ export function Footer() {
   const facebookUrl = getFacebookPageUrl();
 
   return (
-    <footer className="relative bg-site-dark-band text-cream mt-auto border-t border-cream/20">
+    <footer className="relative bg-site-dark-band text-cream mt-auto">
       <div className="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-10 md:pt-16 md:pb-10">
         <div className="grid md:grid-cols-[2fr_auto] gap-8 md:gap-6 items-stretch">
           <div className="flex flex-col sm:flex-row gap-5 sm:gap-6 md:gap-8 items-start sm:items-center">
