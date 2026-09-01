@@ -40,7 +40,7 @@ export function Hero({ tagline, photos }: HeroProps) {
               alt={i === index ? photo.alt : ""}
               fill
               priority={i === 0}
-              quality={i === 0 ? 95 : 85}
+              quality={90}
               aria-hidden={i !== index}
               className={`object-cover object-center transition-opacity ease-in-out ${
                 i === index ? "opacity-100" : "opacity-0"
