@@ -300,7 +300,7 @@ export function FacebookFeedGrid({
             onClick={loadMore}
             disabled={isPending}
             aria-label={isPending ? "Loading more posts" : "Load more posts"}
-            className="group inline-flex h-11 max-w-none sm:max-w-[2.75rem] items-center overflow-hidden rounded-button border border-cream/30 px-1 text-cream transition-[max-width,background-color] duration-300 ease-out sm:enabled:hover:max-w-[9.5rem] enabled:hover:bg-cream/10 enabled:focus-visible:max-w-[9.5rem] enabled:focus-visible:bg-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/30 disabled:cursor-wait disabled:opacity-60"
+            className="group inline-flex h-11 max-w-none items-center overflow-hidden rounded-button border border-cream/30 px-0 text-cream transition-[max-width,background-color] duration-300 ease-out sm:w-11 sm:max-w-[2.75rem] sm:justify-center sm:enabled:hover:max-w-[9.5rem] sm:enabled:hover:justify-start sm:enabled:hover:bg-cream/10 enabled:focus-visible:max-w-[9.5rem] enabled:focus-visible:justify-start enabled:focus-visible:bg-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/30 disabled:cursor-wait disabled:opacity-60"
           >
             <span
               className="flex h-11 w-11 shrink-0 items-center justify-center"
@@ -339,7 +339,9 @@ export function FacebookFeedGrid({
                 </svg>
               )}
             </span>
-            <span className="whitespace-nowrap pr-3 text-sm font-medium opacity-100 sm:opacity-0 sm:transition-opacity sm:duration-200 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
+            <span
+              className="whitespace-nowrap pr-3 text-sm font-medium opacity-100 transition-[max-width,opacity] duration-300 ease-out sm:max-w-0 sm:overflow-hidden sm:opacity-0 sm:group-hover:max-w-[5.5rem] sm:group-hover:opacity-100 sm:group-focus-visible:max-w-[5.5rem] sm:group-focus-visible:opacity-100"
+            >
               {isPending ? "Loading…" : "Load more"}
             </span>
           </button>
