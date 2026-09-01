@@ -11,14 +11,14 @@ export function Footer() {
     <footer className="relative bg-site-dark-band text-cream mt-auto border-t border-cream/20">
       <div className="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-10 md:pt-16 md:pb-10">
         <div className="grid md:grid-cols-[2fr_auto] gap-8 md:gap-6 items-stretch">
-          <div className="flex gap-6 sm:gap-8 items-center">
+          <div className="flex flex-col sm:flex-row gap-5 sm:gap-6 md:gap-8 items-start sm:items-center">
             <Link href="/" className="shrink-0 group">
               <Image
                 src="/logo.svg"
                 alt="Front Porch Flowers"
                 width={256}
                 height={256}
-                className="w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56 transition-transform duration-500 group-hover:scale-105"
+                className="w-32 h-32 sm:w-52 sm:h-52 md:w-56 md:h-56 transition-transform duration-500 group-hover:scale-105"
               />
             </Link>
             <div className="flex-1 sm:max-w-xs md:max-w-none">
@@ -29,7 +29,7 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="grid h-full grid-cols-[1fr_auto_1fr] items-stretch rounded-2xl border border-cream/20 py-5">
+          <div className="flex flex-col sm:grid sm:h-full sm:grid-cols-[1fr_auto_1fr] sm:items-stretch rounded-2xl border border-cream/20 py-5 gap-5 sm:gap-0">
             <div className="flex flex-col px-4 sm:px-5">
               <h4 className="font-medium text-sm uppercase tracking-widest text-sage-light mb-3">
                 Explore
@@ -48,7 +48,7 @@ export function Footer() {
               </ul>
             </div>
 
-            <div className="w-px bg-cream/20" aria-hidden="true" />
+            <div className="h-px sm:h-auto sm:w-px bg-cream/20 mx-4 sm:mx-0" aria-hidden="true" />
 
             <div className="flex flex-col px-4 sm:px-5">
               <h4 className="font-medium text-sm uppercase tracking-widest text-sage-light mb-3">

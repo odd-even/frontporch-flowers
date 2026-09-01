@@ -168,13 +168,13 @@ export function PaymentOptions({
             aria-labelledby="payment-options-title"
           >
             <div
-              className="relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-cream rounded-t-3xl sm:rounded-3xl shadow-xl"
+              className="relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-cream rounded-t-3xl sm:rounded-3xl shadow-xl pb-[max(1rem,env(safe-area-inset-bottom))]"
               onClick={(event) => event.stopPropagation()}
             >
               <button
                 type="button"
                 onClick={close}
-                className="absolute top-4 right-4 z-10 p-2 text-warm-brown/60 hover:text-charcoal transition-colors"
+                className="absolute top-4 right-4 z-10 flex h-11 w-11 items-center justify-center text-warm-brown/60 hover:text-charcoal transition-colors"
                 aria-label="Close"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

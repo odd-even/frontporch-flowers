@@ -228,7 +228,7 @@ export function Header() {
 
           <button
             type="button"
-            className={`md:hidden p-2 transition-colors ${
+            className={`md:hidden p-3 -mr-1 transition-colors ${
               lightText ? "text-cream" : "text-charcoal"
             }`}
             onClick={() => setOpen((value) => !value)}
@@ -248,7 +248,7 @@ export function Header() {
 
       {open && (
         <nav
-          className="md:hidden fixed inset-0 z-[100] bg-cream flex flex-col"
+          className="md:hidden fixed inset-0 z-[120] bg-cream flex flex-col"
           aria-label="Mobile"
         >
           <div className="h-[60px] shrink-0" aria-hidden="true" />

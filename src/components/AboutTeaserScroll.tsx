@@ -124,8 +124,13 @@ export function AboutTeaserScroll({
       return meetCenter - scroller.clientWidth / 2 - t * maxShift;
     };
 
+    const isTouchLayout = () =>
+      window.matchMedia("(max-width: 639px), (pointer: coarse)").matches;
+
     const applyScroll = () => {
       updateMeetCard();
+
+      if (isTouchLayout()) return;
 
       if (frozenScrollLeft !== null && shouldUnfreezeHorizontalScroll()) {
         frozenScrollLeft = null;
@@ -216,6 +221,9 @@ export function AboutTeaserScroll({
 
   return (
     <section id="about" ref={sectionRef} className="scroll-mt-24 pt-10 pb-6 md:pt-14 md:pb-8">
+      <p className="px-6 pb-3 text-xs text-warm-brown/60 sm:hidden">
+        Swipe to explore
+      </p>
       <div
         ref={scrollerRef}
         className="overflow-x-auto overflow-y-hidden overscroll-x-contain touch-pan-x cursor-grab active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -239,7 +247,7 @@ export function AboutTeaserScroll({
               <p className="w-full text-center font-display text-3xl sm:text-4xl leading-none mb-2.5 whitespace-nowrap">
                 Rhoda
               </p>
-              <p className="w-full text-center text-white/85 leading-snug text-[0.8rem] sm:text-[0.85rem]">
+              <p className="w-full text-center text-white/85 leading-snug text-sm sm:text-[0.85rem]">
                 I love sharing beauty with the world. Each bouquet is cut from
                 what&apos;s blooming that week. I also host pick-your-own days and
                 seasonal workshops when the garden has enough to share.
@@ -262,7 +270,7 @@ export function AboutTeaserScroll({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Front Porch Flowers on Facebook"
-                  className="flex h-9 w-9 items-center justify-center rounded-button bg-white/92 text-charcoal shadow-sm transition-transform hover:scale-105"
+                  className="flex h-11 w-11 items-center justify-center rounded-button bg-white/92 text-charcoal shadow-sm transition-transform hover:scale-105"
                 >
                   <FacebookIcon className="w-4 h-4" />
                 </a>
@@ -271,7 +279,7 @@ export function AboutTeaserScroll({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Front Porch Flowers on Instagram"
-                  className="flex h-9 w-9 items-center justify-center rounded-button bg-white/92 text-charcoal shadow-sm transition-transform hover:scale-105"
+                  className="flex h-11 w-11 items-center justify-center rounded-button bg-white/92 text-charcoal shadow-sm transition-transform hover:scale-105"
                 >
                   <InstagramIcon className="w-4 h-4" />
                 </a>

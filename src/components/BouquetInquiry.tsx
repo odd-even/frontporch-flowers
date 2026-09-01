@@ -377,7 +377,7 @@ function PickupDatePicker({
   return (
     <fieldset>
       <legend className="text-sm font-medium text-charcoal mb-3">Pickup / ready by</legend>
-      <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+      <div className="grid grid-cols-3 sm:grid-cols-7 gap-2">
         {dayOptions.map((day) => {
           const isSelected = value === day.id;
           const showHoursLeft = day.isToday && day.available && day.hoursLeft != null;
@@ -385,7 +385,7 @@ function PickupDatePicker({
           return (
             <label
               key={day.id}
-              className={`rounded-xl border px-1.5 py-2.5 text-center transition-colors ${
+              className={`rounded-xl border px-2 py-3 text-center transition-colors ${
                 !day.available
                   ? "cursor-not-allowed border-sage/10 bg-cream/50 opacity-35"
                   : day.isToday
@@ -408,13 +408,13 @@ function PickupDatePicker({
                 }}
                 className="sr-only"
               />
-              <span className="block text-[10px] uppercase tracking-wide text-warm-brown/70">
+              <span className="block text-[11px] sm:text-[10px] uppercase tracking-wide text-warm-brown/70">
                 {day.weekday}
               </span>
               <span className="block text-base font-medium text-charcoal leading-tight mt-0.5">
                 {day.day}
               </span>
-              <span className="block text-[10px] text-warm-brown/60 mt-0.5">
+              <span className="block text-[11px] sm:text-[10px] text-warm-brown/60 mt-0.5">
                 {showHoursLeft ? formatHoursLeft(day.hoursLeft!) : day.month}
               </span>
             </label>
@@ -547,8 +547,8 @@ function PresentationChooser({
     <fieldset>
       <legend className="text-sm font-medium text-charcoal mb-3">Arrangement</legend>
       <div className="overflow-hidden rounded-button border border-sage/20 bg-cream">
-        <div className="grid grid-cols-[minmax(0,11.5rem)_1fr] sm:grid-cols-[minmax(0,14rem)_1fr] items-stretch">
-          <div className="relative min-h-full bg-cream-dark">
+        <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,14rem)_1fr] items-stretch">
+          <div className="relative aspect-[4/3] sm:aspect-auto sm:min-h-full bg-cream-dark">
             <Image
               key={selected.id}
               src={selected.imageSrc}
@@ -560,7 +560,7 @@ function PresentationChooser({
           </div>
 
           <div
-            className="flex flex-col divide-y divide-sage/15 border-l border-sage/15"
+            className="flex flex-col divide-y divide-sage/15 border-t border-sage/15 sm:border-t-0 sm:border-l"
             role="listbox"
             aria-label="Arrangement options"
           >
@@ -705,13 +705,13 @@ function InquiryModal({
       aria-labelledby="bouquet-inquiry-title"
     >
       <div
-        className="relative w-full sm:max-w-xl max-h-[92vh] overflow-y-auto bg-cream rounded-t-3xl sm:rounded-3xl shadow-xl"
+        className="relative w-full sm:max-w-xl max-h-[92vh] overflow-y-auto bg-cream rounded-t-3xl sm:rounded-3xl shadow-xl pb-[max(1rem,env(safe-area-inset-bottom))]"
         onClick={(event) => event.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-warm-brown/60 hover:text-charcoal transition-colors"
+          className="absolute top-4 right-4 flex h-11 w-11 items-center justify-center text-warm-brown/60 hover:text-charcoal transition-colors"
           aria-label="Close"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

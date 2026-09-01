@@ -37,10 +37,11 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    overflow-x: clip;
   }
 
   body {
-    @apply bg-cream text-charcoal font-body antialiased;
+    @apply bg-cream text-charcoal font-body antialiased overflow-x-clip;
   }
 
   ::selection {
@@ -179,6 +180,14 @@
         8% 96%,
         92% 92%,
         58% 64%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .bg-site-dark-band {
+      animation: none;
+      background-attachment: scroll;
+      background-size: cover;
     }
   }
 

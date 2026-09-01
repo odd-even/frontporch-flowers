@@ -98,7 +98,7 @@ function PostMedia({
             type="button"
             onClick={showPrevious}
             aria-label="Previous media"
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-button bg-charcoal/70 text-cream hover:bg-charcoal/90 transition-colors"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-11 w-11 items-center justify-center rounded-button bg-charcoal/70 text-cream hover:bg-charcoal/90 transition-colors"
           >
             <ArrowIcon className="w-5 h-5" direction="left" />
           </button>
@@ -106,7 +106,7 @@ function PostMedia({
             type="button"
             onClick={showNext}
             aria-label="Next media"
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-button bg-charcoal/70 text-cream hover:bg-charcoal/90 transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-11 w-11 items-center justify-center rounded-button bg-charcoal/70 text-cream hover:bg-charcoal/90 transition-colors"
           >
             <ArrowIcon className="w-5 h-5" />
           </button>
@@ -194,20 +194,20 @@ function FacebookPostModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6 bg-charcoal/65"
+      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-6 bg-charcoal/65"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Facebook post"
     >
       <div
-        className="relative w-full sm:max-w-md max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-charcoal text-cream text-left shadow-xl ring-1 ring-cream/15"
+        className="relative w-full sm:max-w-md max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-charcoal text-cream text-left shadow-xl ring-1 ring-cream/15 pb-[max(1rem,env(safe-area-inset-bottom))]"
         onClick={(event) => event.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-3 right-3 z-20 flex h-9 w-9 items-center justify-center rounded-button bg-charcoal/80 text-cream/80 hover:text-cream transition-colors"
+          className="absolute top-3 right-3 z-20 flex h-11 w-11 items-center justify-center rounded-button bg-charcoal/80 text-cream/80 hover:text-cream transition-colors"
           aria-label="Close"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -300,7 +300,7 @@ export function FacebookFeedGrid({
             onClick={loadMore}
             disabled={isPending}
             aria-label={isPending ? "Loading more posts" : "Load more posts"}
-            className="group inline-flex h-11 max-w-[2.75rem] items-center overflow-hidden rounded-button border border-cream/30 text-cream transition-[max-width,background-color] duration-300 ease-out enabled:hover:max-w-[9.5rem] enabled:hover:bg-cream/10 enabled:focus-visible:max-w-[9.5rem] enabled:focus-visible:bg-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/30 disabled:cursor-wait disabled:opacity-60"
+            className="group inline-flex h-11 max-w-none sm:max-w-[2.75rem] items-center overflow-hidden rounded-button border border-cream/30 px-1 text-cream transition-[max-width,background-color] duration-300 ease-out sm:enabled:hover:max-w-[9.5rem] enabled:hover:bg-cream/10 enabled:focus-visible:max-w-[9.5rem] enabled:focus-visible:bg-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/30 disabled:cursor-wait disabled:opacity-60"
           >
             <span
               className="flex h-11 w-11 shrink-0 items-center justify-center"
@@ -339,7 +339,7 @@ export function FacebookFeedGrid({
                 </svg>
               )}
             </span>
-            <span className="whitespace-nowrap pr-4 text-sm font-medium opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+            <span className="whitespace-nowrap pr-3 text-sm font-medium opacity-100 sm:opacity-0 sm:transition-opacity sm:duration-200 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
               {isPending ? "Loading…" : "Load more"}
             </span>
           </button>

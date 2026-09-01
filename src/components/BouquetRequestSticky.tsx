@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { OrderBouquetControls } from "@/components/BouquetInquiry";
 
@@ -13,10 +14,14 @@ export function BouquetRequestSticky({
   rhodaSrc,
   squareReady = false,
 }: BouquetRequestStickyProps) {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [footerVisible, setFooterVisible] = useState(false);
   const [pastIntro, setPastIntro] = useState(false);
 
   useEffect(() => {
+    if (!isHome) return;
+
     const footer = document.querySelector("footer");
     const about = document.getElementById("about");
 
@@ -49,15 +54,15 @@ export function BouquetRequestSticky({
       footerObserver?.disconnect();
       introObserver.disconnect();
     };
-  }, []);
+  }, [isHome]);
 
-  const visible = pastIntro && !footerVisible;
+  const visible = isHome && pastIntro && !footerVisible;
 
   return (
     <OrderBouquetControls squareReady={squareReady}>
       {(openOrder) => (
         <div
-          className={`fixed bottom-5 right-5 z-50 md:bottom-6 md:right-6 transition-all duration-300 ease-out ${
+          className={`fixed right-5 z-50 md:right-6 bottom-[max(1.25rem,env(safe-area-inset-bottom))] md:bottom-6 transition-all duration-300 ease-out ${
             visible
               ? "translate-y-0 scale-100 opacity-100"
               : "pointer-events-none translate-y-3 scale-95 opacity-0"
