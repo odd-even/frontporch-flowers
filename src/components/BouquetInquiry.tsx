@@ -459,7 +459,7 @@ function PickupDatePicker({
             onChange={(event) => onCustomDateNoteChange(event.target.value)}
             rows={2}
             placeholder="e.g. Saturday Aug 15 for a wedding, or anytime next month…"
-            className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-sm text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50 resize-none"
+            className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50 resize-none"
           />
         </div>
       )}
@@ -546,7 +546,51 @@ function PresentationChooser({
   return (
     <fieldset>
       <legend className="text-sm font-medium text-charcoal mb-3">Arrangement</legend>
-      <div className="overflow-hidden rounded-button border border-sage/20 bg-cream">
+
+      <div className="grid grid-cols-2 gap-2 sm:hidden">
+        {PRESENTATION_OPTIONS.map((option) => {
+          const isSelected = option.id === value;
+          return (
+            <button
+              key={option.id}
+              type="button"
+              onClick={() => onChange(option.id)}
+              aria-pressed={isSelected}
+              className={`overflow-hidden rounded-xl border text-left transition-colors ${
+                isSelected
+                  ? "border-sage bg-sage/10 ring-1 ring-sage/30"
+                  : "border-sage/20 bg-cream hover:border-sage/40"
+              }`}
+            >
+              <span className="relative block aspect-[4/3] bg-cream-dark">
+                <Image
+                  src={option.imageSrc}
+                  alt={option.label}
+                  fill
+                  className="object-cover"
+                  sizes="50vw"
+                />
+              </span>
+              <span className="block px-3 py-2.5">
+                <span
+                  className={`block text-sm leading-tight ${
+                    isSelected ? "font-medium text-charcoal" : "text-charcoal"
+                  }`}
+                >
+                  {option.shortLabel}
+                </span>
+                <span className="mt-0.5 block text-[11px] leading-tight text-warm-brown/70">
+                  {option.hint}
+                  {" · "}
+                  <span className="text-terracotta font-medium">{option.price}</span>
+                </span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="hidden sm:block overflow-hidden rounded-button border border-sage/20 bg-cream">
         <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,14rem)_1fr] items-stretch">
           <div className="relative aspect-[4/3] sm:aspect-auto sm:min-h-full bg-cream-dark">
             <Image
@@ -705,7 +749,7 @@ function InquiryModal({
       aria-labelledby="bouquet-inquiry-title"
     >
       <div
-        className="relative w-full sm:max-w-xl max-h-[92vh] overflow-y-auto bg-cream rounded-t-3xl sm:rounded-3xl shadow-xl pb-[max(1rem,env(safe-area-inset-bottom))]"
+        className="relative w-full sm:max-w-xl max-h-[92dvh] overflow-y-auto overscroll-contain bg-cream rounded-t-3xl sm:rounded-3xl shadow-xl pb-[max(1rem,env(safe-area-inset-bottom))]"
         onClick={(event) => event.stopPropagation()}
       >
         <button
@@ -796,7 +840,7 @@ function InquiryModal({
                       onChange={(event) => setCustomerName(event.target.value)}
                       placeholder="Name"
                       autoComplete="name"
-                      className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-sm text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
+                      className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
                     />
                   </div>
                   <div>
@@ -811,7 +855,7 @@ function InquiryModal({
                       onChange={(event) => setCustomerEmail(event.target.value)}
                       placeholder="Email"
                       autoComplete="email"
-                      className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-sm text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
+                      className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
                     />
                   </div>
                   <div>
@@ -825,7 +869,7 @@ function InquiryModal({
                       onChange={(event) => setCustomerPhone(event.target.value)}
                       placeholder="Phone (optional)"
                       autoComplete="tel"
-                      className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-sm text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
+                      className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
                     />
                   </div>
                 </div>
@@ -844,7 +888,7 @@ function InquiryModal({
                     onChange={(event) => setNote(event.target.value)}
                     rows={3}
                     placeholder="Occasion, anything to avoid, delivery notes..."
-                    className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-sm text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50 resize-none"
+                    className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50 resize-none"
                   />
                 </div>
 

@@ -127,27 +127,6 @@ export async function POST(request: Request) {
   requestLines.push("", "Thanks!");
 
   try {
-    await sendBouquetRequestEmail({
-      subject: `Bouquet order (pay now): ${presentationLabel}`,
-      message: requestLines.join("\n"),
-      customerName,
-      customerEmail,
-      customerPhone,
-    });
-  } catch (error) {
-    console.error("Bouquet pay-now notification error:", error);
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Could not send order details to Rhoda. Please try again.",
-      },
-      { status: 502 }
-    );
-  }
-
-  try {
     const checkout = await createBouquetCheckoutLink({
       presentationId,
       quantity: parsedQuantity,
@@ -158,6 +137,17 @@ export async function POST(request: Request) {
       customerPhone,
       note,
     });
+
+    void sendBouquetRequestEmail({
+      subject: `Bouquet order (pay now): ${presentationLabel}`,
+      message: requestLines.join("\n"),
+      customerName,
+      customerEmail,
+      customerPhone,
+    }).catch((error) => {
+      console.error("Bouquet pay-now notification error:", error);
+    });
+
     return NextResponse.json({ url: checkout.url, totalCents });
   } catch (error) {
     console.error("Square bouquet checkout error:", error);

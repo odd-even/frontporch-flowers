@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "sanity": "cd sanity && npm run dev",
-    "facebook:token": "node scripts/facebook-page-token.mjs"
+    "facebook:token": "node scripts/facebook-page-token.mjs",
+    "square:check": "node scripts/square-check.mjs"
   },
   "dependencies": {
     "@portabletext/react": "^3.2.1",

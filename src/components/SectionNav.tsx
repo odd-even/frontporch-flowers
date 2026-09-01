@@ -168,15 +168,19 @@ export function SectionNav({
           const isActive = isHome && activeId === section.id;
           const href = isHome ? `#${section.id}` : `/#${section.id}`;
 
+          const mobileClass = `font-display text-4xl sm:text-5xl py-3.5 px-4 -mx-4 text-left rounded-2xl transition-colors border-l-[3px] ${
+            isActive
+              ? "text-cream border-cream bg-cream/10"
+              : "text-cream/65 border-transparent hover:text-cream hover:bg-cream/5"
+          }`;
+
           if (isHome) {
             return (
               <button
                 key={section.id}
                 type="button"
                 onClick={() => scrollTo(section.id)}
-                className={`font-display text-4xl sm:text-5xl py-3 text-left transition-colors ${
-                  isActive ? "text-terracotta" : "text-charcoal hover:text-terracotta"
-                }`}
+                className={mobileClass}
               >
                 {section.label}
               </button>
@@ -188,7 +192,7 @@ export function SectionNav({
               key={section.id}
               href={href}
               onClick={onNavigate}
-              className="font-display text-4xl sm:text-5xl py-3 text-charcoal hover:text-terracotta transition-colors"
+              className={mobileClass}
             >
               {section.label}
             </Link>

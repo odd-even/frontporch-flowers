@@ -16,7 +16,6 @@ interface HeroProps {
 export function Hero({ tagline, photos }: HeroProps) {
   const slides = photos.length > 0 ? photos : [];
   const [index, setIndex] = useState(0);
-  const [loadedSlideCount, setLoadedSlideCount] = useState(1);
 
   useEffect(() => {
     if (slides.length < 2) return;
@@ -24,12 +23,6 @@ export function Hero({ tagline, photos }: HeroProps) {
       setIndex((current) => (current + 1) % slides.length);
     }, ROTATE_MS);
     return () => window.clearInterval(id);
-  }, [slides.length]);
-
-  useEffect(() => {
-    if (slides.length > 1) {
-      setLoadedSlideCount(slides.length);
-    }
   }, [slides.length]);
 
   function goToSlide(next: number) {
@@ -40,15 +33,14 @@ export function Hero({ tagline, photos }: HeroProps) {
     <>
       <section data-header-zone="hero" className="relative h-svh min-h-svh flex items-end overflow-hidden">
         <div className="absolute inset-0">
-          {slides.slice(0, loadedSlideCount).map((photo, i) => (
+          {slides.map((photo, i) => (
             <Image
               key={photo.src}
               src={photo.src}
               alt={i === index ? photo.alt : ""}
               fill
               priority={i === 0}
-              loading={i === 0 ? undefined : "lazy"}
-              quality={90}
+              quality={i === 0 ? 95 : 85}
               aria-hidden={i !== index}
               className={`object-cover object-center transition-opacity ease-in-out ${
                 i === index ? "opacity-100" : "opacity-0"

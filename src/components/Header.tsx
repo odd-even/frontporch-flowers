@@ -91,17 +91,19 @@ export function Header() {
       : 0;
   const heroScrimOpacity = onHero ? Math.max(0, 1 - heroBlurBlend * 1.35) : 0;
   const onHeroTop = onHero && scrollY < 1;
-  const navTheme = open || !isHome ? "light" : surfaceState.surface;
+  const navTheme = open || !isHome ? "dark" : surfaceState.surface;
   const lightText =
-    !open && isHome && headerUsesLightText(surfaceState.surface, surfaceState.solidMix);
+    open || (!open && isHome && headerUsesLightText(surfaceState.surface, surfaceState.solidMix));
   const showSurfaceBg = isHome && !open;
   const showHeroBlurBar = showSurfaceBg && onHero && heroBlurBlend > 0;
   const solidOpacity = showSurfaceBg && surfaceState.surface !== "hero" ? 1 : 0;
   const headerBorder = open
-    ? "border-sage/20"
+    ? "border-cream/15"
     : onHeroTop
       ? "border-transparent"
       : headerBorderClass(surfaceState.surface, surfaceState.solidMix, surfaceState.imageTintMix);
+
+  const mobileIconClass = lightText ? "text-cream" : "text-charcoal";
 
   useEffect(() => {
     if (!open) return;
@@ -122,19 +124,13 @@ export function Header() {
     <>
       <header
         ref={headerRef}
-        className={`top-0 z-[110] w-full ${
-          isHome ? "fixed" : "sticky"
+        className={`top-0 w-full z-[110] ${isHome ? "fixed" : "sticky"} ${
+          open ? "max-md:hidden" : ""
         } ${
           showHeroBlurBar ? "backdrop-blur-xl backdrop-saturate-150" : ""
-        } ${open ? "bg-cream border-b border-sage/20" : `border-b bg-transparent ${headerBorder}`}`}
+        } border-b bg-transparent ${headerBorder}`}
         style={showHeroBlurBar ? heroScrollBlurStyle(heroBlurBlend) : undefined}
       >
-        {open ? (
-          <div
-            className="pointer-events-none absolute inset-0 bg-dusty-rose/8"
-            aria-hidden="true"
-          />
-        ) : null}
         {!open && isHome ? (
           <>
             {onHero ? (
@@ -228,34 +224,59 @@ export function Header() {
 
           <button
             type="button"
-            className={`md:hidden p-3 -mr-1 transition-colors ${
-              lightText ? "text-cream" : "text-charcoal"
-            }`}
+            className={`md:hidden p-3 -mr-1 transition-colors ${mobileIconClass}`}
             onClick={() => setOpen((value) => !value)}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
+            aria-controls="mobile-nav-panel"
           >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              {open ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
-              )}
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
         </div>
       </header>
 
-      {open && (
-        <nav
-          className="md:hidden fixed inset-0 z-[120] bg-cream flex flex-col"
-          aria-label="Mobile"
-        >
-          <div className="h-[60px] shrink-0" aria-hidden="true" />
-          <div className="flex-1 flex flex-col justify-center px-8 pb-16 gap-2">
+      <nav
+        id="mobile-nav-panel"
+        className={`md:hidden fixed inset-0 z-[140] min-h-dvh h-dvh w-full bg-mobile-nav flex flex-col transition-[opacity,transform,visibility] duration-300 ease-out ${
+          open
+            ? "opacity-100 translate-y-0 visible pointer-events-auto"
+            : "opacity-0 translate-y-2 invisible pointer-events-none"
+        }`}
+        aria-label="Mobile"
+        aria-hidden={!open}
+      >
+        <div className="shrink-0 flex items-center justify-between px-6 py-2.5 border-b border-cream/15 pt-[max(0.625rem,env(safe-area-inset-top))]">
+          <Link href="/" className="group shrink-0" onClick={() => setOpen(false)}>
+            <Image
+              src="/logo-header.svg"
+              alt="Front Porch Flowers"
+              width={3072}
+              height={745}
+              priority
+              className="h-8 w-auto brightness-0 invert transition-opacity group-hover:opacity-80"
+            />
+          </Link>
+          <button
+            type="button"
+            className="p-3 -mr-1 text-cream transition-colors hover:text-cream/80"
+            onClick={() => setOpen(false)}
+            aria-label="Close menu"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="flex-1 min-h-0 overflow-y-auto px-8 pb-[max(2rem,env(safe-area-inset-bottom))] pt-8">
+          <p className="mb-6 text-xs uppercase tracking-[0.22em] text-cream/50">Explore</p>
+          <div className="flex flex-col gap-1">
             <SectionNav
               isHome={isHome}
-              navTheme="light"
+              navTheme="dark"
+              lightNavText
               variant="mobile"
               onNavigate={() => setOpen(false)}
             />
@@ -263,37 +284,37 @@ export function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="font-display text-4xl sm:text-5xl text-charcoal hover:text-terracotta transition-colors py-3"
+                className="font-display text-4xl sm:text-5xl text-cream/75 hover:text-cream transition-colors py-3"
                 onClick={() => setOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
-            <div className={`mt-10 ${socialPillClass(false)}`}>
-              <a
-                href={FACEBOOK_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Follow on Facebook"
-                className={socialIconClass(false)}
-                onClick={() => setOpen(false)}
-              >
-                <FacebookIcon />
-              </a>
-              <a
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Follow on Instagram"
-                className={socialIconClass(false)}
-                onClick={() => setOpen(false)}
-              >
-                <InstagramIcon />
-              </a>
-            </div>
           </div>
-        </nav>
-      )}
+          <div className={`mt-10 w-fit ${socialPillClass(true)}`}>
+            <a
+              href={FACEBOOK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Follow on Facebook"
+              className={socialIconClass(true)}
+              onClick={() => setOpen(false)}
+            >
+              <FacebookIcon />
+            </a>
+            <a
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Follow on Instagram"
+              className={socialIconClass(true)}
+              onClick={() => setOpen(false)}
+            >
+              <InstagramIcon />
+            </a>
+          </div>
+        </div>
+      </nav>
     </>
   );
 }

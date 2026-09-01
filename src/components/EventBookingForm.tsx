@@ -217,7 +217,7 @@ export function EventBookingForm({
                   onChange={(e) => setCustomerName(e.target.value)}
                   placeholder="Your name"
                   autoComplete="name"
-                  className="w-full rounded-xl border border-sage/20 bg-white px-4 py-3 text-sm text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
+                  className="w-full rounded-xl border border-sage/20 bg-white px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
                 />
                 <input
                   type="email"
@@ -226,7 +226,7 @@ export function EventBookingForm({
                   onChange={(e) => setCustomerEmail(e.target.value)}
                   placeholder="Email for your receipt"
                   autoComplete="email"
-                  className="w-full rounded-xl border border-sage/20 bg-white px-4 py-3 text-sm text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
+                  className="w-full rounded-xl border border-sage/20 bg-white px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
                 />
               </div>
 

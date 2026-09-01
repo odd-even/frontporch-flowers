@@ -58,16 +58,54 @@ export function isBouquetCheckoutReady(presentationId: string, quantity: string)
   return canCheckoutBouquet(presentationId, quantity) && isSquareConfigured();
 }
 
+function resolveSquareEnvironment() {
+  const configured = process.env.SQUARE_ENVIRONMENT?.trim().toLowerCase();
+  if (configured === "production" || configured === "prod") {
+    return SquareEnvironment.Production;
+  }
+  if (configured === "sandbox") {
+    return SquareEnvironment.Sandbox;
+  }
+  // Vercel production should use Square production unless explicitly sandbox.
+  if (process.env.VERCEL_ENV === "production") {
+    return SquareEnvironment.Production;
+  }
+  return SquareEnvironment.Sandbox;
+}
+
 function getSquareClient() {
-  const token = process.env.SQUARE_ACCESS_TOKEN;
+  const token = process.env.SQUARE_ACCESS_TOKEN?.trim();
   if (!token) throw new Error("SQUARE_ACCESS_TOKEN is not set");
 
-  const environment =
-    process.env.SQUARE_ENVIRONMENT === "production"
-      ? SquareEnvironment.Production
-      : SquareEnvironment.Sandbox;
+  return new SquareClient({ token, environment: resolveSquareEnvironment() });
+}
 
-  return new SquareClient({ token, environment });
+function getSquareLocationId() {
+  const locationId = process.env.SQUARE_LOCATION_ID?.trim();
+  if (!locationId) throw new Error("SQUARE_LOCATION_ID is not set");
+  return locationId;
+}
+
+function formatSquareError(error: SquareError): string {
+  const detail =
+    error.errors?.map((item) => item.detail || item.code).filter(Boolean).join("; ") ||
+    error.message;
+
+  if (
+    error.errors?.some(
+      (item) =>
+        item.category === "AUTHENTICATION_ERROR" &&
+        (item.code === "UNAUTHORIZED" || item.code === "ACCESS_TOKEN_EXPIRED")
+    )
+  ) {
+    const env = resolveSquareEnvironment() === SquareEnvironment.Production ? "production" : "sandbox";
+    return (
+      `${detail} Check that SQUARE_ACCESS_TOKEN is the Production access token (not the application secret) ` +
+      `and SQUARE_ENVIRONMENT matches (${env}).`
+    );
+  }
+
+  return detail || "Square checkout failed.";
 }
 
 export function formatMoneyFromCents(cents: number, currency: string = "CAD") {
@@ -93,7 +131,7 @@ export async function countBookedSpotsForEvent(eventId: string): Promise<number>
   if (!isSquareConfigured()) return 0;
 
   const client = getSquareClient();
-  const locationId = process.env.SQUARE_LOCATION_ID!;
+  const locationId = getSquareLocationId();
   const referenceId = eventOrderReferenceId(eventId);
   const lookbackStart = new Date(Date.now() - ORDER_LOOKBACK_MS).toISOString();
   const holdCutoff = Date.now() - OPEN_HOLD_MS;
@@ -189,7 +227,7 @@ export async function createEventCheckoutLink({
     throw new Error("This event does not have a prepaid price set.");
   }
 
-  const locationId = process.env.SQUARE_LOCATION_ID!;
+  const locationId = getSquareLocationId();
   const currency = event.currency || "CAD";
   const origin = getSiteOrigin();
   const client = getSquareClient();
@@ -247,10 +285,7 @@ export async function createEventCheckoutLink({
     };
   } catch (error) {
     if (error instanceof SquareError) {
-      const detail =
-        error.errors?.map((item) => item.detail || item.code).filter(Boolean).join("; ") ||
-        error.message;
-      throw new Error(detail || "Square checkout failed.");
+      throw new Error(formatSquareError(error));
     }
     throw error;
   }
@@ -274,7 +309,7 @@ export async function createBouquetCheckoutLink(
     throw new Error("Could not calculate order total.");
   }
 
-  const locationId = process.env.SQUARE_LOCATION_ID!;
+  const locationId = getSquareLocationId();
   const currency = "CAD";
   const origin = getSiteOrigin();
   const client = getSquareClient();
@@ -337,10 +372,7 @@ export async function createBouquetCheckoutLink(
     };
   } catch (error) {
     if (error instanceof SquareError) {
-      const detail =
-        error.errors?.map((item) => item.detail || item.code).filter(Boolean).join("; ") ||
-        error.message;
-      throw new Error(detail || "Square checkout failed.");
+      throw new Error(formatSquareError(error));
     }
     throw error;
   }
