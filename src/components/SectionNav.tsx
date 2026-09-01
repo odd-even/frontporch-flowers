@@ -202,7 +202,7 @@ export function SectionNav({
     <div ref={containerRef} className="relative flex items-center">
       <span
         aria-hidden="true"
-        className="absolute inset-y-0 rounded-button pointer-events-none"
+        className="absolute inset-y-0 rounded-nav pointer-events-none"
         style={{
           left: pill.left,
           width: pill.width,
@@ -231,7 +231,7 @@ export function SectionNav({
                 onNavigate?.();
               }
             }}
-            className={`relative z-10 px-3 py-1.5 text-sm font-medium tracking-wide rounded-button whitespace-nowrap transition-colors duration-200 ${navLinkClass(isActive, lightNavText, section.id, navTheme)}`}
+            className={`relative z-10 px-3 py-1.5 text-sm font-medium tracking-wide rounded-nav whitespace-nowrap transition-colors duration-200 ${navLinkClass(isActive, lightNavText, section.id, navTheme)}`}
           >
             {section.label}
           </Link>

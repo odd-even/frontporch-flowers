@@ -280,7 +280,7 @@ export function PaymentOptions({
         <button
           type="button"
           onClick={openModal}
-          className="btn gap-2 bg-terracotta text-cream hover:bg-terracotta-dark"
+          className="btn gap-2 bg-terracotta-dark text-cream hover:bg-[color-mix(in_srgb,var(--color-terracotta-dark)_82%,var(--color-charcoal)_18%)]"
         >
           View payment options
         </button>

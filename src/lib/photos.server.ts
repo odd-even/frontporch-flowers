@@ -204,6 +204,8 @@ const PICK_YOUR_OWN_PHOTO_SRC = "/photos/gardening/pick-your-own-cover.jpg";
 /** Flanks the Meet Rhoda card in the about scroll strip. */
 const ABOUT_STRIP_LEFT_RHODA_SRC =
   "/photos/rhoda/619307978_122119506213020895_8144851958459755963_n.jpg";
+const ABOUT_STRIP_SEED_PACKET_SRC =
+  "/photos/gardening/617960987_122119491603020895_7089043428993150415_n.jpg";
 const ABOUT_STRIP_RIGHT_GREENHOUSE_SRC = PICK_YOUR_OWN_PHOTO_SRC;
 
 /** Omit from the Meet Rhoda scroll — duplicate seed packs, featured portraits, etc. */
@@ -277,9 +279,18 @@ export function getAboutStripPhotos(): SitePhoto[] {
   const greenhouse =
     bySrc.get(ABOUT_STRIP_RIGHT_GREENHOUSE_SRC) ?? getPickYourOwnPhoto();
 
+  const seedPacket =
+    bySrc.get(ABOUT_STRIP_SEED_PACKET_SRC) ?? {
+      src: ABOUT_STRIP_SEED_PACKET_SRC,
+      alt: "Flower seed packets from Olive Seed Company",
+      category: "gardening" as const,
+      subcategory: "gardening",
+    };
+
   const reserved = new Set([
     ...EXCLUDED_FROM_ABOUT_STRIP,
     ABOUT_STRIP_LEFT_RHODA_SRC,
+    ABOUT_STRIP_SEED_PACKET_SRC,
     ABOUT_STRIP_RIGHT_GREENHOUSE_SRC,
   ]);
 
@@ -287,12 +298,12 @@ export function getAboutStripPhotos(): SitePhoto[] {
     .filter((photo) => !reserved.has(photo.src))
     .sort((a, b) => a.src.localeCompare(b.src));
 
-  const total = pool.length + 2;
+  const total = pool.length + 3;
   const leftCount = Math.ceil(total / 2);
-  const leftFillers = pool.slice(0, leftCount - 1);
-  const rightFillers = pool.slice(leftCount - 1);
+  const leftFillers = pool.slice(0, leftCount - 2);
+  const rightFillers = pool.slice(leftCount - 2);
 
-  return [...leftFillers, oliveRhoda, greenhouse, ...rightFillers];
+  return [...leftFillers, seedPacket, oliveRhoda, greenhouse, ...rightFillers];
 }
 
 export function getGardenPhoto(): SitePhoto {

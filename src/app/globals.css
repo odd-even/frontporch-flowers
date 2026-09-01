@@ -30,7 +30,8 @@
   --color-deep-blue-green: #1e201d;
   --color-follow-band: #182126;
 
-  --radius-button: 18px;
+  --radius-button: 12px;
+  --radius-nav: 9px;
 }
 
 @layer base {
