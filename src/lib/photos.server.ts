@@ -112,6 +112,8 @@ function galleryDedupeKey(src: string): string {
 /** Banner crops and other near-duplicates — keep out of the public gallery. */
 const EXCLUDED_FROM_GALLERY = new Set([
   "/photos/boquets/hero-evi3.webp",
+  "/photos/boquets/hero-evi4.webp",
+  "/photos/boquets/hero-evi4.jpg",
   "/photos/boquets/hero-img-4252.jpg",
   "/photos/boquets/hero-img-4252.webp",
   "/photos/boquets/hero-IMG_4193.jpg",
@@ -199,7 +201,7 @@ export function getPhotoAt(index: number, category?: PhotoCategory): SitePhoto |
 }
 
 const HERO_PHOTO_SRCS = [
-  "/photos/boquets/hero-evi4.webp",
+  "/photos/boquets/hero-evi4.jpg",
   "/photos/boquets/hero-img-4252.webp",
   "/photos/boquets/hero-IMG_4193.webp",
 ] as const;
