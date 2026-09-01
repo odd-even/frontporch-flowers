@@ -49,7 +49,11 @@ function altForPhoto(relativePath: string, category: PhotoCategory): string {
   return ALT_BY_CATEGORY[category];
 }
 
+let allPhotosCache: SitePhoto[] | null = null;
+
 export function getAllPhotos(): SitePhoto[] {
+  if (allPhotosCache) return allPhotosCache;
+
   const photosDir = path.join(process.cwd(), "public/photos");
   if (!fs.existsSync(photosDir)) return [];
 
@@ -85,6 +89,7 @@ export function getAllPhotos(): SitePhoto[] {
   }
 
   walk(photosDir);
+  allPhotosCache = photos;
   return photos;
 }
 
@@ -109,6 +114,10 @@ const EXCLUDED_FROM_GALLERY = new Set([
   "/photos/boquets/hero-evi3.webp",
   "/photos/boquets/hero-img-4252.jpg",
   "/photos/boquets/hero-IMG_4193.jpg",
+  "/photos/boquets/hero-IMG_4187.jpg",
+  "/photos/boquets/hero-bouquet.jpg",
+  "/photos/boquets/hero-slide-4187.webp",
+  "/photos/boquets/hero-slide-4193.webp",
   "/photos/boquets/bucket-img-3993.jpg",
   "/photos/706d1a0e22bfb79deb54ddb65fb3f1a4.jpg",
 ]);
@@ -193,8 +202,8 @@ export function getPhotoAt(index: number, category?: PhotoCategory): SitePhoto |
 
 const HERO_PHOTO_SRCS = [
   "/photos/boquets/hero-evi4.webp",
-  "/photos/boquets/hero-img-4252.jpg",
-  "/photos/boquets/hero-IMG_4193.jpg",
+  "/photos/boquets/hero-slide-4187.webp",
+  "/photos/boquets/hero-slide-4193.webp",
 ] as const;
 
 const HERO_PHOTO_SRC = HERO_PHOTO_SRCS[0];

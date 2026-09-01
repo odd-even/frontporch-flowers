@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { client, isSanityConfigured } from "./sanity";
 import {
   fallbackBouquets,
@@ -26,7 +27,7 @@ export async function getWorkshops(): Promise<Workshop[]> {
   return [];
 }
 
-export async function getPickYourOwnEvents(): Promise<PickYourOwnEvent[]> {
+export const getPickYourOwnEvents = cache(async (): Promise<PickYourOwnEvent[]> => {
   const today = new Date().toISOString().slice(0, 10);
 
   function upcomingOnly(events: PickYourOwnEvent[]) {
@@ -49,7 +50,7 @@ export async function getPickYourOwnEvents(): Promise<PickYourOwnEvent[]> {
   } catch {
     return upcomingOnly(fallbackEvents);
   }
-}
+});
 
 export async function getBouquets(): Promise<Bouquet[]> {
   if (!isSanityConfigured) return fallbackBouquets;
@@ -71,7 +72,7 @@ export async function getBouquets(): Promise<Bouquet[]> {
   }
 }
 
-export async function getSiteSettings(): Promise<SiteSettings> {
+export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
   if (!isSanityConfigured) return fallbackSettings;
   try {
     const data = await client.fetch<SiteSettings>(settingsQuery);
@@ -79,4 +80,4 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   } catch {
     return fallbackSettings;
   }
-}
+});

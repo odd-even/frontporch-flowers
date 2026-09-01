@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { Hero } from "@/components/Hero";
-import { FinishRequestPicker } from "@/components/BouquetInquiry";
 import { AboutTeaser, EventsTeaser } from "@/components/AboutTeaser";
 import { PaymentOptions } from "@/components/PaymentOptions";
 import { FacebookFeed } from "@/components/FacebookFeed";
@@ -10,8 +10,18 @@ import { getSiteSettings } from "@/lib/queries";
 import { isSquareConfigured } from "@/lib/square";
 import { LOCAL_SEO, SITE_NAME } from "@/lib/seo";
 
-/** Keep Facebook posts fresh; homepage is server-rendered with env-backed Graph API. */
-export const dynamic = "force-dynamic";
+const FinishRequestPicker = dynamic(
+  () =>
+    import("@/components/BouquetInquiry").then((mod) => mod.FinishRequestPicker),
+  {
+    loading: () => (
+      <div className="min-h-[320px] animate-pulse rounded-3xl bg-sage/10" aria-hidden="true" />
+    ),
+  }
+);
+
+/** Cache homepage HTML; Facebook posts refresh hourly via fetch revalidate. */
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: {

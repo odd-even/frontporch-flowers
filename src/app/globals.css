@@ -145,16 +145,9 @@
         color-mix(in srgb, var(--color-brand-teal) 46%, transparent) 0%,
         transparent 75%
       );
-    background-attachment: fixed;
+    background-attachment: scroll;
     background-repeat: no-repeat;
-    background-size: 120% 120%, 118% 118%, 122% 122%, 116% 116%, 112% 112%;
-    background-position:
-      0% 0%,
-      100% 0%,
-      0% 100%,
-      100% 100%,
-      50% 55%;
-    animation: site-dark-band-drift 24s ease-in-out infinite alternate;
+    background-size: cover;
   }
 
   /* Follow section — solid band behind intro + nav */
@@ -162,38 +155,14 @@
     background-color: var(--color-follow-band);
   }
 
-  @keyframes site-dark-band-drift {
-    0% {
-      background-size: 116% 116%, 114% 114%, 118% 118%, 112% 112%, 106% 106%;
-      background-position:
-        -4% -3%,
-        104% -4%,
-        -5% 104%,
-        105% 102%,
-        46% 50%;
-    }
-    100% {
-      background-size: 132% 132%, 128% 128%, 134% 134%, 126% 126%, 120% 120%;
-      background-position:
-        10% 8%,
-        90% 6%,
-        8% 96%,
-        92% 92%,
-        58% 64%;
-    }
-  }
-
   @media (max-width: 768px) {
     .bg-site-dark-band {
-      animation: none;
-      background-attachment: scroll;
       background-size: cover;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .bg-site-dark-band {
-      animation: none;
       background-size: cover;
     }
 
