@@ -118,7 +118,7 @@ export const PRESENTATION_OPTIONS = [
     label: "In a sleeve",
     shortLabel: "Sleeve",
     hint: "wrapped for carrying",
-    price: "$25",
+    price: "$26",
     imageSrc: "/photos/boquets/sleeve-arrangement.jpg",
   },
   {
@@ -126,7 +126,7 @@ export const PRESENTATION_OPTIONS = [
     label: "In a vase",
     shortLabel: "Vase",
     hint: "ready to place",
-    price: "$45",
+    price: "$46",
     imageSrc: "/photos/boquets/vase-arrangement.png",
   },
   {
@@ -134,7 +134,7 @@ export const PRESENTATION_OPTIONS = [
     label: "In a mason jar",
     shortLabel: "Mason jar",
     hint: "casual & charming",
-    price: "$18",
+    price: "$19",
     imageSrc: "/photos/boquets/mason-jar-arrangement.jpg",
   },
   {
@@ -142,7 +142,7 @@ export const PRESENTATION_OPTIONS = [
     label: "Gift bag posie",
     shortLabel: "Gift bag",
     hint: "ready to gift",
-    price: "$20",
+    price: "$21",
     imageSrc: "/photos/boquets/gift-bag-posie.jpg",
   },
   {

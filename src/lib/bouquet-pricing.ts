@@ -1,9 +1,9 @@
 /** Fixed arrangement prices (CAD cents) — source of truth for Square checkout. */
 export const PRESENTATION_PRICES_CENTS: Record<string, number> = {
-  sleeve: 2500,
-  vase: 4500,
-  "mason-jar": 1800,
-  "gift-bag-posie": 2000,
+  sleeve: 2600,
+  vase: 4600,
+  "mason-jar": 1900,
+  "gift-bag-posie": 2100,
 };
 
 export const QUOTE_ONLY_PRESENTATIONS = new Set(["bucket", "custom"]);

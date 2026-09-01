@@ -72,7 +72,7 @@ export const fallbackBouquets: Bouquet[] = [
     title: "For Your Event",
     description:
       "Tell me what you need for your specific occasion — photo shoots, celebrations, and more. Share a few details and Rhoda will create a bouquet that fits.",
-    price: "From $55",
+    price: "From $57",
     available: true,
     featured: false,
   },
@@ -81,7 +81,7 @@ export const fallbackBouquets: Bouquet[] = [
     title: "Front Porch Classic",
     description:
       "Rhoda's signature mix — seasonal flowers with a touch of the unexpected. Perfect for laid-back celebrations.",
-    price: "From $55",
+    price: "From $57",
     available: true,
     featured: true,
   },
@@ -90,7 +90,7 @@ export const fallbackBouquets: Bouquet[] = [
     title: "Garden Posy",
     description:
       "A sweet, hand-tied bundle of whatever's blooming. Ideal for gifting or brightening your kitchen table.",
-    price: "From $35",
+    price: "From $36",
     available: true,
     featured: false,
   },
@@ -99,7 +99,7 @@ export const fallbackBouquets: Bouquet[] = [
     title: "Anniversary Bouquet",
     description:
       "A romantic Soft mix for anniversaries — seasonal blooms arranged in a vase ready to gift.",
-    price: "From $50",
+    price: "From $52",
     available: true,
     featured: true,
     tags: ["Includes vase"],
@@ -109,7 +109,7 @@ export const fallbackBouquets: Bouquet[] = [
     title: "Late Summer Glow",
     description:
       "A generous Bright gathering from peak-season blooms — bold, a little wild, and cut from whatever's at its best in the garden.",
-    price: "From $60",
+    price: "From $62",
     available: true,
     featured: true,
   },
@@ -118,7 +118,7 @@ export const fallbackBouquets: Bouquet[] = [
     title: "Meadow Jar",
     description:
       "A casual mason-jar bundle of backyard blooms and wispy grasses. Unfussy, charming, and perfect for a windowsill or bedside table.",
-    price: "From $40",
+    price: "From $41",
     available: true,
     featured: false,
   },
