@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowIcon } from "@/components/ArrowIcon";
 import { getPickYourOwnEvents } from "@/lib/queries";
 import { SITE_URL } from "@/lib/seo";
 import { formatDate } from "@/lib/utils";
@@ -129,8 +130,9 @@ export default async function WorkshopThanksPage() {
                             {line}
                           </span>
                         ))}
-                        <span className="mt-1 block text-sm font-normal text-terracotta group-hover:text-terracotta-dark">
-                          Open in Google Maps →
+                        <span className="mt-1 inline-flex items-center gap-1.5 text-sm font-normal text-terracotta group-hover:text-terracotta-dark">
+                          Open in Google Maps
+                          <ArrowIcon className="w-3.5 h-3.5" />
                         </span>
                       </span>
                     </a>

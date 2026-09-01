@@ -1,5 +1,6 @@
 import { BouquetGrid } from "@/components/BouquetCard";
 import { PageHeader } from "@/components/AboutTeaser";
+import { ArrowIcon } from "@/components/ArrowIcon";
 import { getBouquets, getSiteSettings } from "@/lib/queries";
 import { buildMailtoUrl, getContactEmail } from "@/lib/email";
 import { isSquareConfigured } from "@/lib/square";
@@ -46,7 +47,7 @@ export default async function BouquetsPage() {
             className="btn gap-2 bg-terracotta text-cream hover:bg-terracotta-dark"
           >
             Order by email
-            <span aria-hidden="true">&rarr;</span>
+            <ArrowIcon />
           </a>
         </div>
       </section>

@@ -1,17 +1,31 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowIcon } from "@/components/ArrowIcon";
 import { AboutTeaserScroll } from "@/components/AboutTeaserScroll";
 import { PickYourOwnFeatured } from "@/components/PickYourOwnFeatured";
 import { getFacebookPageUrl } from "@/lib/facebook";
 import {
   getAboutStripPhotos,
   getBouquetWorkshopPhotos,
+  getMeetRhodaPhoto,
   getPickYourOwnPhoto,
 } from "@/lib/photos.server";
 import { getPickYourOwnEvents, getSiteSettings } from "@/lib/queries";
 
-export function AboutTeaser() {
-  return <AboutTeaserScroll sidePhotos={getAboutStripPhotos()} />;
+export async function AboutTeaser() {
+  const settings = await getSiteSettings();
+  const facebookUrl = getFacebookPageUrl(settings.facebookPageUrl);
+  const instagramHandle = settings.instagramHandle || "front_porchflowers";
+  const instagramUrl = `https://www.instagram.com/${instagramHandle}`;
+
+  return (
+    <AboutTeaserScroll
+      sidePhotos={getAboutStripPhotos()}
+      rhodaPhoto={getMeetRhodaPhoto()}
+      facebookUrl={facebookUrl}
+      instagramUrl={instagramUrl}
+    />
+  );
 }
 
 export async function EventsTeaser() {
@@ -42,9 +56,10 @@ export async function EventsTeaser() {
           </div>
           <Link
             href="/events"
-            className="text-sm font-medium text-terracotta hover:text-terracotta-dark transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-medium text-terracotta hover:text-terracotta-dark transition-colors"
           >
-            All events &rarr;
+            All events
+            <ArrowIcon />
           </Link>
         </div>
 

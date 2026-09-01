@@ -31,7 +31,7 @@ export function Hero({ tagline, photos }: HeroProps) {
 
   return (
     <>
-      <section className="relative h-svh min-h-svh flex items-end overflow-hidden">
+      <section data-header-zone="hero" className="relative h-svh min-h-svh flex items-end overflow-hidden">
         <div className="absolute inset-0">
           {slides.map((photo, i) => (
             <Image

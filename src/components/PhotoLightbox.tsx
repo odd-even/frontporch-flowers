@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect } from "react";
+import { ArrowIcon } from "@/components/ArrowIcon";
 import type { SitePhoto } from "@/lib/photos.shared";
 
 interface PhotoLightboxProps {
@@ -72,9 +73,7 @@ export function PhotoLightbox({
           className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 p-3 text-cream/70 hover:text-cream transition-colors z-10"
           aria-label="Previous photo"
         >
-          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
-          </svg>
+          <ArrowIcon className="w-8 h-8" direction="left" />
         </button>
       )}
 
@@ -88,9 +87,7 @@ export function PhotoLightbox({
           className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 p-3 text-cream/70 hover:text-cream transition-colors z-10"
           aria-label="Next photo"
         >
-          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
-          </svg>
+          <ArrowIcon className="w-8 h-8" />
         </button>
       )}
 

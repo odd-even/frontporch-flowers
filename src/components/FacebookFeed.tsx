@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { PhotoGallery } from "@/components/PhotoGallery";
 import { FacebookFeedGrid } from "@/components/FacebookFeedGrid";
 import { FacebookIcon, InstagramIcon } from "@/components/SocialIcons";
@@ -23,14 +22,13 @@ export async function FacebookFeed({ pageUrl }: FacebookFeedProps) {
   const fallbackPhotos = getInstagramFallbackPhotos();
 
   return (
-    <section className="relative bg-site-dark-band py-20 md:py-28 text-cream">
-      {/* Keep most of the section solid charcoal; mesh only near the footer */}
+    <section id="follow" className="relative scroll-mt-24 bg-site-dark-band bg-follow-band py-20 md:py-28 text-cream">
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-[92%] bg-gradient-to-b from-charcoal from-70% via-charcoal/95 via-85% to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 bottom-0 z-[1] bg-gradient-to-b from-follow-band from-55% via-follow-band/75 via-80% to-transparent"
         aria-hidden="true"
       />
 
-      <div className="relative max-w-6xl mx-auto px-6 text-center">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
         <p className="text-sage-light text-sm uppercase tracking-[0.2em] mb-3">
           From the garden
         </p>
@@ -73,13 +71,6 @@ export async function FacebookFeed({ pageUrl }: FacebookFeedProps) {
             <InstagramIcon className="w-5 h-5" />
             Instagram
           </a>
-          <Link
-            href="/gallery"
-            className="btn gap-2 border border-cream/30 text-cream hover:bg-cream/10"
-          >
-            View full gallery
-            <span aria-hidden="true">&rarr;</span>
-          </Link>
         </div>
       </div>
     </section>

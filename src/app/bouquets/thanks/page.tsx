@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowIcon } from "@/components/ArrowIcon";
 import {
   bouquetOrderTotalCents,
   formatCents,
@@ -110,8 +111,9 @@ export default async function BouquetThanksPage({
                       <span className="text-base leading-snug">
                         <span className="block">Front Porch Flowers</span>
                         <span className="block">{PICKUP_ADDRESS}</span>
-                        <span className="mt-1 block text-sm font-normal text-terracotta group-hover:text-terracotta-dark">
-                          Open in Google Maps →
+                        <span className="mt-1 inline-flex items-center gap-1.5 text-sm font-normal text-terracotta group-hover:text-terracotta-dark">
+                          Open in Google Maps
+                          <ArrowIcon className="w-3.5 h-3.5" />
                         </span>
                       </span>
                     </a>

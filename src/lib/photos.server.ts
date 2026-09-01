@@ -3,6 +3,7 @@ import "server-only";
 import fs from "fs";
 import path from "path";
 import type { PhotoCategory, SitePhoto } from "./photos.shared";
+import { BUTTON_RHODA_PHOTO_SRC, MEET_RHODA_PHOTO_SRC } from "./photos.shared";
 
 const FOLDER_CATEGORY: Record<string, PhotoCategory> = {
   boquets: "bouquets",
@@ -200,10 +201,19 @@ const HERO_PHOTO_SRC = HERO_PHOTO_SRCS[0];
 
 const PICK_YOUR_OWN_PHOTO_SRC = "/photos/gardening/pick-your-own-cover.jpg";
 
-/** Omit from the Meet Rhoda scroll — duplicate seed packs, etc. */
+/** Flanks the Meet Rhoda card in the about scroll strip. */
+const ABOUT_STRIP_LEFT_RHODA_SRC =
+  "/photos/rhoda/619307978_122119506213020895_8144851958459755963_n.jpg";
+const ABOUT_STRIP_RIGHT_GREENHOUSE_SRC = PICK_YOUR_OWN_PHOTO_SRC;
+
+/** Omit from the Meet Rhoda scroll — duplicate seed packs, featured portraits, etc. */
 const EXCLUDED_FROM_ABOUT_STRIP = new Set([
   "/photos/gardening/619252661_122119491681020895_5001416612745842382_n.jpg",
+  "/photos/gardening/684852749_122131780233020895_5762345005324446283_n.jpg",
+  "/photos/gardening/699491262_122132749023020895_4185938830171669844_n.jpg",
   "/photos/706d1a0e22bfb79deb54ddb65fb3f1a4.jpg",
+  MEET_RHODA_PHOTO_SRC,
+  BUTTON_RHODA_PHOTO_SRC,
 ]);
 
 function heroPhotoFallback(src: string): SitePhoto {
@@ -241,49 +251,48 @@ export function getRhodaPhotos(): SitePhoto[] {
     .sort((a, b) => a.src.localeCompare(b.src));
 }
 
+export function getMeetRhodaPhoto(): SitePhoto {
+  return (
+    getAllPhotos().find((photo) => photo.src === MEET_RHODA_PHOTO_SRC) ?? {
+      src: MEET_RHODA_PHOTO_SRC,
+      alt: "Rhoda in the zinnia field",
+      category: "gardening",
+      subcategory: "rhoda",
+    }
+  );
+}
+
 /** Rhoda portraits plus garden photos for the Meet Rhoda scroll strip. */
 export function getAboutStripPhotos(): SitePhoto[] {
-  const rhoda = getRhodaPhotos();
-  const used = new Set(rhoda.map((photo) => photo.src));
-
-  const GREENHOUSE_SRCS = [
-    PICK_YOUR_OWN_PHOTO_SRC,
-    "/photos/gardening/684852749_122131780233020895_5762345005324446283_n.jpg",
-  ] as const;
-
   const bySrc = new Map(getAllPhotos().map((photo) => [photo.src, photo]));
-  const greenhouse: SitePhoto[] = [];
 
-  for (const src of GREENHOUSE_SRCS) {
-    if (used.has(src)) continue;
-    const photo =
-      bySrc.get(src) ||
-      (src === PICK_YOUR_OWN_PHOTO_SRC ? getPickYourOwnPhoto() : undefined);
-    if (!photo) continue;
-    used.add(src);
-    greenhouse.push(photo);
-  }
+  const oliveRhoda =
+    bySrc.get(ABOUT_STRIP_LEFT_RHODA_SRC) ?? {
+      src: ABOUT_STRIP_LEFT_RHODA_SRC,
+      alt: "Rhoda working in the garden at Front Porch Flowers",
+      category: "gardening" as const,
+      subcategory: "rhoda",
+    };
 
-  const garden = getPhotosByCategory("gardening")
-    .filter((photo) => !used.has(photo.src) && !EXCLUDED_FROM_ABOUT_STRIP.has(photo.src))
+  const greenhouse =
+    bySrc.get(ABOUT_STRIP_RIGHT_GREENHOUSE_SRC) ?? getPickYourOwnPhoto();
+
+  const reserved = new Set([
+    ...EXCLUDED_FROM_ABOUT_STRIP,
+    ABOUT_STRIP_LEFT_RHODA_SRC,
+    ABOUT_STRIP_RIGHT_GREENHOUSE_SRC,
+  ]);
+
+  const pool = getPhotosByCategory("gardening")
+    .filter((photo) => !reserved.has(photo.src))
     .sort((a, b) => a.src.localeCompare(b.src));
 
-  const more = [...greenhouse, ...garden]
-    .filter((photo) => !EXCLUDED_FROM_ABOUT_STRIP.has(photo.src))
-    .slice(0, 12);
-  const mid = Math.ceil(more.length / 2);
-  const rhodaMid = Math.ceil(rhoda.length / 2);
+  const total = pool.length + 2;
+  const leftCount = Math.ceil(total / 2);
+  const leftFillers = pool.slice(0, leftCount - 1);
+  const rightFillers = pool.slice(leftCount - 1);
 
-  // Greenhouse-with-rainbow leads the strip (just below the homepage banner).
-  return pinPhotosFirst(
-    [
-      ...more.slice(0, mid),
-      ...rhoda.slice(0, rhodaMid),
-      ...rhoda.slice(rhodaMid),
-      ...more.slice(mid),
-    ],
-    GALLERY_PINNED_SRCS
-  );
+  return [...leftFillers, oliveRhoda, greenhouse, ...rightFillers];
 }
 
 export function getGardenPhoto(): SitePhoto {

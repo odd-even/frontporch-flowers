@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { FacebookIcon } from "@/components/SocialIcons";
 import type { Workshop } from "@/lib/types";
 import { formatShortDate } from "@/lib/utils";
@@ -101,15 +100,6 @@ export function WorkshopsSection({
               Seasonal workshops
             </h2>
           </div>
-          {!showAll && display.length > 0 && (
-            <Link
-              href="/gallery"
-              className="text-terracotta font-medium hover:text-terracotta-dark transition-colors flex items-center gap-2"
-            >
-              Gallery
-              <span aria-hidden="true">&rarr;</span>
-            </Link>
-          )}
         </div>
 
         {display.length > 0 ? (

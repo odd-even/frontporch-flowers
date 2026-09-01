@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
       { source: "/workshops", destination: "/events", permanent: true },
       { source: "/pick-your-own", destination: "/events", permanent: true },
       { source: "/about", destination: "/", permanent: true },
+      { source: "/gallery", destination: "/", permanent: false },
     ];
   },
 };

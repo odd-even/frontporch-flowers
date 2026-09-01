@@ -178,13 +178,13 @@ export function EventBookingForm({
                       {qtyMax < 10 ? ` · ${qtyMax} left` : null}
                     </p>
                   </div>
-                  <div className="flex shrink-0 items-center gap-1 rounded-full bg-cream ring-1 ring-sage/20 p-1">
+                  <div className="flex shrink-0 items-center gap-1 rounded-button bg-cream ring-1 ring-sage/20 p-1">
                     <button
                       type="button"
                       onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                       disabled={quantity <= 1}
                       aria-label="Fewer guests"
-                      className="flex h-8 w-8 items-center justify-center rounded-full text-charcoal hover:bg-sage/10 transition-colors disabled:opacity-30"
+                      className="flex h-8 w-8 items-center justify-center rounded-button text-charcoal hover:bg-sage/10 transition-colors disabled:opacity-30"
                     >
                       <span className="text-lg leading-none" aria-hidden="true">
                         −
@@ -198,7 +198,7 @@ export function EventBookingForm({
                       onClick={() => setQuantity((q) => Math.min(qtyMax, q + 1))}
                       disabled={quantity >= qtyMax}
                       aria-label="More guests"
-                      className="flex h-8 w-8 items-center justify-center rounded-full text-charcoal hover:bg-sage/10 transition-colors disabled:opacity-30"
+                      className="flex h-8 w-8 items-center justify-center rounded-button text-charcoal hover:bg-sage/10 transition-colors disabled:opacity-30"
                     >
                       <span className="text-lg leading-none" aria-hidden="true">
                         +

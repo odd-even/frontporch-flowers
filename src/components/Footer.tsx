@@ -2,25 +2,26 @@ import Image from "next/image";
 import Link from "next/link";
 import { FacebookIcon, InstagramIcon } from "@/components/SocialIcons";
 import { getFacebookPageUrl } from "@/lib/facebook";
+import { HOME_SECTIONS } from "@/lib/home-sections";
 
 export function Footer() {
   const facebookUrl = getFacebookPageUrl();
 
   return (
     <footer className="relative bg-site-dark-band text-cream mt-auto border-t border-cream/20">
-      <div className="relative max-w-6xl mx-auto px-6 pt-14 pb-10 md:pt-16 md:pb-10">
-        <div className="grid md:grid-cols-3 gap-10 md:gap-12 items-start">
-          <div className="flex gap-5 items-start">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-10 md:pt-16 md:pb-10">
+        <div className="grid md:grid-cols-[2fr_auto] gap-8 md:gap-6 items-stretch">
+          <div className="flex gap-6 sm:gap-8 items-center">
             <Link href="/" className="shrink-0 group">
               <Image
                 src="/logo.svg"
                 alt="Front Porch Flowers"
-                width={192}
-                height={192}
-                className="w-36 h-36 sm:w-44 sm:h-44 transition-transform duration-500 group-hover:scale-105"
+                width={256}
+                height={256}
+                className="w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56 transition-transform duration-500 group-hover:scale-105"
               />
             </Link>
-            <div className="min-w-0 pt-1">
+            <div className="flex-1 sm:max-w-xs md:max-w-none">
               <p className="text-cream/70 text-sm leading-relaxed">
                 Locally grown cut flowers and bouquets in Woodstock, New Brunswick.
               </p>
@@ -28,68 +29,83 @@ export function Footer() {
             </div>
           </div>
 
-          <div>
-            <h4 className="font-medium text-sm uppercase tracking-widest text-sage-light mb-4">
-              Explore
-            </h4>
-            <ul className="space-y-2 text-sm text-cream/70">
-              <li>
-                <Link href="/gallery" className="hover:text-cream transition-colors">
-                  Gallery
-                </Link>
-              </li>
-              <li>
-                <Link href="/events" className="hover:text-cream transition-colors">
-                  Events
-                </Link>
-              </li>
-            </ul>
-          </div>
+          <div className="grid h-full grid-cols-[1fr_auto_1fr] items-stretch rounded-2xl border border-cream/20 py-5">
+            <div className="flex flex-col px-4 sm:px-5">
+              <h4 className="font-medium text-sm uppercase tracking-widest text-sage-light mb-3">
+                Explore
+              </h4>
+              <ul className="space-y-2 text-sm text-cream/70">
+                {HOME_SECTIONS.map((section) => (
+                  <li key={section.id}>
+                    <Link
+                      href={`/#${section.id}`}
+                      className="hover:text-cream transition-colors"
+                    >
+                      {section.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          <div>
-            <h4 className="font-medium text-sm uppercase tracking-widest text-sage-light mb-4">
-              Connect
-            </h4>
-            <ul className="space-y-2 text-sm text-cream/70">
-              <li>
-                <a
-                  href={facebookUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 hover:text-cream transition-colors"
-                >
-                  <FacebookIcon className="w-3.5 h-3.5" />
-                  Facebook — reservations
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.instagram.com/front_porchflowers"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 hover:text-cream transition-colors"
-                >
-                  <InstagramIcon className="w-3.5 h-3.5" />
-                  @front_porchflowers
-                </a>
-              </li>
-              <li>
-                <a
-                  href="mailto:hello@frontporchflowers.ca"
-                  className="hover:text-cream transition-colors"
-                >
-                  hello@frontporchflowers.ca
-                </a>
-              </li>
-            </ul>
+            <div className="w-px bg-cream/20" aria-hidden="true" />
+
+            <div className="flex flex-col px-4 sm:px-5">
+              <h4 className="font-medium text-sm uppercase tracking-widest text-sage-light mb-3">
+                Connect
+              </h4>
+              <ul className="space-y-2 text-sm text-cream/70">
+                <li>
+                  <a
+                    href={facebookUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 hover:text-cream transition-colors"
+                  >
+                    <FacebookIcon className="w-3.5 h-3.5" />
+                    Facebook
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.instagram.com/front_porchflowers"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 hover:text-cream transition-colors"
+                  >
+                    <InstagramIcon className="w-3.5 h-3.5" />
+                    @front_porchflowers
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="mailto:hello@frontporchflowers.ca"
+                    className="hover:text-cream transition-colors"
+                  >
+                    hello@frontporchflowers.ca
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="relative border-t border-cream/10">
-        <div className="max-w-6xl mx-auto px-6 py-8 text-xs text-cream/50">
+      <div className="relative z-10 border-t border-cream/10">
+        <div className="max-w-6xl mx-auto px-6 py-8 text-xs text-cream/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <p>
             &copy; {new Date().getFullYear()} Front Porch Flowers · Woodstock, NB
+          </p>
+          <p>
+            Site crafted by{" "}
+            <a
+              href="https://darrowdesign.ca"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cream/70 hover:text-cream transition-colors"
+            >
+              Darrow Design
+            </a>
           </p>
         </div>
       </div>

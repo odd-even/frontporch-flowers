@@ -32,6 +32,8 @@ export const BRAND_COLORS = {
   warmBrown: "#5c4a3d",
   charcoal: "#2d2926",
   moss: "#5c7564",
+  deepBlueGreen: "#1e201d",
+  followBand: "#182126",
 } as const;
 
 export type BrandGradientKey = keyof typeof BRAND_GRADIENT;
@@ -50,6 +52,8 @@ export const BRAND_CSS_VARS = {
   warmBrown: "--color-warm-brown",
   charcoal: "--color-charcoal",
   moss: "--color-moss",
+  deepBlueGreen: "--color-deep-blue-green",
+  followBand: "--color-follow-band",
   brandPink: "--color-brand-pink",
   brandYellow: "--color-brand-yellow",
   brandBlue: "--color-brand-blue",

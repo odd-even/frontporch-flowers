@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowIcon } from "@/components/ArrowIcon";
 import {
   bouquetOrderTotalCents,
   canCheckoutBouquet,
@@ -545,7 +546,7 @@ function PresentationChooser({
   return (
     <fieldset>
       <legend className="text-sm font-medium text-charcoal mb-3">Arrangement</legend>
-      <div className="overflow-hidden rounded-2xl border border-sage/20 bg-cream">
+      <div className="overflow-hidden rounded-button border border-sage/20 bg-cream">
         <div className="grid grid-cols-[minmax(0,11.5rem)_1fr] sm:grid-cols-[minmax(0,14rem)_1fr] items-stretch">
           <div className="relative min-h-full bg-cream-dark">
             <Image
@@ -1031,7 +1032,7 @@ export function BouquetInquiry({
         className="mt-4 inline-flex items-center gap-2 text-sage-dark font-medium hover:text-sage transition-colors"
       >
         I&apos;d like something similar
-        <span aria-hidden="true">&rarr;</span>
+        <ArrowIcon />
       </button>
 
       <InquiryModal
@@ -1272,7 +1273,7 @@ export function FinishRequestPicker({
         <div>
           <div className="mb-8">
             <p className="text-sage text-sm uppercase tracking-[0.2em] mb-2">
-              Choose an arrangement option
+              Choose an arrangement
             </p>
             <h3 className="font-display text-2xl md:text-3xl text-charcoal mb-2">
               Order a bouquet
@@ -1285,7 +1286,7 @@ export function FinishRequestPicker({
                 key={option.id}
                 type="button"
                 onClick={() => openOrder(option.id)}
-                className="group relative aspect-[3/4] overflow-hidden rounded-2xl text-left ring-1 ring-sage/15 hover:ring-sage/40 transition-all"
+                className="group relative aspect-[3/4] overflow-hidden rounded-button text-left ring-1 ring-sage/15 hover:ring-sage/40 transition-all"
               >
                 <Image
                   src={option.imageSrc}

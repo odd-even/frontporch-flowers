@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition, type MouseEvent } from "react";
 import Image from "next/image";
+import { ArrowIcon } from "@/components/ArrowIcon";
 import type { FacebookMediaItem, FacebookPost } from "@/lib/facebook";
 
 interface FacebookFeedGridProps {
@@ -97,21 +98,17 @@ function PostMedia({
             type="button"
             onClick={showPrevious}
             aria-label="Previous media"
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-charcoal/70 text-cream hover:bg-charcoal/90 transition-colors"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-button bg-charcoal/70 text-cream hover:bg-charcoal/90 transition-colors"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M14.7 5.3a1 1 0 0 1 0 1.4L9.4 12l5.3 5.3a1 1 0 0 1-1.4 1.4l-6-6a1 1 0 0 1 0-1.4l6-6a1 1 0 0 1 1.4 0z" />
-            </svg>
+            <ArrowIcon className="w-5 h-5" direction="left" />
           </button>
           <button
             type="button"
             onClick={showNext}
             aria-label="Next media"
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-charcoal/70 text-cream hover:bg-charcoal/90 transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-button bg-charcoal/70 text-cream hover:bg-charcoal/90 transition-colors"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M9.3 5.3a1 1 0 0 1 1.4 0l6 6a1 1 0 0 1 0 1.4l-6 6a1 1 0 0 1-1.4-1.4l5.3-5.3-5.3-5.3a1 1 0 0 1 0-1.4z" />
-            </svg>
+            <ArrowIcon className="w-5 h-5" />
           </button>
           <p className="absolute bottom-2 right-2 z-10 rounded-full bg-charcoal/70 px-2.5 py-1 text-xs text-cream tabular-nums">
             {index + 1} / {mediaItems.length}
@@ -160,9 +157,10 @@ function FacebookPostCard({
             href={post.permalink}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-auto pt-3 text-sm text-cream/55 hover:text-cream transition-colors"
+            className="mt-auto pt-3 inline-flex items-center gap-1.5 text-sm text-cream/55 hover:text-cream transition-colors"
           >
-            View on Facebook &rarr;
+            View on Facebook
+            <ArrowIcon className="w-3.5 h-3.5" />
           </a>
         </div>
       ) : null}
@@ -209,7 +207,7 @@ function FacebookPostModal({
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-3 right-3 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-charcoal/80 text-cream/80 hover:text-cream transition-colors"
+          className="absolute top-3 right-3 z-20 flex h-9 w-9 items-center justify-center rounded-button bg-charcoal/80 text-cream/80 hover:text-cream transition-colors"
           aria-label="Close"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -229,9 +227,10 @@ function FacebookPostModal({
             href={post.permalink}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 inline-flex text-sm text-sage-light hover:text-cream transition-colors"
+            className="mt-4 inline-flex items-center gap-1.5 text-sm text-sage-light hover:text-cream transition-colors"
           >
-            View on Facebook &rarr;
+            View on Facebook
+            <ArrowIcon className="w-3.5 h-3.5" />
           </a>
         </div>
       </div>
@@ -295,14 +294,54 @@ export function FacebookFeedGrid({
       </div>
 
       {cursor ? (
-        <div className="mt-8 text-center">
+        <div className="mt-8">
           <button
             type="button"
             onClick={loadMore}
             disabled={isPending}
-            className="btn gap-2 border border-cream/30 text-cream hover:bg-cream/10 disabled:opacity-60 disabled:cursor-wait"
+            aria-label={isPending ? "Loading more posts" : "Load more posts"}
+            className="group inline-flex h-11 max-w-[2.75rem] items-center overflow-hidden rounded-button border border-cream/30 text-cream transition-[max-width,background-color] duration-300 ease-out enabled:hover:max-w-[9.5rem] enabled:hover:bg-cream/10 enabled:focus-visible:max-w-[9.5rem] enabled:focus-visible:bg-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/30 disabled:cursor-wait disabled:opacity-60"
           >
-            {isPending ? "Loading…" : "Load more"}
+            <span
+              className="flex h-11 w-11 shrink-0 items-center justify-center"
+              aria-hidden="true"
+            >
+              {isPending ? (
+                <svg
+                  className="h-5 w-5 animate-spin"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                >
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              )}
+            </span>
+            <span className="whitespace-nowrap pr-4 text-sm font-medium opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+              {isPending ? "Loading…" : "Load more"}
+            </span>
           </button>
           {error ? <p className="mt-3 text-sm text-cream/60">{error}</p> : null}
         </div>

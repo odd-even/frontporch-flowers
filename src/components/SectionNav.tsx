@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { gradientColorAtProgress, scrollColorProgress } from "@/lib/brand-gradient";
+import { BRAND_GRADIENT } from "@/lib/brand-colors";
+import type { HeaderSurface } from "@/lib/header-surface";
 import {
   HOME_SECTIONS,
   type HomeSectionId,
@@ -10,22 +13,60 @@ import {
 const SPRING_EASE = "cubic-bezier(0.34, 1.56, 0.64, 1)";
 const SCROLL_OFFSET = 100;
 
+function pillBackground(color: string, navTheme: HeaderSurface, solid = false) {
+  const mix = solid
+    ? 82
+    : navTheme === "hero" || navTheme === "gradient" || navTheme === "dark" || navTheme === "follow"
+      ? 44
+      : 28;
+  return `color-mix(in srgb, ${color} ${mix}%, transparent)`;
+}
+
+function navLinkClass(
+  isActive: boolean,
+  lightNavText: boolean,
+  sectionId: HomeSectionId,
+  navTheme: HeaderSurface
+) {
+  if (isActive && navTheme === "follow" && sectionId === "follow") {
+    return "text-charcoal";
+  }
+  if (lightNavText) {
+    return isActive ? "text-cream" : "text-cream/70 hover:text-cream";
+  }
+  return isActive ? "text-charcoal" : "text-warm-brown hover:text-terracotta";
+}
+
 interface SectionNavProps {
   isHome: boolean;
-  onHero: boolean;
+  navTheme: HeaderSurface;
+  lightNavText?: boolean;
+  surfaceAccent?: string;
   onNavigate?: () => void;
   variant?: "desktop" | "mobile";
 }
 
+function sectionActivationLine(sectionId: HomeSectionId): number {
+  if (sectionId === "about") return window.innerHeight;
+  return SCROLL_OFFSET;
+}
+
+function isSectionActive(sectionId: HomeSectionId, top: number): boolean {
+  const line = sectionActivationLine(sectionId);
+  if (sectionId === "about") return top < line;
+  return top <= line;
+}
+
 function getActiveSection(): HomeSectionId | null {
-  const scrollPos = window.scrollY + SCROLL_OFFSET;
   let current: HomeSectionId | null = null;
 
-  for (const section of [...HOME_SECTIONS].reverse()) {
+  for (const section of HOME_SECTIONS) {
     const el = document.getElementById(section.id);
-    if (el && el.offsetTop <= scrollPos) {
+    if (!el) continue;
+
+    const top = el.getBoundingClientRect().top;
+    if (isSectionActive(section.id, top)) {
       current = section.id;
-      break;
     }
   }
 
@@ -34,14 +75,28 @@ function getActiveSection(): HomeSectionId | null {
 
 export function SectionNav({
   isHome,
-  onHero,
+  navTheme,
+  lightNavText = false,
+  surfaceAccent,
   onNavigate,
   variant = "desktop",
 }: SectionNavProps) {
   const [activeId, setActiveId] = useState<HomeSectionId | null>(null);
   const [pill, setPill] = useState({ left: 0, width: 0 });
+  const [scrollAccent, setScrollAccent] = useState(gradientColorAtProgress(0));
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef(new Map<HomeSectionId, HTMLElement>());
+
+  const followActiveOnDark = navTheme === "follow" && activeId === "follow";
+
+  const pillColor =
+    navTheme === "gradient" && surfaceAccent
+      ? surfaceAccent
+      : followActiveOnDark
+        ? BRAND_GRADIENT.teal
+        : navTheme === "dark" || navTheme === "follow"
+          ? "#faf6f0"
+          : scrollAccent;
 
   const updateActive = useCallback(() => {
     if (!isHome) return;
@@ -66,15 +121,24 @@ export function SectionNav({
     });
   }, [activeId, isHome, variant]);
 
+  const updateScrollAccent = useCallback(() => {
+    if (!isHome || navTheme === "gradient" || navTheme === "dark" || navTheme === "follow") return;
+    setScrollAccent(gradientColorAtProgress(scrollColorProgress()));
+  }, [isHome, navTheme]);
+
   useEffect(() => {
     if (!isHome) return;
 
     updateActive();
+    updateScrollAccent();
 
     let frame = 0;
     const onScroll = () => {
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(updateActive);
+      frame = requestAnimationFrame(() => {
+        updateActive();
+        updateScrollAccent();
+      });
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -85,11 +149,11 @@ export function SectionNav({
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", updatePill);
     };
-  }, [isHome, updateActive, updatePill]);
+  }, [isHome, updateActive, updateScrollAccent, updatePill]);
 
   useEffect(() => {
     updatePill();
-  }, [activeId, onHero, updatePill]);
+  }, [activeId, navTheme, updatePill]);
 
   const scrollTo = (id: HomeSectionId) => {
     setActiveId(id);
@@ -138,14 +202,13 @@ export function SectionNav({
     <div ref={containerRef} className="relative flex items-center">
       <span
         aria-hidden="true"
-        className={`absolute inset-y-0 rounded-full pointer-events-none ${
-          onHero ? "bg-cream/22" : "bg-sage/15"
-        }`}
+        className="absolute inset-y-0 rounded-button pointer-events-none"
         style={{
           left: pill.left,
           width: pill.width,
           opacity: pill.width > 0 ? 1 : 0,
-          transition: `left 320ms ${SPRING_EASE}, width 320ms ${SPRING_EASE}, opacity 180ms ease`,
+          backgroundColor: pillBackground(pillColor, navTheme, followActiveOnDark),
+          transition: `left 320ms ${SPRING_EASE}, width 320ms ${SPRING_EASE}, opacity 180ms ease, background-color 120ms linear`,
         }}
       />
       {HOME_SECTIONS.map((section) => {
@@ -168,15 +231,7 @@ export function SectionNav({
                 onNavigate?.();
               }
             }}
-            className={`relative z-10 px-3 py-1.5 text-sm font-medium tracking-wide rounded-full whitespace-nowrap transition-colors duration-200 ${
-              onHero
-                ? isActive
-                  ? "text-cream"
-                  : "text-cream/70 hover:text-cream"
-                : isActive
-                  ? "text-charcoal"
-                  : "text-warm-brown hover:text-terracotta"
-            }`}
+            className={`relative z-10 px-3 py-1.5 text-sm font-medium tracking-wide rounded-button whitespace-nowrap transition-colors duration-200 ${navLinkClass(isActive, lightNavText, section.id, navTheme)}`}
           >
             {section.label}
           </Link>
