@@ -66,6 +66,10 @@ export function AboutTeaserScroll({
 
     const MAX_EXTRA_RATIO = 1;
     const MEET_RADIUS = "1.5rem";
+    const OPEN_EASE_POWER = 0.55;
+    const FREEZE_PROGRESS = 0.98;
+
+    const easeOpen = (progress: number) => Math.pow(progress, OPEN_EASE_POWER);
 
     const updateMeetCard = () => {
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -83,8 +87,9 @@ export function AboutTeaserScroll({
       }
 
       const progress = meetScrollProgress();
+      const eased = easeOpen(progress);
       const maxExtra = base * MAX_EXTRA_RATIO;
-      const photoWidth = maxExtra * Math.pow(progress, 0.55);
+      const photoWidth = maxExtra * eased;
       const isOpen = photoWidth > 0;
 
       meet.dataset.open = isOpen ? "true" : "false";
@@ -107,21 +112,14 @@ export function AboutTeaserScroll({
       return Math.abs(meetCenterX - window.innerWidth / 2) <= 20;
     };
 
-    const shouldUnfreezeHorizontalScroll = () => {
-      const rect = section.getBoundingClientRect();
-      const sectionCenter = rect.top + rect.height / 2;
-      return sectionCenter > window.innerHeight * 0.72;
-    };
-
     const computeBase = () => {
-      const rect = section.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const sectionCenter = rect.top + rect.height / 2;
-      const t = Math.min(1, Math.max(-1, (sectionCenter - vh / 2) / (vh * 0.55)));
+      const progress = meetScrollProgress();
+      const eased = easeOpen(progress);
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const maxShift = reduceMotion ? 0 : Math.min(window.innerWidth * 0.55, 480);
       const meetCenter = meet.offsetLeft + meet.offsetWidth / 2;
-      return meetCenter - scroller.clientWidth / 2 - t * maxShift;
+      const shift = (1 - eased) * maxShift;
+      return meetCenter - scroller.clientWidth / 2 - shift;
     };
 
     const isTouchLayout = () =>
@@ -132,7 +130,9 @@ export function AboutTeaserScroll({
 
       if (isTouchLayout()) return;
 
-      if (frozenScrollLeft !== null && shouldUnfreezeHorizontalScroll()) {
+      const progress = meetScrollProgress();
+
+      if (frozenScrollLeft !== null && progress < FREEZE_PROGRESS) {
         frozenScrollLeft = null;
         manualOffset = 0;
       }
@@ -148,7 +148,11 @@ export function AboutTeaserScroll({
       syncing = true;
       scroller.scrollLeft = next;
 
-      if (frozenScrollLeft === null && isMeetHorizontallyCentered()) {
+      if (
+        frozenScrollLeft === null &&
+        progress >= FREEZE_PROGRESS &&
+        isMeetHorizontallyCentered()
+      ) {
         frozenScrollLeft = scroller.scrollLeft;
         manualOffset = 0;
         baseScroll = frozenScrollLeft;
