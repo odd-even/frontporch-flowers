@@ -16,15 +16,7 @@ const PHOTO_CARD =
   "relative w-[min(72vw,18rem)] sm:w-[min(40vw,20rem)] aspect-square shrink-0 rounded-3xl overflow-hidden";
 
 const MEET_CARD =
-  "relative w-[min(72vw,18rem)] sm:w-[min(40vw,20rem)] h-[min(72vw,18rem)] sm:h-[min(40vw,20rem)] shrink-0 overflow-hidden flex";
-
-const smoothstep = (t: number) => {
-  const x = Math.min(1, Math.max(0, t));
-  return x * x * (3 - 2 * x);
-};
-
-const lerp = (current: number, target: number, factor: number) =>
-  current + (target - current) * factor;
+  "relative w-[min(72vw,18rem)] sm:w-[min(40vw,20rem)] h-[min(72vw,18rem)] sm:h-[min(40vw,20rem)] shrink-0 overflow-hidden flex will-change-[width]";
 
 export function AboutTeaserScroll({
   sidePhotos,
@@ -51,25 +43,19 @@ export function AboutTeaserScroll({
     if (!section || !scroller || !meet || !meetTextCol || !meetPhoto) return;
 
     let raf = 0;
-    let animating = false;
     let baseScroll = 0;
     let manualOffset = 0;
     let syncing = false;
-    let smoothedOpen = 0;
-    let smoothedScrollLeft: number | null = null;
-
-    const OPEN_LERP = 0.09;
-    const SCROLL_LERP = 0.11;
 
     const meetScrollProgress = () => {
       const rect = meet.getBoundingClientRect();
       const vh = window.innerHeight;
       const meetCenter = rect.top + rect.height / 2;
-      const startCenter = vh * 0.8;
-      const endCenter = vh * 0.46;
+      const viewportCenter = vh / 2;
+      const startCenter = vh * 0.76;
       return Math.min(
         1,
-        Math.max(0, (startCenter - meetCenter) / (startCenter - endCenter))
+        Math.max(0, (startCenter - meetCenter) / (startCenter - viewportCenter))
       );
     };
 
@@ -81,11 +67,7 @@ export function AboutTeaserScroll({
     const MAX_EXTRA_RATIO = 1;
     const MEET_RADIUS = "1.5rem";
 
-    let dragPointerId: number | null = null;
-    let dragStartX = 0;
-    let dragStartScroll = 0;
-
-    const applyMeetCard = (openAmount: number) => {
+    const updateMeetCard = () => {
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const base = meetBaseWidth();
 
@@ -100,10 +82,10 @@ export function AboutTeaserScroll({
         return;
       }
 
-      const eased = smoothstep(openAmount);
+      const progress = meetScrollProgress();
       const maxExtra = base * MAX_EXTRA_RATIO;
-      const photoWidth = maxExtra * eased;
-      const isOpen = photoWidth > 0.5;
+      const photoWidth = maxExtra * Math.pow(progress, 0.55);
+      const isOpen = photoWidth > 0;
 
       meet.dataset.open = isOpen ? "true" : "false";
 
@@ -138,21 +120,21 @@ export function AboutTeaserScroll({
       const t = Math.min(1, Math.max(-1, (sectionCenter - vh / 2) / (vh * 0.55)));
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const maxShift = reduceMotion ? 0 : Math.min(window.innerWidth * 0.55, 480);
-      const base = meetBaseWidth();
-      const meetCenter = meet.offsetLeft + base / 2;
+      const meetCenter = meet.offsetLeft + meet.offsetWidth / 2;
       return meetCenter - scroller.clientWidth / 2 - t * maxShift;
     };
 
     const isTouchLayout = () =>
       window.matchMedia("(max-width: 639px), (pointer: coarse)").matches;
 
-    const computeTargetScroll = () => {
-      if (isTouchLayout()) return scroller.scrollLeft;
+    const applyScroll = () => {
+      updateMeetCard();
+
+      if (isTouchLayout()) return;
 
       if (frozenScrollLeft !== null && shouldUnfreezeHorizontalScroll()) {
         frozenScrollLeft = null;
         manualOffset = 0;
-        smoothedScrollLeft = scroller.scrollLeft;
       }
 
       if (frozenScrollLeft === null) {
@@ -162,66 +144,33 @@ export function AboutTeaserScroll({
       }
 
       const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
-      return Math.min(max, Math.max(0, baseScroll + manualOffset));
-    };
+      const next = Math.min(max, Math.max(0, baseScroll + manualOffset));
+      syncing = true;
+      scroller.scrollLeft = next;
 
-    const tick = () => {
-      const targetOpen = meetScrollProgress();
-      smoothedOpen = lerp(smoothedOpen, targetOpen, OPEN_LERP);
-      applyMeetCard(smoothedOpen);
-
-      if (!isTouchLayout()) {
-        const targetScroll = computeTargetScroll();
-
-        if (smoothedScrollLeft === null) {
-          smoothedScrollLeft = scroller.scrollLeft;
-        }
-
-        smoothedScrollLeft = lerp(smoothedScrollLeft, targetScroll, SCROLL_LERP);
-        syncing = true;
-        scroller.scrollLeft = smoothedScrollLeft;
-        syncing = false;
-
-        if (frozenScrollLeft === null && isMeetHorizontallyCentered()) {
-          frozenScrollLeft = scroller.scrollLeft;
-          manualOffset = 0;
-          baseScroll = frozenScrollLeft;
-          smoothedScrollLeft = frozenScrollLeft;
-        }
-
-        manualOffset = scroller.scrollLeft - baseScroll;
+      if (frozenScrollLeft === null && isMeetHorizontallyCentered()) {
+        frozenScrollLeft = scroller.scrollLeft;
+        manualOffset = 0;
+        baseScroll = frozenScrollLeft;
       }
 
-      const openDelta = Math.abs(targetOpen - smoothedOpen);
-      const scrollDelta =
-        smoothedScrollLeft === null
-          ? 0
-          : Math.abs(computeTargetScroll() - smoothedScrollLeft);
-
-      if (openDelta > 0.0015 || scrollDelta > 0.75 || dragPointerId !== null) {
-        raf = requestAnimationFrame(tick);
-      } else {
-        animating = false;
-        smoothedOpen = targetOpen;
-        applyMeetCard(smoothedOpen);
-      }
-    };
-
-    const requestTick = () => {
-      if (animating) return;
-      animating = true;
-      raf = requestAnimationFrame(tick);
+      manualOffset = scroller.scrollLeft - baseScroll;
+      syncing = false;
     };
 
     const onWindowScroll = () => {
-      requestTick();
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(applyScroll);
     };
 
     const onScrollerScroll = () => {
       if (syncing) return;
       manualOffset = scroller.scrollLeft - baseScroll;
-      smoothedScrollLeft = scroller.scrollLeft;
     };
+
+    let dragPointerId: number | null = null;
+    let dragStartX = 0;
+    let dragStartScroll = 0;
 
     const onPointerDown = (event: PointerEvent) => {
       if (event.pointerType === "mouse" && event.button !== 0) return;
@@ -236,10 +185,8 @@ export function AboutTeaserScroll({
       const dx = event.clientX - dragStartX;
       syncing = true;
       scroller.scrollLeft = dragStartScroll - dx;
-      smoothedScrollLeft = scroller.scrollLeft;
       manualOffset = scroller.scrollLeft - baseScroll;
       syncing = false;
-      requestTick();
     };
 
     const onPointerUp = (event: PointerEvent) => {
@@ -250,10 +197,9 @@ export function AboutTeaserScroll({
       } catch {
         /* already released */
       }
-      requestTick();
     };
 
-    requestTick();
+    applyScroll();
     window.addEventListener("scroll", onWindowScroll, { passive: true });
     window.addEventListener("resize", onWindowScroll);
     scroller.addEventListener("scroll", onScrollerScroll, { passive: true });
