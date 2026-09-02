@@ -58,7 +58,7 @@ export const fallbackEvents: PickYourOwnEvent[] = [
     startTime: "4:00 PM",
     endTime: "6:00 PM",
     description:
-      "Pick and arrange your own bouquet. Vase and floral tea included.",
+      "I'm hosting an in-person gathering in the garden on September 12. Come join me to pick and arrange your own beautiful bouquet in the backyard while sipping homemade floral lemonade. I can't wait to see you there! Limited spots are available.",
     spotsAvailable: 8,
     priceCents: 6500,
     currency: "CAD",

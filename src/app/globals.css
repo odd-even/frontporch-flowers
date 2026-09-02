@@ -130,10 +130,10 @@
     background-color: var(--color-deep-blue-green);
     background-image:
       radial-gradient(
-        ellipse 120% 100% at 0% 0%,
-        color-mix(in srgb, var(--color-brand-pink) 82%, transparent) 0%,
-        color-mix(in srgb, var(--color-brand-pink) 38%, transparent) 42%,
-        transparent 72%
+        ellipse 132% 112% at 0% 0%,
+        color-mix(in srgb, var(--color-brand-pink) 86%, transparent) 0%,
+        color-mix(in srgb, var(--color-brand-pink) 42%, transparent) 44%,
+        transparent 78%
       ),
       radial-gradient(
         ellipse 120% 100% at 100% 0%,
@@ -160,14 +160,14 @@
       );
     background-attachment: fixed;
     background-repeat: no-repeat;
-    background-size: 120% 120%, 118% 118%, 122% 122%, 116% 116%, 112% 112%;
+    background-size: 128% 128%, 118% 118%, 122% 122%, 116% 116%, 112% 112%;
     background-position:
       0% 0%,
       100% 0%,
       0% 100%,
       100% 100%,
       50% 55%;
-    animation: site-dark-band-drift 24s ease-in-out infinite alternate;
+    animation: site-dark-band-orbit 10s linear infinite;
   }
 
   /* Follow section — solid band behind intro + nav */
@@ -175,31 +175,53 @@
     background-color: var(--color-follow-band);
   }
 
-  @keyframes site-dark-band-drift {
+  @keyframes site-dark-band-orbit {
     0% {
-      background-size: 116% 116%, 114% 114%, 118% 118%, 112% 112%, 106% 106%;
       background-position:
-        -4% -3%,
-        104% -4%,
-        -5% 104%,
-        105% 102%,
-        46% 50%;
+        0% 0%,
+        100% 0%,
+        0% 100%,
+        100% 100%,
+        50% 55%;
+    }
+    25% {
+      background-position:
+        100% 0%,
+        100% 100%,
+        0% 0%,
+        0% 100%,
+        55% 50%;
+    }
+    50% {
+      background-position:
+        100% 100%,
+        0% 100%,
+        100% 0%,
+        0% 0%,
+        50% 45%;
+    }
+    75% {
+      background-position:
+        0% 100%,
+        0% 0%,
+        100% 100%,
+        100% 0%,
+        45% 50%;
     }
     100% {
-      background-size: 132% 132%, 128% 128%, 134% 134%, 126% 126%, 120% 120%;
       background-position:
-        10% 8%,
-        90% 6%,
-        8% 96%,
-        92% 92%,
-        58% 64%;
+        0% 0%,
+        100% 0%,
+        0% 100%,
+        100% 100%,
+        50% 55%;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .bg-site-dark-band {
       animation: none;
-      background-size: 120% 120%, 118% 118%, 122% 122%, 116% 116%, 112% 112%;
+      background-size: 128% 128%, 118% 118%, 122% 122%, 116% 116%, 112% 112%;
       background-position:
         0% 0%,
         100% 0%,

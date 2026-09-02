@@ -1529,7 +1529,7 @@ export function FinishRequestPicker({
             <p className="text-sage text-sm uppercase tracking-[0.2em] mb-2">
               Choose an arrangement
             </p>
-            <h3 className="font-display text-2xl md:text-3xl text-charcoal mb-2">
+            <h3 className="font-display text-4xl md:text-5xl text-charcoal mb-2">
               Order a bouquet
             </h3>
           </div>

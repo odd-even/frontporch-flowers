@@ -88,12 +88,20 @@ export function Hero({ tagline, photos }: HeroProps) {
                 {tagline}
               </p>
             ) : null}
-            <Link
-              href="#bouquets"
-              className="btn bg-terracotta text-cream hover:bg-terracotta-dark"
-            >
-              Order a bouquet
-            </Link>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href="#bouquets"
+                className="btn bg-terracotta text-cream hover:bg-terracotta-dark"
+              >
+                Order a bouquet
+              </Link>
+              <Link
+                href="#events"
+                className="btn border border-cream/35 bg-transparent text-cream hover:border-cream/55"
+              >
+                Workshops
+              </Link>
+            </div>
           </div>
         </div>
 

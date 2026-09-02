@@ -5,7 +5,7 @@ import { getFacebookPageUrl } from "@/lib/facebook";
 const EXPLORE_LINKS = [
   { href: "/#about", label: "About" },
   { href: "/bouquets", label: "Bouquets" },
-  { href: "/events", label: "Events" },
+  { href: "/#events", label: "Events" },
   { href: "/gallery", label: "Gallery" },
   { href: "/#follow", label: "Follow" },
 ] as const;
@@ -16,7 +16,7 @@ export function Footer() {
   return (
     <footer className="relative bg-site-dark-band text-cream mt-auto border-t border-cream/20">
       <div
-        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-charcoal/25 via-charcoal/38 to-charcoal/48"
+        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[#1c2220]/28 via-[#151a19]/68 to-[#121716]"
         aria-hidden="true"
       />
       <div className="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-10 md:pt-16 md:pb-10">

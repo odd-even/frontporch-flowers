@@ -1,6 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowIcon } from "@/components/ArrowIcon";
 import { AboutTeaserScroll } from "@/components/AboutTeaserScroll";
 import { PickYourOwnFeatured } from "@/components/PickYourOwnFeatured";
 import { getFacebookPageUrl } from "@/lib/facebook";
@@ -42,25 +40,16 @@ export async function EventsTeaser() {
   return (
     <section id="events" className="scroll-mt-24 pt-10 pb-20 md:pt-14 md:pb-28 bg-brand-wash">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-          <div>
-            <p className="text-sage-dark text-sm uppercase tracking-[0.2em] mb-3">
-              Bedell, NB
+        <div className="mb-10">
+          <p className="text-sage-dark text-sm uppercase tracking-[0.2em] mb-3">
+            Events
+          </p>
+          <h2 className="font-display text-4xl md:text-5xl text-charcoal">Workshops</h2>
+          {!nextPyo ? (
+            <p className="text-warm-brown/80 max-w-xl mt-3">
+              Pick-your-own days and seasonal workshops — dates are announced on social.
             </p>
-            <h2 className="font-display text-4xl md:text-5xl text-charcoal">Events</h2>
-            {!nextPyo ? (
-              <p className="text-warm-brown/80 max-w-xl mt-3">
-                Pick-your-own days and seasonal workshops — dates are announced on social.
-              </p>
-            ) : null}
-          </div>
-          <Link
-            href="/events"
-            className="inline-flex items-center gap-2 text-sm font-medium text-terracotta hover:text-terracotta-dark transition-colors"
-          >
-            All events
-            <ArrowIcon />
-          </Link>
+          ) : null}
         </div>
 
         {nextPyo ? (

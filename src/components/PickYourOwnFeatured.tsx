@@ -16,7 +16,7 @@ interface PickYourOwnFeaturedProps {
 function workshopTitleLines(title: string) {
   const normalized = title.replace(/\s+/g, " ").trim();
   if (/stem\s*&\s*style/i.test(normalized)) {
-    return { lead: "Stem & Style", accent: "Pick and arrange your own bouquet" };
+    return { lead: "Stem & Style", accent: "Gather & arrange in the garden" };
   }
   if (/pick.*arrange.*your own bouquet/i.test(normalized)) {
     return { lead: "Pick & arrange", accent: "your own bouquet" };
@@ -48,15 +48,10 @@ export async function PickYourOwnFeatured({
     capacity.capacity || 8,
     8
   );
-  const spotsLabel = capacity.soldOut
-    ? "Sold out"
-    : capacity.remaining === capacity.capacity
-      ? `Limited to ${capacity.capacity} · prepaid`
-      : `${capacity.remaining} of ${capacity.capacity} left · prepaid`;
 
   const titleLines = workshopTitleLines(event.title);
 
-  const includes = ["Vase included", "Floral tea"];
+  const includes = ["Vase included", "Homemade floral lemonade"];
 
   return (
     <article className="overflow-hidden rounded-3xl border border-sage/15 bg-cream shadow-[0_20px_60px_-40px_rgba(60,50,40,0.45)]">
@@ -147,7 +142,7 @@ export async function PickYourOwnFeatured({
           </div>
 
           {event.description ? (
-            <p className="text-warm-brown/85 text-sm leading-relaxed mb-4">
+            <p className="text-warm-brown/85 text-base leading-relaxed mb-4 text-pretty">
               {event.description}
             </p>
           ) : null}
@@ -172,19 +167,11 @@ export async function PickYourOwnFeatured({
                 {event.startTime} – {event.endTime}
               </span>
             </li>
-            {capacity.capacity > 0 ? (
-              <li className="rounded-xl bg-sage/10 px-4 py-3">
-                <span className="block text-xs uppercase tracking-wider text-sage-dark mb-1">
-                  Spots
-                </span>
-                <span className="font-medium text-charcoal">{spotsLabel}</span>
-              </li>
-            ) : null}
             <li className="rounded-xl bg-sage/10 px-4 py-3">
               <span className="block text-xs uppercase tracking-wider text-sage-dark mb-1">
                 Refreshment
               </span>
-              <span className="font-medium text-charcoal">Floral tea</span>
+              <span className="font-medium text-charcoal">Floral lemonade</span>
             </li>
             {event.priceCents ? (
               <li className="rounded-xl bg-terracotta/10 px-4 py-3">
@@ -210,7 +197,7 @@ export async function PickYourOwnFeatured({
               <div className="rounded-2xl bg-sage/10 px-5 py-4">
                 <p className="font-medium text-charcoal">Sold out</p>
                 <p className="mt-1 text-sm text-warm-brown/75 leading-relaxed">
-                  All {capacity.capacity} spots are booked. Message Rhoda on{" "}
+                  All spots are booked. Message Rhoda on{" "}
                   <a
                     href={facebookUrl}
                     target="_blank"
