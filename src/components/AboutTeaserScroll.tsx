@@ -62,8 +62,8 @@ export function AboutTeaserScroll({
 
     const PROGRESS_LERP = 0.1;
     const SECTION_VIEW_BUFFER = 48;
-    /** Only recenter after scrolling down well past — never while leaving upward. */
-    const resetPastBelowPx = () => Math.max(400, window.innerHeight * 0.5);
+    /** Reset only after the section is fully off-screen below — never while still visible. */
+    const resetPastBelowPx = () => Math.max(window.innerHeight, 700);
 
     const isSectionInView = () => {
       const rect = section.getBoundingClientRect();
@@ -169,7 +169,7 @@ export function AboutTeaserScroll({
       baseScroll = centeredScrollForMeet();
       syncing = true;
       scroller.scrollLeft = clamp(
-        baseScroll + (userHasDragged ? manualOffset : 0),
+        baseScroll + manualOffset,
         0,
         Math.max(0, scroller.scrollWidth - scroller.clientWidth)
       );
@@ -177,20 +177,15 @@ export function AboutTeaserScroll({
     };
 
     let dragPointerId: number | null = null;
-    let userHasDragged = false;
 
     const resetRhodaStrip = () => {
       smoothedProgress = 0;
       manualOffset = 0;
-      userHasDragged = false;
       updateMeetCard(0);
       if (dragPointerId == null) {
         applyCenteredScroll();
       }
     };
-
-    const shouldAutoCenter = () =>
-      dragPointerId == null && !userHasDragged;
 
     const tick = () => {
       if (isTouchLayout()) return;
@@ -210,8 +205,14 @@ export function AboutTeaserScroll({
 
       updateMeetCard(eased);
 
-      if (shouldAutoCenter()) {
+      // Keep Rhoda centered as it opens/closes, but never wipe a user horizontal offset
+      // until resetRhodaStrip runs (only when well past below).
+      if (dragPointerId == null) {
         applyCenteredScroll();
+      } else {
+        // Card width is changing under an active drag — keep offset relative to the new center.
+        baseScroll = centeredScrollForMeet();
+        manualOffset = scroller.scrollLeft - baseScroll;
       }
 
       const settling = Math.abs(smoothedProgress - rawProgress) > 0.0015;
@@ -222,11 +223,11 @@ export function AboutTeaserScroll({
       } else if (rawProgress >= 0.99 && smoothedProgress !== 1) {
         smoothedProgress = 1;
         updateMeetCard(1);
-        if (shouldAutoCenter()) applyCenteredScroll();
+        if (dragPointerId == null) applyCenteredScroll();
       } else if (rawProgress <= 0.01 && smoothedProgress !== 0) {
         smoothedProgress = 0;
         updateMeetCard(0);
-        if (shouldAutoCenter()) applyCenteredScroll();
+        if (dragPointerId == null) applyCenteredScroll();
       }
     };
 
@@ -251,7 +252,7 @@ export function AboutTeaserScroll({
       }
       smoothedProgress = meetScrollProgress();
       updateMeetCard(easeInOutSmooth(smoothedProgress));
-      if (shouldAutoCenter()) {
+      if (dragPointerId == null) {
         applyCenteredScroll();
       }
       applyScroll();
@@ -268,7 +269,6 @@ export function AboutTeaserScroll({
 
     let dragStartX = 0;
     let dragStartScroll = 0;
-    let dragMoved = false;
 
     const onPointerDown = (event: PointerEvent) => {
       if (isTouchLayout()) return;
@@ -276,14 +276,12 @@ export function AboutTeaserScroll({
       dragPointerId = event.pointerId;
       dragStartX = event.clientX;
       dragStartScroll = scroller.scrollLeft;
-      dragMoved = false;
       scroller.setPointerCapture(event.pointerId);
     };
 
     const onPointerMove = (event: PointerEvent) => {
       if (dragPointerId !== event.pointerId) return;
       const dx = event.clientX - dragStartX;
-      if (Math.abs(dx) > 3) dragMoved = true;
       syncing = true;
       scroller.scrollLeft = dragStartScroll - dx;
       manualOffset = scroller.scrollLeft - baseScroll;
@@ -292,8 +290,9 @@ export function AboutTeaserScroll({
 
     const onPointerUp = (event: PointerEvent) => {
       if (dragPointerId !== event.pointerId) return;
-      if (dragMoved) userHasDragged = true;
       dragPointerId = null;
+      baseScroll = centeredScrollForMeet();
+      manualOffset = scroller.scrollLeft - baseScroll;
       try {
         scroller.releasePointerCapture(event.pointerId);
       } catch {
