@@ -273,6 +273,13 @@ export function AboutTeaserScroll({
     const onPointerDown = (event: PointerEvent) => {
       if (isTouchLayout()) return;
       if (event.pointerType === "mouse" && event.button !== 0) return;
+      const target = event.target;
+      if (
+        target instanceof Element &&
+        target.closest("a, button, input, textarea, select, label")
+      ) {
+        return;
+      }
       dragPointerId = event.pointerId;
       dragStartX = event.clientX;
       dragStartScroll = scroller.scrollLeft;
@@ -412,13 +419,13 @@ export function AboutTeaserScroll({
                   sizes="(max-width: 640px) 80vw, 400px"
                   draggable={false}
                 />
-                <div className="absolute inset-y-0 right-0 z-10 flex flex-col items-end justify-end gap-2.5 p-3">
+                <div className="absolute inset-y-0 right-0 z-20 flex flex-col items-end justify-end gap-2.5 p-3">
                   <a
                     href={facebookUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Front Porch Flowers on Facebook"
-                    className="flex h-11 w-11 items-center justify-center rounded-button bg-white/92 text-charcoal shadow-sm transition-transform hover:scale-105"
+                    className="relative z-20 flex h-11 w-11 cursor-pointer items-center justify-center rounded-button bg-white/92 text-charcoal shadow-sm transition-transform hover:scale-105"
                   >
                     <FacebookIcon className="w-4 h-4" />
                   </a>
@@ -427,7 +434,7 @@ export function AboutTeaserScroll({
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Front Porch Flowers on Instagram"
-                    className="flex h-11 w-11 items-center justify-center rounded-button bg-white/92 text-charcoal shadow-sm transition-transform hover:scale-105"
+                    className="relative z-20 flex h-11 w-11 cursor-pointer items-center justify-center rounded-button bg-white/92 text-charcoal shadow-sm transition-transform hover:scale-105"
                   >
                     <InstagramIcon className="w-4 h-4" />
                   </a>

@@ -501,4 +501,25 @@
     background-size: cover;
     background-position: center;
   }
+
+  /* Match feed caption overlay tones; avoid layout overrides (they shift the bar) */
+  .feed-video::-webkit-media-controls-panel {
+    background-image: linear-gradient(
+      to top,
+      rgba(18, 28, 34, 0.8) 0%,
+      rgba(26, 40, 48, 0.4) 55%,
+      transparent 100%
+    ) !important;
+    background-color: transparent !important;
+  }
+
+  .feed-video::-webkit-media-controls-download-button {
+    display: none !important;
+  }
+
+  .feed-video::-webkit-media-controls-overlay-play-button,
+  .feed-video::-webkit-media-controls-start-playback-button {
+    background-color: rgba(18, 28, 34, 0.55) !important;
+    border-radius: 9999px;
+  }
 }
