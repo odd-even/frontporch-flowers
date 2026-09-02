@@ -1,6 +1,6 @@
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { PhotoGallery } from "@/components/PhotoGallery";
-import { FacebookFeedGrid } from "@/components/FacebookFeedGrid";
 import { Reveal } from "@/components/Reveal";
 import { FacebookIcon, InstagramIcon } from "@/components/SocialIcons";
 import {
@@ -10,6 +10,28 @@ import {
 } from "@/lib/facebook";
 import { getInstagramFallbackPhotos } from "@/lib/photos.server";
 
+const FacebookFeedGrid = dynamic(
+  () =>
+    import("@/components/FacebookFeedGrid").then((mod) => mod.FacebookFeedGrid),
+  {
+    loading: () => (
+      <div
+        className="grid min-h-[18rem] grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+        aria-hidden="true"
+      >
+        {Array.from({ length: 9 }).map((_, i) => (
+          <div
+            key={i}
+            className={`aspect-square animate-pulse rounded-xl bg-cream/10${
+              i >= 6 ? " max-lg:hidden" : i >= 4 ? " max-md:hidden" : ""
+            }`}
+          />
+        ))}
+      </div>
+    ),
+  }
+);
+
 interface FacebookFeedProps {
   pageUrl?: string;
 }
@@ -17,7 +39,7 @@ interface FacebookFeedProps {
 export async function FacebookFeed({ pageUrl }: FacebookFeedProps) {
   const facebookUrl = getFacebookPageUrl(pageUrl);
   const { posts, nextCursor } = await getFacebookPostsPage({
-    limit: 6,
+    limit: 9,
   });
   const connected = isFacebookFeedConfigured() && posts.length > 0;
   const fallbackPhotos = getInstagramFallbackPhotos();

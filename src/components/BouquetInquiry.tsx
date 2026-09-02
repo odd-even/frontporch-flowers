@@ -159,7 +159,7 @@ export const PRESENTATION_OPTIONS = [
     shortLabel: "Vase",
     hint: "ready to place",
     price: "$46",
-    imageSrc: "/photos/boquets/vase-arrangement.png",
+    imageSrc: "/photos/boquets/vase-arrangement.webp",
   },
   {
     id: "mason-jar",
@@ -167,7 +167,7 @@ export const PRESENTATION_OPTIONS = [
     shortLabel: "Mason jar",
     hint: "casual & charming",
     price: "$19",
-    imageSrc: "/photos/boquets/mason-jar-arrangement.jpg",
+    imageSrc: "/photos/boquets/mason-jar-arrangement.webp",
   },
   {
     id: "gift-bag-posie",
@@ -175,7 +175,7 @@ export const PRESENTATION_OPTIONS = [
     shortLabel: "Gift bag",
     hint: "ready to gift",
     price: "$21",
-    imageSrc: "/photos/boquets/gift-bag-posie.jpg",
+    imageSrc: "/photos/boquets/gift-bag-posie.webp",
   },
   {
     id: "bucket",
@@ -183,7 +183,7 @@ export const PRESENTATION_OPTIONS = [
     shortLabel: "Bucket",
     hint: "garden-gather style",
     price: "Get in touch",
-    imageSrc: "/photos/boquets/bucket-img-3993.jpg",
+    imageSrc: "/photos/boquets/bucket-img-3993.webp",
   },
   {
     id: "custom",
@@ -191,7 +191,7 @@ export const PRESENTATION_OPTIONS = [
     shortLabel: "Custom",
     hint: "your own idea",
     price: "Get in touch",
-    imageSrc: "/photos/boquets/custom-arrangement.jpg",
+    imageSrc: "/photos/boquets/custom-arrangement.webp",
   },
 ] as const;
 

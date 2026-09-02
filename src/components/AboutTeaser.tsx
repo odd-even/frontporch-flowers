@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { AboutTeaserScroll } from "@/components/AboutTeaserScroll";
+import dynamic from "next/dynamic";
 import { PickYourOwnFeatured } from "@/components/PickYourOwnFeatured";
 import { Reveal } from "@/components/Reveal";
 import { getFacebookPageUrl } from "@/lib/facebook";
@@ -10,6 +10,19 @@ import {
   getPickYourOwnPhoto,
 } from "@/lib/photos.server";
 import { getPickYourOwnEvents, getSiteSettings } from "@/lib/queries";
+
+const AboutTeaserScroll = dynamic(
+  () =>
+    import("@/components/AboutTeaserScroll").then((mod) => mod.AboutTeaserScroll),
+  {
+    loading: () => (
+      <div
+        className="h-[min(72vw,18rem)] sm:h-[min(40vw,20rem)] w-full animate-pulse bg-cream-dark/40"
+        aria-hidden="true"
+      />
+    ),
+  }
+);
 
 export async function AboutTeaser() {
   const settings = await getSiteSettings();

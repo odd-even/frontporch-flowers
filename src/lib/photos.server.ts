@@ -337,9 +337,20 @@ export function getWorkshopPhotos(): SitePhoto[] {
 
 /** Cover + gallery images for the pick-and-arrange bouquet workshop. */
 export function getBouquetWorkshopPhotos(): SitePhoto[] {
-  return getAllPhotos()
+  const photos = getAllPhotos()
     .filter((photo) => photo.subcategory === "bouquet workshop")
     .sort((a, b) => a.src.localeCompare(b.src));
+
+  // Prefer webp when both jpg and webp exist for the same stem.
+  const byStem = new Map<string, SitePhoto>();
+  for (const photo of photos) {
+    const stem = photo.src.replace(/\.(jpe?g|png|webp)$/i, "");
+    const existing = byStem.get(stem);
+    if (!existing || photo.src.endsWith(".webp")) {
+      byStem.set(stem, photo);
+    }
+  }
+  return Array.from(byStem.values()).sort((a, b) => a.src.localeCompare(b.src));
 }
 
 export function getBouquetWorkshopCoverPhoto(): SitePhoto {

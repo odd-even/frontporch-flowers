@@ -490,6 +490,7 @@ export function FacebookFeedGrid({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [modalPending, startModalTransition] = useTransition();
+  const [gridExpanded, setGridExpanded] = useState(false);
   const [activePost, setActivePost] = useState<{
     postIndex: number;
     mediaIndex: number;
@@ -503,6 +504,7 @@ export function FacebookFeedGrid({
 
     startTransition(async () => {
       setError(null);
+      setGridExpanded(true);
       try {
         const res = await fetch(
           `/api/facebook/posts?limit=9&after=${encodeURIComponent(cursor)}`
@@ -569,15 +571,32 @@ export function FacebookFeedGrid({
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {posts.map((post, postIndex) => (
-          <FacebookPostCard
-            key={post.id}
-            post={post}
-            onReadMore={(_selected, mediaIndex) =>
-              openModal(postIndex, mediaIndex)
-            }
-          />
-        ))}
+        {posts.map((post, postIndex) => {
+          // Initial page: 4 @ 1-up, 6 @ 2-up, 9 @ 3-up. Reveal all after load more.
+          const hideBelowMd =
+            !gridExpanded && postIndex >= 4 && postIndex < 6;
+          const hideBelowLg = !gridExpanded && postIndex >= 6;
+
+          return (
+            <div
+              key={post.id}
+              className={
+                hideBelowLg
+                  ? "max-lg:hidden"
+                  : hideBelowMd
+                    ? "max-md:hidden"
+                    : undefined
+              }
+            >
+              <FacebookPostCard
+                post={post}
+                onReadMore={(_selected, mediaIndex) =>
+                  openModal(postIndex, mediaIndex)
+                }
+              />
+            </div>
+          );
+        })}
       </div>
 
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3">

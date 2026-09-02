@@ -28,11 +28,11 @@ export function EventImageRotator({ photos }: { photos: SitePhoto[] }) {
           src={photo.src}
           alt={photo.alt}
           fill
-          priority={i === 0}
           className={`object-cover transition-opacity duration-1000 ease-in-out ${
             i === index ? "opacity-100" : "opacity-0"
           }`}
           sizes="(max-width: 768px) 100vw, 50vw"
+          loading={i === 0 ? "eager" : "lazy"}
         />
       ))}
       {slides.length > 1 ? (

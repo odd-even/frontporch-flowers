@@ -42,7 +42,16 @@ export async function PickYourOwnFeatured({
   const day = eventDate.getDate();
   const squareReady = isEventCheckoutReady(event);
   const paymentLinkUrl = event.squarePaymentLinkUrl;
-  const capacity = await getEventCapacity(event);
+  // External Square payment links are not tracked via order reference search —
+  // skip the live capacity call so the homepage can stay ISR-friendly.
+  const capacity = paymentLinkUrl
+    ? {
+        capacity: Math.max(0, event.spotsAvailable ?? 0),
+        booked: 0,
+        remaining: Math.max(0, event.spotsAvailable ?? 0),
+        soldOut: false,
+      }
+    : await getEventCapacity(event);
   const maxQuantity = Math.min(
     capacity.remaining > 0 ? capacity.remaining : capacity.capacity || 8,
     capacity.capacity || 8,

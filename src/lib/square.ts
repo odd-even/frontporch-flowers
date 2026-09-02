@@ -1,7 +1,7 @@
 import "server-only";
 
 import { randomUUID } from "crypto";
-import { unstable_noStore as noStore } from "next/cache";
+import { unstable_cache } from "next/cache";
 import { SquareClient, SquareEnvironment, SquareError, type Order } from "square";
 import { SITE_URL } from "@/lib/seo";
 import {
@@ -125,9 +125,9 @@ function lineItemQuantity(order: Order) {
 /**
  * Counts prepaid spots already taken for an event from Square orders:
  * completed (paid) + recent open orders (active checkouts).
+ * Cached briefly so homepage ISR is not forced dynamic by noStore().
  */
-export async function countBookedSpotsForEvent(eventId: string): Promise<number> {
-  noStore();
+async function countBookedSpotsForEventUncached(eventId: string): Promise<number> {
   if (!isSquareConfigured()) return 0;
 
   const client = getSquareClient();
@@ -178,6 +178,15 @@ export async function countBookedSpotsForEvent(eventId: string): Promise<number>
   } while (cursor);
 
   return booked;
+}
+
+export async function countBookedSpotsForEvent(eventId: string): Promise<number> {
+  const cached = unstable_cache(
+    () => countBookedSpotsForEventUncached(eventId),
+    [`square-event-booked-${eventId}`],
+    { revalidate: 300, tags: [`square-event-${eventId}`] }
+  );
+  return cached();
 }
 
 export async function getEventCapacity(event: PickYourOwnEvent) {

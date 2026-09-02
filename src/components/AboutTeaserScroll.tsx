@@ -355,7 +355,6 @@ export function AboutTeaserScroll({
               quality={90}
               className="object-cover object-[72%_38%]"
               sizes="92vw"
-              priority
             />
             <div className="absolute inset-x-0 bottom-0 z-10 flex items-end justify-end gap-2.5 p-4">
               <a

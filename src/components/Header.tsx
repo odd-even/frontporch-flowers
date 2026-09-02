@@ -74,15 +74,21 @@ export function Header() {
       setSurfaceState(resolveHeaderSurface(probeY));
     };
 
+    let raf = 0;
     const onScroll = () => {
-      setScrollY(window.scrollY);
-      updateSurface();
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        setScrollY(window.scrollY);
+        updateSurface();
+      });
     };
 
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", updateSurface);
     return () => {
+      if (raf) window.cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", updateSurface);
     };

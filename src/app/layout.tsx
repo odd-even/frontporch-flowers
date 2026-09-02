@@ -18,7 +18,7 @@ import { getFacebookPageUrl } from "@/lib/facebook";
 import { getSiteSettings } from "@/lib/queries";
 
 const laborUnion = localFont({
-  src: "../fonts/LaborUnion-Small.otf",
+  src: "../fonts/LaborUnion-Regular.woff",
   variable: "--font-labor-union",
   display: "swap",
 });
@@ -32,7 +32,8 @@ const alwaysInMyHeart = localFont({
 const poppins = Poppins({
   subsets: ["latin"],
   variable: "--font-poppins",
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500", "600"],
+  display: "swap",
 });
 
 export const viewport = {
