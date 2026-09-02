@@ -2,11 +2,14 @@ import { GalleryGrid } from "@/components/GalleryGrid";
 import { PageHeader } from "@/components/AboutTeaser";
 import { getGalleryPhotos } from "@/lib/photos.server";
 
-export const metadata = {
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata = pageMetadata({
   title: "Gallery",
   description:
     "Photos of locally grown cut flowers, bouquets, and garden days from Front Porch Flowers in Woodstock, New Brunswick.",
-};
+  path: "/gallery",
+});
 
 export default function GalleryPage() {
   const photos = getGalleryPhotos();

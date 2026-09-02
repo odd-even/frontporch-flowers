@@ -8,7 +8,7 @@ import { getContactEmail } from "@/lib/email";
 import { getHeroPhotos } from "@/lib/photos.server";
 import { getSiteSettings } from "@/lib/queries";
 import { isSquareConfigured } from "@/lib/square";
-import { LOCAL_SEO, SITE_NAME } from "@/lib/seo";
+import { LOCAL_SEO, SITE_NAME, pageMetadata } from "@/lib/seo";
 
 const FinishRequestPicker = dynamic(
   () =>
@@ -24,11 +24,24 @@ const FinishRequestPicker = dynamic(
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
+  ...pageMetadata({
+    title: "Cut Flowers & Bouquets in Woodstock, NB",
+    description: LOCAL_SEO.description,
+    path: "/",
+  }),
   title: {
     absolute: `${SITE_NAME} | Cut Flowers & Bouquets in Woodstock, NB`,
   },
-  description: LOCAL_SEO.description,
-  alternates: { canonical: "/" },
+  keywords: [
+    "cut flowers Woodstock NB",
+    "cut flowers Woodstock New Brunswick",
+    "flower farm Woodstock NB",
+    "local bouquets Woodstock",
+    "seasonal flowers New Brunswick",
+    "pick your own flowers Woodstock",
+    "Front Porch Flowers",
+    "Bedell NB flowers",
+  ],
 };
 
 export default async function HomePage() {

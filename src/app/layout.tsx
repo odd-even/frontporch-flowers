@@ -10,8 +10,11 @@ import {
   SITE_NAME,
   SITE_URL,
   absoluteUrl,
-  getLocalBusinessJsonLd,
+  getSiteJsonLd,
 } from "@/lib/seo";
+import { getContactEmail } from "@/lib/email";
+import { getFacebookPageUrl } from "@/lib/facebook";
+import { getSiteSettings } from "@/lib/queries";
 
 const laborUnion = localFont({
   src: "../fonts/LaborUnion-Small.otf",
@@ -54,9 +57,13 @@ export const metadata: Metadata = {
   authors: [{ name: "Rhoda", url: SITE_URL }],
   creator: SITE_NAME,
   publisher: SITE_NAME,
-  alternates: {
-    canonical: "/",
-  },
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? {
+        verification: {
+          google: process.env.GOOGLE_SITE_VERIFICATION,
+        },
+      }
+    : {}),
   openGraph: {
     title: `${SITE_NAME} | Cut Flowers in Woodstock, NB`,
     description: LOCAL_SEO.shortDescription,
@@ -91,12 +98,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const jsonLd = getLocalBusinessJsonLd();
+  const settings = await getSiteSettings();
+  const jsonLd = getSiteJsonLd({
+    email: getContactEmail(settings.email),
+    phone: settings.phone || LOCAL_SEO.phone,
+    facebookUrl: getFacebookPageUrl(settings.facebookPageUrl),
+    instagramHandle: settings.instagramHandle || "front_porchflowers",
+  });
 
   return (
     <html

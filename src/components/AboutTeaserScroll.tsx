@@ -21,6 +21,12 @@ const MEET_CARD =
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
+/** Soft ease-in-out with gentle starts and stops. */
+function easeInOutSmooth(t: number) {
+  const x = clamp(t, 0, 1);
+  return x * x * x * (x * (x * 6 - 15) + 10);
+}
+
 function isTouchLayout() {
   return window.matchMedia("(max-width: 639px), (pointer: coarse)").matches;
 }
@@ -52,15 +58,32 @@ export function AboutTeaserScroll({
     let baseScroll = 0;
     let manualOffset = 0;
     let syncing = false;
+    let smoothedProgress = 0;
+
+    const PROGRESS_LERP = 0.1;
+    const SECTION_VIEW_BUFFER = 48;
+    /** Only recenter after scrolling down well past — never while leaving upward. */
+    const resetPastBelowPx = () => Math.max(400, window.innerHeight * 0.5);
+
+    const isSectionInView = () => {
+      const rect = section.getBoundingClientRect();
+      const vh = window.innerHeight;
+      return rect.bottom > -SECTION_VIEW_BUFFER && rect.top < vh + SECTION_VIEW_BUFFER;
+    };
+
+    const isSectionWellPastBelow = () => {
+      const rect = section.getBoundingClientRect();
+      return rect.bottom < -resetPastBelowPx();
+    };
 
     const meetScrollProgress = () => {
       const rect = meet.getBoundingClientRect();
       const vh = window.innerHeight;
       const meetCenter = rect.top + rect.height / 2;
-      const viewportCenter = vh / 2;
-      const startCenter = vh * 0.9;
+      const startCenter = vh * 0.92;
+      const endCenter = vh * 0.5;
       return clamp(
-        (startCenter - meetCenter) / (startCenter - viewportCenter),
+        (startCenter - meetCenter) / (startCenter - endCenter),
         0,
         1
       );
@@ -73,91 +96,162 @@ export function AboutTeaserScroll({
 
     const MAX_EXTRA_RATIO = 1;
     const MEET_RADIUS = "1.5rem";
-    const OPEN_EASE_POWER = 0.72;
-    const FREEZE_PROGRESS = 0.98;
+    const MEET_RADIUS_PX = 24;
+    /** How far the photo tucks under the gradient panel (at full open). */
+    const MEET_OVERLAP_RATIO = 0.17;
 
-    const easeOpen = (progress: number) => Math.pow(progress, OPEN_EASE_POWER);
+    /** Keep the photo tucked far enough under the gradient's rounding as it opens. */
+    const meetPhotoOverlap = (base: number, eased: number) => {
+      if (eased <= 0) return 0;
+      const tuck = base * MEET_OVERLAP_RATIO * eased;
+      const forRoundedRight = MEET_RADIUS_PX * Math.max(0, 1 - eased);
+      return Math.round(Math.max(tuck, forRoundedRight) + 1);
+    };
 
-    const updateMeetCard = () => {
+    const meetCornerRadii = (eased: number) => {
+      // Lerp often stops just shy of 1 — snap so the gradient seam stays square when open.
+      if (eased >= 0.992) {
+        return { text: `${MEET_RADIUS} 0 0 ${MEET_RADIUS}` };
+      }
+
+      const right = Math.max(0, 1 - eased);
+      const rightRadius =
+        right <= 0.008 ? "0" : `calc(${MEET_RADIUS} * ${right})`;
+
+      return {
+        text: `${MEET_RADIUS} ${rightRadius} ${rightRadius} ${MEET_RADIUS}`,
+      };
+    };
+
+    const updateMeetCard = (eased: number) => {
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const base = meetBaseWidth();
 
       if (reduceMotion || isTouchLayout()) {
         meet.style.width = "";
         meet.style.height = "";
+        meet.style.borderRadius = "";
         meetTextCol.style.width = "";
+        meetTextCol.style.height = "";
         meetTextCol.style.borderRadius = "";
         meetPhoto.style.width = "";
-        meetPhoto.style.borderRadius = "";
+        meetPhoto.style.marginLeft = "";
         delete meet.dataset.open;
         return;
       }
 
-      const progress = meetScrollProgress();
-      const eased = easeOpen(progress);
       const maxExtra = base * MAX_EXTRA_RATIO;
       const photoWidth = maxExtra * eased;
-      const isOpen = photoWidth > 0;
+      const overlap = meetPhotoOverlap(base, eased);
+      const corners = meetCornerRadii(eased);
+      const isOpen = photoWidth > 0.5;
 
       meet.dataset.open = isOpen ? "true" : "false";
 
       meet.style.width = `${base + photoWidth}px`;
       meet.style.height = `${base}px`;
+      meet.style.borderRadius = MEET_RADIUS;
       meetTextCol.style.width = `${base}px`;
-      meetTextCol.style.borderRadius = isOpen
-        ? `${MEET_RADIUS} 0 0 ${MEET_RADIUS}`
-        : MEET_RADIUS;
-      meetPhoto.style.width = `${photoWidth}px`;
-      meetPhoto.style.borderRadius = isOpen ? `0 ${MEET_RADIUS} ${MEET_RADIUS} 0` : "0";
+      meetTextCol.style.height = `${base}px`;
+      meetTextCol.style.borderRadius = corners.text;
+      meetPhoto.style.marginLeft = overlap > 0 ? `${-overlap}px` : "";
+      meetPhoto.style.width = `${photoWidth + overlap}px`;
     };
 
-    const meetTargetScrollLeft = () => {
+    /** Center the Rhoda card so outer flex gutters stay matched on both sides. */
+    const centeredScrollForMeet = () => {
       const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
       const meetCenter = meet.offsetLeft + meet.offsetWidth / 2;
       return clamp(meetCenter - scroller.clientWidth / 2, 0, max);
     };
 
-    const computeBase = () => {
-      const progress = meetScrollProgress();
-      const eased = easeOpen(progress);
-      const centered = meetTargetScrollLeft();
-
-      if (progress >= FREEZE_PROGRESS) {
-        return centered;
-      }
-
-      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const maxShift = reduceMotion ? 0 : Math.min(window.innerWidth * 0.55, 480);
-      const meetCenter = meet.offsetLeft + meet.offsetWidth / 2;
-      const shift = (1 - eased) * maxShift;
-      const shifted = meetCenter - scroller.clientWidth / 2 - shift;
-
-      return shifted + (centered - shifted) * eased;
-    };
-
-    const applyScroll = () => {
-      updateMeetCard();
-
-      if (isTouchLayout()) return;
-
-      const progress = meetScrollProgress();
-      if (progress >= FREEZE_PROGRESS) {
-        manualOffset = 0;
-      }
-
-      baseScroll = computeBase();
-
-      const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
-      const next = clamp(baseScroll + manualOffset, 0, max);
+    const applyCenteredScroll = () => {
+      baseScroll = centeredScrollForMeet();
       syncing = true;
-      scroller.scrollLeft = next;
-      manualOffset = scroller.scrollLeft - baseScroll;
+      scroller.scrollLeft = clamp(
+        baseScroll + manualOffset,
+        0,
+        Math.max(0, scroller.scrollWidth - scroller.clientWidth)
+      );
       syncing = false;
     };
 
-    const onWindowScroll = () => {
+    let dragPointerId: number | null = null;
+
+    const resetRhodaStrip = () => {
+      smoothedProgress = 0;
+      manualOffset = 0;
+      updateMeetCard(0);
+      if (dragPointerId == null) {
+        applyCenteredScroll();
+      }
+    };
+
+    const tick = () => {
+      if (isTouchLayout()) return;
+
+      if (isSectionWellPastBelow()) {
+        resetRhodaStrip();
+        return;
+      }
+
+      if (!isSectionInView()) {
+        return;
+      }
+
+      const rawProgress = meetScrollProgress();
+      smoothedProgress += (rawProgress - smoothedProgress) * PROGRESS_LERP;
+      const eased = easeInOutSmooth(smoothedProgress);
+
+      updateMeetCard(eased);
+
+      // Keep auto-center only before the user has dragged; never snap back while scrolling.
+      if (dragPointerId == null && manualOffset === 0) {
+        applyCenteredScroll();
+      }
+
+      const settling = Math.abs(smoothedProgress - rawProgress) > 0.0015;
+
+      if (settling) {
+        raf = requestAnimationFrame(tick);
+      } else if (rawProgress >= 0.99 && smoothedProgress !== 1) {
+        smoothedProgress = 1;
+        updateMeetCard(1);
+      } else if (rawProgress <= 0.01 && smoothedProgress !== 0) {
+        smoothedProgress = 0;
+        updateMeetCard(0);
+      }
+    };
+
+    const applyScroll = () => {
+      if (isTouchLayout()) {
+        updateMeetCard(1);
+        return;
+      }
+
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(applyScroll);
+      raf = requestAnimationFrame(tick);
+    };
+
+    const onResize = () => {
+      if (isTouchLayout()) return;
+      if (isSectionWellPastBelow()) {
+        resetRhodaStrip();
+        return;
+      }
+      if (!isSectionInView()) {
+        return;
+      }
+      smoothedProgress = meetScrollProgress();
+      updateMeetCard(easeInOutSmooth(smoothedProgress));
+      if (manualOffset === 0) {
+        applyCenteredScroll();
+      }
+      applyScroll();
+    };
+
+    const onWindowScroll = () => {
+      applyScroll();
     };
 
     const onScrollerScroll = () => {
@@ -165,7 +259,6 @@ export function AboutTeaserScroll({
       manualOffset = scroller.scrollLeft - baseScroll;
     };
 
-    let dragPointerId: number | null = null;
     let dragStartX = 0;
     let dragStartScroll = 0;
 
@@ -197,9 +290,12 @@ export function AboutTeaserScroll({
       }
     };
 
+    smoothedProgress = meetScrollProgress();
+    updateMeetCard(easeInOutSmooth(smoothedProgress));
+    applyCenteredScroll();
     applyScroll();
     window.addEventListener("scroll", onWindowScroll, { passive: true });
-    window.addEventListener("resize", onWindowScroll);
+    window.addEventListener("resize", onResize);
     scroller.addEventListener("scroll", onScrollerScroll, { passive: true });
     scroller.addEventListener("pointerdown", onPointerDown);
     scroller.addEventListener("pointermove", onPointerMove);
@@ -208,7 +304,7 @@ export function AboutTeaserScroll({
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onWindowScroll);
-      window.removeEventListener("resize", onWindowScroll);
+      window.removeEventListener("resize", onResize);
       scroller.removeEventListener("scroll", onScrollerScroll);
       scroller.removeEventListener("pointerdown", onPointerDown);
       scroller.removeEventListener("pointermove", onPointerMove);
@@ -278,56 +374,56 @@ export function AboutTeaserScroll({
             <ImageCard key={photo.src} photo={photo} />
           ))}
 
-          <div ref={meetRef} data-meet className={`${MEET_CARD} relative z-10`}>
+          <div ref={meetRef} data-meet className={`${MEET_CARD} relative z-10 rounded-3xl`}>
             <div
               ref={meetTextColRef}
-              className="relative shrink-0 overflow-hidden rounded-3xl bg-brand-gradient bg-center [background-size:118%] px-6 py-6 sm:px-7 sm:py-7 flex flex-col items-stretch justify-center text-left text-white"
+              className="relative z-10 h-full shrink-0 overflow-hidden bg-brand-pink bg-brand-gradient bg-center [background-size:118%] px-6 py-6 sm:px-7 sm:py-7 flex flex-col items-stretch justify-center text-left text-white isolate"
             >
-              <p className="w-full text-center text-sm text-white/80 mb-2 whitespace-nowrap">
-                Hello, I&apos;m
-              </p>
-              <p className="w-full text-center font-display text-3xl sm:text-4xl leading-none mb-2.5 whitespace-nowrap">
-                Rhoda
-              </p>
-              <p className="w-full text-center text-white/85 leading-snug text-sm sm:text-[0.85rem]">
-                I love sharing beauty with the world. Each bouquet is cut from
-                what&apos;s blooming that week. I also host pick-your-own days and
-                seasonal workshops when the garden has enough to share.
-              </p>
-            </div>
+                <p className="w-full text-center text-sm text-white/80 mb-2 whitespace-nowrap">
+                  Hello, I&apos;m
+                </p>
+                <p className="w-full text-center font-display text-3xl sm:text-4xl leading-none mb-2.5 whitespace-nowrap">
+                  Rhoda
+                </p>
+                <p className="w-full text-center text-white/85 leading-snug text-sm sm:text-[0.85rem]">
+                  I love sharing beauty with the world. Each bouquet is cut from
+                  what&apos;s blooming that week. I also host pick-your-own days and
+                  seasonal workshops when the garden has enough to share.
+                </p>
+              </div>
 
-            <div ref={meetPhotoRef} className="relative h-full shrink-0 overflow-hidden w-0">
-              <Image
-                src={rhodaPhoto.src}
-                alt=""
-                fill
-                quality={90}
-                className="object-cover object-[72%_38%]"
-                sizes="(max-width: 640px) 80vw, 400px"
-                draggable={false}
-              />
-              <div className="absolute inset-y-0 right-0 z-10 flex flex-col items-end justify-end gap-2.5 p-3">
-                <a
-                  href={facebookUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Front Porch Flowers on Facebook"
-                  className="flex h-11 w-11 items-center justify-center rounded-button bg-white/92 text-charcoal shadow-sm transition-transform hover:scale-105"
-                >
-                  <FacebookIcon className="w-4 h-4" />
-                </a>
-                <a
-                  href={instagramUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Front Porch Flowers on Instagram"
-                  className="flex h-11 w-11 items-center justify-center rounded-button bg-white/92 text-charcoal shadow-sm transition-transform hover:scale-105"
-                >
-                  <InstagramIcon className="w-4 h-4" />
-                </a>
+              <div ref={meetPhotoRef} className="relative z-0 h-full shrink-0 overflow-hidden">
+                <Image
+                  src={rhodaPhoto.src}
+                  alt=""
+                  fill
+                  quality={90}
+                  className="object-cover object-[72%_38%]"
+                  sizes="(max-width: 640px) 80vw, 400px"
+                  draggable={false}
+                />
+                <div className="absolute inset-y-0 right-0 z-10 flex flex-col items-end justify-end gap-2.5 p-3">
+                  <a
+                    href={facebookUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Front Porch Flowers on Facebook"
+                    className="flex h-11 w-11 items-center justify-center rounded-button bg-white/92 text-charcoal shadow-sm transition-transform hover:scale-105"
+                  >
+                    <FacebookIcon className="w-4 h-4" />
+                  </a>
+                  <a
+                    href={instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Front Porch Flowers on Instagram"
+                    className="flex h-11 w-11 items-center justify-center rounded-button bg-white/92 text-charcoal shadow-sm transition-transform hover:scale-105"
+                  >
+                    <InstagramIcon className="w-4 h-4" />
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
 
           {rightPhotos.map((photo) => (
             <ImageCard key={photo.src} photo={photo} />

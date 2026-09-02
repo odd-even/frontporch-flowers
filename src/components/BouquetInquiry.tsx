@@ -113,11 +113,35 @@ function formatPickupLabel(
   return day?.fullLabel ?? pickupDate;
 }
 
-const COLOR_OPTIONS = [
-  { id: "soft", label: "Soft", hint: "gentle, quiet tones" },
-  { id: "bright", label: "Bright", hint: "bold colour, lively mix" },
-  { id: "surprise", label: "Surprise me", hint: "Rhoda picks from what's blooming" },
-] as const;
+type ColorOption = {
+  id: "soft" | "bright" | "surprise";
+  label: string;
+  hint: string;
+  exampleImage?: string;
+  exampleAlt?: string;
+};
+
+const COLOR_OPTIONS: ColorOption[] = [
+  {
+    id: "soft",
+    label: "Soft",
+    hint: "gentle, quiet tones",
+    exampleImage: "/photos/boquets/color-soft-example.webp",
+    exampleAlt: "Soft pastel bouquet wrapped in kraft paper",
+  },
+  {
+    id: "bright",
+    label: "Bright",
+    hint: "bold colour, lively mix",
+    exampleImage: "/photos/boquets/color-bright-example.webp",
+    exampleAlt: "Bright colourful zinnia bouquet in a mason jar",
+  },
+  {
+    id: "surprise",
+    label: "Surprise me",
+    hint: "Rhoda picks from what's blooming",
+  },
+];
 
 export const PRESENTATION_OPTIONS = [
   {
@@ -508,6 +532,122 @@ function PickupDatePicker({
   );
 }
 
+function ColorChooser({
+  value,
+  onChange,
+}: {
+  value: ColorId;
+  onChange: (id: ColorId) => void;
+}) {
+  const [openExample, setOpenExample] = useState<ColorId | null>(null);
+  const popoverRef = useRef<HTMLFieldSetElement>(null);
+
+  useEffect(() => {
+    if (openExample == null) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpenExample(null);
+    };
+
+    const onPointerDown = (event: MouseEvent) => {
+      if (!popoverRef.current?.contains(event.target as Node)) {
+        setOpenExample(null);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown);
+    };
+  }, [openExample]);
+
+  return (
+    <fieldset ref={popoverRef}>
+      <legend className="text-sm font-medium text-charcoal mb-3">Color</legend>
+      <div className="grid sm:grid-cols-2 gap-2">
+        {COLOR_OPTIONS.map((option) => {
+          const isSelected = value === option.id;
+          const hasExample = option.id === "soft" || option.id === "bright";
+          const exampleOpen = openExample === option.id;
+
+          return (
+            <div key={option.id} className="relative">
+              <label
+                className={`flex cursor-pointer border transition-colors rounded-xl ${
+                  isSelected
+                    ? "border-sage bg-sage/10"
+                    : "border-sage/45 hover:border-sage/60 bg-cream"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="color"
+                  value={option.id}
+                  checked={isSelected}
+                  onChange={() => onChange(option.id)}
+                  className="sr-only"
+                />
+                <span className="flex flex-1 items-start justify-between gap-2 px-4 py-3">
+                  <span className="min-w-0">
+                    <span className="block text-sm font-medium text-charcoal">{option.label}</span>
+                    <span className="block text-xs text-warm-brown/85 mt-0.5">{option.hint}</span>
+                  </span>
+                  {hasExample ? (
+                    <button
+                      type="button"
+                      aria-label={`See a ${option.label.toLowerCase()} bouquet example`}
+                      aria-expanded={exampleOpen}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setOpenExample((current) => (current === option.id ? null : option.id));
+                      }}
+                      className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sage/45 bg-cream text-[11px] font-semibold text-warm-brown/85 transition-colors hover:border-sage/60 hover:text-charcoal"
+                    >
+                      ?
+                    </button>
+                  ) : null}
+                </span>
+              </label>
+
+              {hasExample && exampleOpen ? (
+                <div
+                  role="tooltip"
+                  className="absolute right-0 top-full z-30 mt-2 w-[min(100%,11.5rem)] overflow-hidden rounded-xl border border-sage/45 bg-cream shadow-lg"
+                >
+                  {option.exampleImage ? (
+                    <div className="relative aspect-[3/4] bg-cream-dark">
+                      <Image
+                        src={option.exampleImage}
+                        alt={option.exampleAlt ?? `${option.label} bouquet example`}
+                        fill
+                        className="object-cover"
+                        sizes="184px"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex aspect-[3/4] items-center justify-center bg-cream-dark px-4 text-center">
+                      <p className="text-xs leading-relaxed text-warm-brown/75">
+                        Soft example photo coming soon.
+                      </p>
+                    </div>
+                  )}
+                  <p className="px-3 py-2 text-[11px] leading-snug text-warm-brown/85">
+                    Example of a <span className="font-medium text-charcoal">{option.label.toLowerCase()}</span>{" "}
+                    palette — Rhoda picks from what&apos;s blooming.
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
+
 function OptionGroup<T extends string>({
   legend,
   name,
@@ -894,13 +1034,7 @@ function InquiryModal({
                   dayOptions={dayOptions}
                 />
 
-                <OptionGroup
-                  legend="Color"
-                  name="color"
-                  options={COLOR_OPTIONS}
-                  value={color}
-                  onChange={setColor}
-                />
+                <ColorChooser value={color} onChange={setColor} />
 
                 <div className="space-y-3">
                   <p className="text-sm font-medium text-charcoal">Your contact details</p>

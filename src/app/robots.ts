@@ -6,7 +6,12 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/", "/workshop/thanks", "/events/booked"],
+      disallow: [
+        "/api/",
+        "/bouquets/thanks",
+        "/workshop/thanks",
+        "/events/booked",
+      ],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,

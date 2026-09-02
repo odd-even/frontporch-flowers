@@ -9,11 +9,14 @@ import {
   getPickYourOwnPhoto,
 } from "@/lib/photos.server";
 
-export const metadata = {
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata = pageMetadata({
   title: "Events",
   description:
-    "Pick-your-own garden days and seasonal workshops at Front Porch Flowers in Woodstock, NB. Reserve your spot for the next visit.",
-};
+    "Pick-your-own garden days and seasonal workshops at Front Porch Flowers in Bedell and Woodstock, NB. Reserve your spot for the next visit.",
+  path: "/events",
+});
 
 export default async function EventsPage() {
   const [settings, events] = await Promise.all([

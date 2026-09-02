@@ -2,7 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { FacebookIcon, InstagramIcon } from "@/components/SocialIcons";
 import { getFacebookPageUrl } from "@/lib/facebook";
-import { HOME_SECTIONS } from "@/lib/home-sections";
+const EXPLORE_LINKS = [
+  { href: "/#about", label: "About" },
+  { href: "/bouquets", label: "Bouquets" },
+  { href: "/events", label: "Events" },
+  { href: "/gallery", label: "Gallery" },
+  { href: "/#follow", label: "Follow" },
+] as const;
 
 export function Footer() {
   const facebookUrl = getFacebookPageUrl();
@@ -39,13 +45,13 @@ export function Footer() {
                 Explore
               </h4>
               <ul className="space-y-2 text-sm text-cream/85">
-                {HOME_SECTIONS.map((section) => (
-                  <li key={section.id}>
+                {EXPLORE_LINKS.map((link) => (
+                  <li key={link.href}>
                     <Link
-                      href={`/#${section.id}`}
+                      href={link.href}
                       className="hover:text-cream transition-colors"
                     >
-                      {section.label}
+                      {link.label}
                     </Link>
                   </li>
                 ))}

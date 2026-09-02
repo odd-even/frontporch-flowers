@@ -1,5 +1,6 @@
 export const SITE_URL = "https://www.frontporchflowers.ca";
 export const SITE_NAME = "Front Porch Flowers";
+export const DEFAULT_OG_IMAGE = "/photos/boquets/hero-evi5.webp";
 
 export const LOCAL_SEO = {
   city: "Woodstock",
@@ -20,6 +21,60 @@ export function absoluteUrl(path = "/"): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+type PageMetadataInput = {
+  title: string;
+  description: string;
+  path: `/${string}`;
+};
+
+/** Shared metadata for indexable pages — canonical URL, Open Graph, and Twitter. */
+export function pageMetadata({ title, description, path }: PageMetadataInput) {
+  const url = absoluteUrl(path);
+  const ogImage = absoluteUrl(DEFAULT_OG_IMAGE);
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: path,
+    },
+    openGraph: {
+      title: `${title} | ${SITE_NAME} Woodstock NB`,
+      description,
+      type: "website" as const,
+      locale: "en_CA",
+      url,
+      siteName: SITE_NAME,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: `Wild whimsical cut flower bouquets by ${SITE_NAME} in Woodstock, NB`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image" as const,
+      title: `${title} | ${SITE_NAME} Woodstock NB`,
+      description,
+      images: [ogImage],
+    },
+  };
+}
+
+export function getWebSiteJsonLd() {
+  return {
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    url: SITE_URL,
+    name: SITE_NAME,
+    description: LOCAL_SEO.shortDescription,
+    inLanguage: "en-CA",
+    publisher: { "@id": `${SITE_URL}/#business` },
+  };
+}
+
 /** Local florist / cut-flower business schema for Google. */
 export function getLocalBusinessJsonLd(options?: {
   facebookUrl?: string;
@@ -35,16 +90,22 @@ export function getLocalBusinessJsonLd(options?: {
     "https://www.facebook.com/people/Front-Porch-Flowers/61580626863252/";
 
   return {
-    "@context": "https://schema.org",
     "@type": ["Florist", "LocalBusiness"],
     "@id": `${SITE_URL}/#business`,
     name: SITE_NAME,
     description: LOCAL_SEO.description,
     url: SITE_URL,
-    image: absoluteUrl("/logo.svg"),
+    image: [
+      absoluteUrl(DEFAULT_OG_IMAGE),
+      absoluteUrl("/logo.svg"),
+    ],
     telephone: phone,
     email,
     priceRange: "$$",
+    founder: {
+      "@type": "Person",
+      name: "Rhoda",
+    },
     address: {
       "@type": "PostalAddress",
       addressLocality: LOCAL_SEO.city,
@@ -91,5 +152,20 @@ export function getLocalBusinessJsonLd(options?: {
       "Woodstock NB",
       "Bedell NB",
     ],
+    makesOffer: {
+      "@type": "Offer",
+      itemOffered: {
+        "@type": "Service",
+        name: "Cut flower bouquets",
+        areaServed: "Woodstock, New Brunswick",
+      },
+    },
+  };
+}
+
+export function getSiteJsonLd(options?: Parameters<typeof getLocalBusinessJsonLd>[0]) {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [getWebSiteJsonLd(), getLocalBusinessJsonLd(options)],
   };
 }

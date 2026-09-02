@@ -5,11 +5,14 @@ import { getBouquets, getSiteSettings } from "@/lib/queries";
 import { buildMailtoUrl, getContactEmail } from "@/lib/email";
 import { isSquareConfigured } from "@/lib/square";
 
-export const metadata = {
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata = pageMetadata({
   title: "Bouquets & Cut Flowers",
   description:
     "Order locally grown cut flowers and wild whimsical bouquets in Woodstock, NB. Seasonal backyard blooms for local pickup from Front Porch Flowers.",
-};
+  path: "/bouquets",
+});
 
 export default async function BouquetsPage() {
   const [bouquets, settings] = await Promise.all([getBouquets(), getSiteSettings()]);
