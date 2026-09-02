@@ -35,6 +35,14 @@
 }
 
 @layer base {
+  :root {
+    --workshop-banner-h: 0px;
+  }
+
+  body:has([data-workshop-banner]) {
+    --workshop-banner-h: 2rem; /* h-8 thin banner */
+  }
+
   /* iOS Safari auto-zooms inputs below 16px — keep touch targets readable */
   @media (pointer: coarse) {
     input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]),

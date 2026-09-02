@@ -5,6 +5,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BouquetRequestStickyLoader } from "@/components/BouquetRequestStickyLoader";
+import { WorkshopBanner } from "@/components/WorkshopBanner";
 import {
   LOCAL_SEO,
   SITE_NAME,
@@ -121,6 +122,7 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <WorkshopBanner />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

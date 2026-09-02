@@ -162,6 +162,16 @@ function PostMedia({
   );
 }
 
+function stripEmojis(text: string) {
+  return text
+    .replace(/\p{Extended_Pictographic}/gu, "")
+    .replace(/\uFE0F/g, "")
+    .replace(/\u200D/g, "")
+    .replace(/[^\S\n]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/^\s+|\s+$/g, "");
+}
+
 function FacebookPostCard({
   post,
   onReadMore,
@@ -172,6 +182,7 @@ function FacebookPostCard({
   const [index, setIndex] = useState(0);
   const message = post.message?.trim() || "";
   const overlayMessage = message.replace(/^\s+/, "").replace(/\n{3,}/g, "\n\n");
+  const overlayRestMessage = stripEmojis(overlayMessage);
 
   function openModal() {
     onReadMore(post, index);
@@ -224,8 +235,11 @@ function FacebookPostCard({
               overlayMessage.length > 110 ? "mb-0 group-hover:mb-7" : "mb-0"
             }`}
           >
-            <p className="text-cream text-sm leading-snug whitespace-pre-line line-clamp-2 group-hover:line-clamp-5">
-              {overlayMessage}
+            <p className="text-cream text-sm leading-snug whitespace-pre-line line-clamp-2 group-hover:hidden">
+              {overlayRestMessage}
+            </p>
+            <p className="hidden overflow-hidden text-cream text-sm leading-snug whitespace-pre-line group-hover:[display:-webkit-box] group-hover:[-webkit-box-orient:vertical] group-hover:[-webkit-line-clamp:6]">
+              {overlayMessage.replace(/\n{2,}/g, "\n")}
             </p>
             {overlayMessage.length > 110 ? (
               <span className="pointer-events-none absolute left-0 top-full mt-1.5 text-xs text-cream/75 opacity-0 translate-y-1.5 transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] delay-75 group-hover:opacity-100 group-hover:translate-y-0">

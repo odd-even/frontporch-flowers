@@ -174,7 +174,7 @@ export function Header() {
     <>
       <header
         ref={headerRef}
-        className={`top-0 w-full z-[110] ${isHome ? "fixed" : "sticky"} ${
+        className={`w-full z-[110] top-[var(--workshop-banner-h,0px)] ${isHome ? "fixed" : "sticky"} ${
           open ? "max-md:hidden" : ""
         } ${
           showHeroBlurBar ? "backdrop-blur-xl backdrop-saturate-150" : ""
