@@ -44,7 +44,7 @@ export default async function HomePage() {
     <>
       <Hero photos={heroPhotos} />
       <AboutTeaser />
-      <section id="bouquets" className="scroll-mt-24 pt-12 pb-20 md:pt-16 md:pb-28">
+      <section id="bouquets" className="scroll-mt-24 pt-8 pb-10 md:pt-16 md:pb-14">
         <div className="max-w-6xl mx-auto px-6">
           <FinishRequestPicker
             contactEmail={getContactEmail(settings.email)}

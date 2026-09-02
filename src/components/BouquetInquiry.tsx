@@ -11,6 +11,8 @@ import {
 
 const CUSTOM_DATE_ID = "custom" as const;
 const SAME_DAY_CUTOFF_HOUR = 10;
+/** Fri–Mon are not available for pickup in the weekly picker. */
+const UNAVAILABLE_PICKUP_WEEKDAYS = new Set([0, 1, 5, 6]); // Sun, Mon, Fri, Sat
 type PickupDateId = string;
 
 type DayOption = {
@@ -58,6 +60,10 @@ function formatHoursLeft(hours: number): string {
   return `${hours} hrs left`;
 }
 
+function isPickupWeekdayAvailable(date: Date): boolean {
+  return !UNAVAILABLE_PICKUP_WEEKDAYS.has(date.getDay());
+}
+
 function getUpcomingDays(count = 7, now = new Date()): DayOption[] {
   const today = startOfLocalDay(now);
   const sameDayAvailable = isSameDayStillAvailable(now);
@@ -79,7 +85,8 @@ function getUpcomingDays(count = 7, now = new Date()): DayOption[] {
         day: "numeric",
         year: "numeric",
       }),
-      available: isToday ? sameDayAvailable : true,
+      available:
+        isPickupWeekdayAvailable(date) && (isToday ? sameDayAvailable : true),
       isToday,
       hoursLeft: isToday ? hoursLeft : undefined,
     };
@@ -99,7 +106,7 @@ function formatPickupLabel(
     const detail = customDateNote.trim();
     return detail
       ? `Custom date (to discuss): ${detail}`
-      : "Custom date — happy to discuss timing with Rhoda";
+      : "Custom date — discuss timing with Rhoda";
   }
 
   const day = dayOptions.find((option) => option.id === pickupDate);
@@ -107,7 +114,7 @@ function formatPickupLabel(
 }
 
 const COLOR_OPTIONS = [
-  { id: "soft", label: "Soft", hint: "gentle, quiet seasonal tones" },
+  { id: "soft", label: "Soft", hint: "gentle, quiet tones" },
   { id: "bright", label: "Bright", hint: "bold colour, lively mix" },
   { id: "surprise", label: "Surprise me", hint: "Rhoda picks from what's blooming" },
 ] as const;
@@ -119,7 +126,7 @@ export const PRESENTATION_OPTIONS = [
     shortLabel: "Sleeve",
     hint: "wrapped for carrying",
     price: "$26",
-    imageSrc: "/photos/boquets/sleeve-arrangement.jpg",
+    imageSrc: "/photos/boquets/sleeve-arrangement.webp",
   },
   {
     id: "vase",
@@ -164,15 +171,17 @@ export const PRESENTATION_OPTIONS = [
 ] as const;
 
 const QUANTITY_OPTIONS = [
-  { id: "1", label: "1", hint: "a single bouquet" },
-  { id: "2", label: "2", hint: "a pair" },
-  { id: "3", label: "3", hint: "a small set" },
-  { id: "4+", label: "4+", hint: "larger order" },
+  { id: "1", label: "1", hint: "" },
+  { id: "2", label: "2", hint: "" },
+  { id: "3", label: "3", hint: "" },
+  { id: "4+", label: "4+", hint: "send a request" },
 ] as const;
 
 type ColorId = (typeof COLOR_OPTIONS)[number]["id"];
 export type PresentationId = (typeof PRESENTATION_OPTIONS)[number]["id"];
 type QuantityId = (typeof QUANTITY_OPTIONS)[number]["id"];
+
+const QUANTITY_ORDER: QuantityId[] = ["1", "2", "3", "4+"];
 
 type BouquetPreferences = {
   color: ColorId;
@@ -359,6 +368,30 @@ function buildMessage(
   return lines.join("\n");
 }
 
+function PickupDateConfirmNote({ noteKey }: { noteKey: number }) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    setVisible(false);
+    const frame = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(frame);
+  }, [noteKey]);
+
+  if (noteKey === 0) return null;
+
+  return (
+    <p
+      role="status"
+      aria-live="polite"
+      className={`mt-3 rounded-lg bg-terracotta-dark px-3 py-2 text-[11px] leading-snug text-cream transition-all duration-300 ease-out ${
+        visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-[0.98]"
+      }`}
+    >
+      Some dates may not be available for pickup. I will confirm via email.
+    </p>
+  );
+}
+
 function PickupDatePicker({
   value,
   onChange,
@@ -373,6 +406,12 @@ function PickupDatePicker({
   dayOptions: DayOption[];
 }) {
   const isCustom = value === CUSTOM_DATE_ID;
+  const [confirmNoteKey, setConfirmNoteKey] = useState(0);
+
+  const selectDate = (id: PickupDateId) => {
+    onChange(id);
+    setConfirmNoteKey((key) => key + 1);
+  };
 
   return (
     <fieldset>
@@ -387,14 +426,14 @@ function PickupDatePicker({
               key={day.id}
               className={`rounded-xl border px-2 py-3 text-center transition-colors ${
                 !day.available
-                  ? "cursor-not-allowed border-sage/10 bg-cream/50 opacity-35"
+                  ? "cursor-not-allowed border-sage/25 bg-cream/50 opacity-35"
                   : day.isToday
                     ? isSelected
                       ? "cursor-pointer border-sage bg-sage/10 opacity-70"
-                      : "cursor-pointer border-sage/20 bg-cream opacity-55 hover:opacity-80 hover:border-sage/40"
+                      : "cursor-pointer border-sage/45 bg-cream opacity-55 hover:opacity-80 hover:border-sage/60"
                     : isSelected
                       ? "cursor-pointer border-sage bg-sage/10"
-                      : "cursor-pointer border-sage/20 hover:border-sage/40 bg-cream"
+                      : "cursor-pointer border-sage/45 hover:border-sage/60 bg-cream"
               }`}
             >
               <input
@@ -404,17 +443,17 @@ function PickupDatePicker({
                 checked={isSelected}
                 disabled={!day.available}
                 onChange={() => {
-                  if (day.available) onChange(day.id);
+                  if (day.available) selectDate(day.id);
                 }}
                 className="sr-only"
               />
-              <span className="block text-[11px] sm:text-[10px] uppercase tracking-wide text-warm-brown/70">
+              <span className="block text-[11px] sm:text-[10px] uppercase tracking-wide text-warm-brown/85">
                 {day.weekday}
               </span>
               <span className="block text-base font-medium text-charcoal leading-tight mt-0.5">
                 {day.day}
               </span>
-              <span className="block text-[11px] sm:text-[10px] text-warm-brown/60 mt-0.5">
+              <span className="block text-[11px] sm:text-[10px] text-warm-brown/78 mt-0.5">
                 {showHoursLeft ? formatHoursLeft(day.hoursLeft!) : day.month}
               </span>
             </label>
@@ -426,7 +465,7 @@ function PickupDatePicker({
         className={`mt-2 flex cursor-pointer rounded-xl border px-4 py-3 transition-colors ${
           isCustom
             ? "border-sage bg-sage/10"
-            : "border-sage/20 hover:border-sage/40 bg-cream"
+            : "border-sage/45 hover:border-sage/60 bg-cream"
         }`}
       >
         <input
@@ -434,13 +473,13 @@ function PickupDatePicker({
           name="pickup-date"
           value={CUSTOM_DATE_ID}
           checked={isCustom}
-          onChange={() => onChange(CUSTOM_DATE_ID)}
+          onChange={() => selectDate(CUSTOM_DATE_ID)}
           className="sr-only"
         />
         <span>
           <span className="block text-sm font-medium text-charcoal">Custom date</span>
-          <span className="block text-xs text-warm-brown/70 mt-0.5">
-            Outside this week — happy to discuss with Rhoda
+          <span className="block text-xs text-warm-brown/85 mt-0.5">
+            Outside this week — discuss with Rhoda
           </span>
         </span>
       </label>
@@ -459,10 +498,12 @@ function PickupDatePicker({
             onChange={(event) => onCustomDateNoteChange(event.target.value)}
             rows={2}
             placeholder="e.g. Saturday Aug 15 for a wedding, or anytime next month…"
-            className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50 resize-none"
+            className="w-full rounded-xl border border-sage/45 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/55 focus:outline-none focus:border-sage/70 resize-none"
           />
         </div>
       )}
+
+      <PickupDateConfirmNote noteKey={confirmNoteKey} />
     </fieldset>
   );
 }
@@ -474,6 +515,8 @@ function OptionGroup<T extends string>({
   value,
   onChange,
   withImages = false,
+  layout = "grid",
+  compact = false,
 }: {
   legend: string;
   name: string;
@@ -481,18 +524,30 @@ function OptionGroup<T extends string>({
   value: T;
   onChange: (id: T) => void;
   withImages?: boolean;
+  layout?: "grid" | "stack";
+  compact?: boolean;
 }) {
   return (
     <fieldset>
-      <legend className="text-sm font-medium text-charcoal mb-3">{legend}</legend>
-      <div className="grid sm:grid-cols-2 gap-2">
+      <legend className={`font-medium text-charcoal ${compact ? "text-xs mb-2" : "text-sm mb-3"}`}>
+        {legend}
+      </legend>
+      <div
+        className={
+          layout === "stack"
+            ? `flex flex-col ${compact ? "gap-1.5 max-w-[14rem]" : "gap-2"}`
+            : "grid sm:grid-cols-2 gap-2"
+        }
+      >
         {options.map((option) => (
           <label
             key={option.id}
-            className={`cursor-pointer rounded-xl border overflow-hidden transition-colors ${
+            className={`cursor-pointer border overflow-hidden transition-colors ${
+              compact ? "rounded-lg" : "rounded-xl"
+            } ${
               value === option.id
                 ? "border-sage bg-sage/10"
-                : "border-sage/20 hover:border-sage/40 bg-cream"
+                : "border-sage/45 hover:border-sage/60 bg-cream"
             }`}
           >
             <input
@@ -514,21 +569,91 @@ function OptionGroup<T extends string>({
                 />
               </span>
             )}
-            <span className="block px-4 py-3">
-              <span className="block text-sm font-medium text-charcoal">{option.label}</span>
-              <span className="block text-xs text-warm-brown/70 mt-0.5">
-                {option.hint}
-                {option.price ? (
-                  <>
-                    {" · "}
-                    <span className="text-terracotta font-medium">{option.price}</span>
-                  </>
-                ) : null}
+            {compact && layout === "stack" ? (
+              <span className="flex items-center justify-between gap-3 px-3 py-2">
+                <span className="text-sm font-medium text-charcoal tabular-nums">{option.label}</span>
+                <span className="text-xs text-warm-brown/85">{option.hint}</span>
               </span>
-            </span>
+            ) : (
+              <span className={`block ${compact ? "px-3 py-2" : "px-4 py-3"}`}>
+                <span className="block text-sm font-medium text-charcoal">{option.label}</span>
+                <span className="block text-xs text-warm-brown/85 mt-0.5">
+                  {option.hint}
+                  {option.price ? (
+                    <>
+                      {" · "}
+                      <span className="text-terracotta font-medium">{option.price}</span>
+                    </>
+                  ) : null}
+                </span>
+              </span>
+            )}
           </label>
         ))}
       </div>
+    </fieldset>
+  );
+}
+
+function QuantityStepper({
+  value,
+  onChange,
+  legend = "How many bouquets?",
+}: {
+  value: QuantityId;
+  onChange: (id: QuantityId) => void;
+  legend?: string;
+}) {
+  const index = QUANTITY_ORDER.indexOf(value);
+  const option = QUANTITY_OPTIONS.find((entry) => entry.id === value);
+  const canDecrease = index > 0;
+  const canIncrease = index < QUANTITY_ORDER.length - 1;
+
+  const step = (delta: number) => {
+    const next = QUANTITY_ORDER[index + delta];
+    if (next) onChange(next);
+  };
+
+  const stepperButtonClass =
+    "flex flex-1 items-center justify-center text-warm-brown/85 transition-colors hover:text-charcoal hover:bg-sage/10 disabled:opacity-30 disabled:pointer-events-none";
+
+  return (
+    <fieldset>
+      <legend className="text-sm font-medium text-charcoal mb-3">{legend}</legend>
+      <div className="flex w-full items-stretch overflow-hidden rounded-xl border border-sage/45 bg-cream">
+        <button
+          type="button"
+          onClick={() => step(-1)}
+          disabled={!canDecrease}
+          aria-label="Decrease quantity"
+          className={`${stepperButtonClass} border-r border-sage/45 py-3`}
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <span
+          className="flex min-w-[4rem] flex-[2] items-center justify-center px-4 py-3 text-lg font-medium tabular-nums text-charcoal"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {option?.label ?? value}
+        </span>
+        <button
+          type="button"
+          onClick={() => step(1)}
+          disabled={!canIncrease}
+          aria-label="Increase quantity"
+          className={`${stepperButtonClass} border-l border-sage/45 py-3`}
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
+      </div>
+      {option?.hint ? (
+        <p className="mt-2 text-xs text-warm-brown/85">{option.hint}</p>
+      ) : null}
     </fieldset>
   );
 }
@@ -547,51 +672,8 @@ function PresentationChooser({
     <fieldset>
       <legend className="text-sm font-medium text-charcoal mb-3">Arrangement</legend>
 
-      <div className="grid grid-cols-2 gap-2 sm:hidden">
-        {PRESENTATION_OPTIONS.map((option) => {
-          const isSelected = option.id === value;
-          return (
-            <button
-              key={option.id}
-              type="button"
-              onClick={() => onChange(option.id)}
-              aria-pressed={isSelected}
-              className={`overflow-hidden rounded-xl border text-left transition-colors ${
-                isSelected
-                  ? "border-sage bg-sage/10 ring-1 ring-sage/30"
-                  : "border-sage/20 bg-cream hover:border-sage/40"
-              }`}
-            >
-              <span className="relative block aspect-[4/3] bg-cream-dark">
-                <Image
-                  src={option.imageSrc}
-                  alt={option.label}
-                  fill
-                  className="object-cover"
-                  sizes="50vw"
-                />
-              </span>
-              <span className="block px-3 py-2.5">
-                <span
-                  className={`block text-sm leading-tight ${
-                    isSelected ? "font-medium text-charcoal" : "text-charcoal"
-                  }`}
-                >
-                  {option.shortLabel}
-                </span>
-                <span className="mt-0.5 block text-[11px] leading-tight text-warm-brown/70">
-                  {option.hint}
-                  {" · "}
-                  <span className="text-terracotta font-medium">{option.price}</span>
-                </span>
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="hidden sm:block overflow-hidden rounded-button border border-sage/20 bg-cream">
-        <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,14rem)_1fr] items-stretch">
+      <div className="overflow-hidden rounded-xl sm:rounded-button border border-sage/45 bg-cream">
+        <div className="flex flex-col sm:grid sm:grid-cols-[minmax(0,17rem)_1fr] items-stretch">
           <div className="relative aspect-[4/3] sm:aspect-auto sm:min-h-full bg-cream-dark">
             <Image
               key={selected.id}
@@ -599,12 +681,12 @@ function PresentationChooser({
               alt={selected.label}
               fill
               className="object-cover transition-opacity duration-300"
-              sizes="224px"
+              sizes="(max-width: 640px) 100vw, 272px"
             />
           </div>
 
           <div
-            className="flex flex-col divide-y divide-sage/15 border-t border-sage/15 sm:border-t-0 sm:border-l"
+            className="flex flex-col divide-y divide-sage/30 border-t border-sage/30 sm:border-t-0 sm:border-l"
             role="listbox"
             aria-label="Arrangement options"
           >
@@ -617,7 +699,7 @@ function PresentationChooser({
                   role="option"
                   aria-selected={isSelected}
                   onClick={() => onChange(option.id)}
-                  className={`flex flex-1 items-center justify-between gap-3 px-3.5 py-2.5 text-left transition-colors ${
+                  className={`flex flex-1 items-center justify-between gap-2 sm:gap-3 px-3 py-2 sm:px-3.5 sm:py-2.5 text-left transition-colors ${
                     isSelected
                       ? "bg-sage/12 text-charcoal"
                       : "text-warm-brown hover:bg-sage/5 hover:text-charcoal"
@@ -633,15 +715,15 @@ function PresentationChooser({
                     </span>
                     <span
                       className={`mt-0.5 block text-[11px] leading-tight ${
-                        isSelected ? "text-warm-brown/75" : "text-warm-brown/55"
+                        isSelected ? "text-warm-brown/88" : "text-warm-brown/72"
                       }`}
                     >
                       {option.hint}
                     </span>
                   </span>
                   <span
-                    className={`shrink-0 text-xs tabular-nums ${
-                      isSelected ? "font-medium text-terracotta" : "text-warm-brown/65"
+                    className={`shrink-0 text-[11px] sm:text-xs tabular-nums ${
+                      isSelected ? "font-medium text-terracotta" : "text-warm-brown/82"
                     }`}
                   >
                     {option.price}
@@ -755,7 +837,7 @@ function InquiryModal({
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 flex h-11 w-11 items-center justify-center text-warm-brown/60 hover:text-charcoal transition-colors"
+          className="absolute top-4 right-4 flex h-11 w-11 items-center justify-center text-warm-brown/78 hover:text-charcoal transition-colors"
           aria-label="Close"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -767,7 +849,7 @@ function InquiryModal({
           {submitted ? (
             <div className="text-center py-4">
               <p className="font-display text-2xl text-charcoal mb-3">Request sent</p>
-              <p className="text-warm-brown/80 text-sm leading-relaxed mb-6">
+              <p className="text-warm-brown/90 text-sm leading-relaxed mb-6">
                 Thanks! Your bouquet request is on its way to Rhoda. She&apos;ll follow up by email
                 soon.
               </p>
@@ -788,7 +870,7 @@ function InquiryModal({
               >
                 {title}
               </h2>
-              <p className="text-warm-brown/80 text-sm mb-6">{description}</p>
+              <p className="text-warm-brown/90 text-sm mb-6">{description}</p>
 
               <form
                 ref={formRef}
@@ -802,13 +884,7 @@ function InquiryModal({
                   <PresentationChooser value={presentation} onChange={setPresentation} />
                 )}
 
-                <OptionGroup
-                  legend="How many bouquets?"
-                  name="quantity"
-                  options={QUANTITY_OPTIONS}
-                  value={quantity}
-                  onChange={setQuantity}
-                />
+                <QuantityStepper value={quantity} onChange={setQuantity} />
 
                 <PickupDatePicker
                   value={pickupDate}
@@ -840,7 +916,7 @@ function InquiryModal({
                       onChange={(event) => setCustomerName(event.target.value)}
                       placeholder="Name"
                       autoComplete="name"
-                      className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
+                      className="w-full rounded-xl border border-sage/45 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/55 focus:outline-none focus:border-sage/70"
                     />
                   </div>
                   <div>
@@ -855,7 +931,7 @@ function InquiryModal({
                       onChange={(event) => setCustomerEmail(event.target.value)}
                       placeholder="Email"
                       autoComplete="email"
-                      className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
+                      className="w-full rounded-xl border border-sage/45 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/55 focus:outline-none focus:border-sage/70"
                     />
                   </div>
                   <div>
@@ -869,7 +945,7 @@ function InquiryModal({
                       onChange={(event) => setCustomerPhone(event.target.value)}
                       placeholder="Phone (optional)"
                       autoComplete="tel"
-                      className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50"
+                      className="w-full rounded-xl border border-sage/45 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/55 focus:outline-none focus:border-sage/70"
                     />
                   </div>
                 </div>
@@ -880,7 +956,7 @@ function InquiryModal({
                     className="block text-sm font-medium text-charcoal mb-2"
                   >
                     Anything else?{" "}
-                    <span className="font-normal text-warm-brown/60">(optional)</span>
+                    <span className="font-normal text-warm-brown/78">(optional)</span>
                   </label>
                   <textarea
                     id="bouquet-note"
@@ -888,7 +964,7 @@ function InquiryModal({
                     onChange={(event) => setNote(event.target.value)}
                     rows={3}
                     placeholder="Occasion, anything to avoid, delivery notes..."
-                    className="w-full rounded-xl border border-sage/20 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/40 focus:outline-none focus:border-sage/50 resize-none"
+                    className="w-full rounded-xl border border-sage/45 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/55 focus:outline-none focus:border-sage/70 resize-none"
                   />
                 </div>
 
@@ -938,7 +1014,7 @@ function InquiryModal({
                 </div>
 
                 {canPay ? (
-                  <p className="text-center text-xs text-warm-brown/55">
+                  <p className="text-center text-xs text-warm-brown/75">
                     Pay now with Square, or send a request for Rhoda to follow up by email.
                   </p>
                 ) : null}
@@ -1330,7 +1406,7 @@ export function FinishRequestPicker({
                 key={option.id}
                 type="button"
                 onClick={() => openOrder(option.id)}
-                className="group relative aspect-[3/4] overflow-hidden rounded-button text-left ring-1 ring-sage/15 hover:ring-sage/40 transition-all"
+                className="group relative aspect-[3/4] overflow-hidden rounded-button text-left ring-1 ring-sage/35 hover:ring-sage/55 transition-all"
               >
                 <Image
                   src={option.imageSrc}

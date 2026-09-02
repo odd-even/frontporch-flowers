@@ -18,6 +18,13 @@ const PHOTO_CARD =
 const MEET_CARD =
   "relative w-[min(72vw,18rem)] sm:w-[min(40vw,20rem)] h-[min(72vw,18rem)] sm:h-[min(40vw,20rem)] shrink-0 overflow-hidden flex will-change-[width]";
 
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
+
+function isTouchLayout() {
+  return window.matchMedia("(max-width: 639px), (pointer: coarse)").matches;
+}
+
 export function AboutTeaserScroll({
   sidePhotos,
   rhodaPhoto,
@@ -26,7 +33,6 @@ export function AboutTeaserScroll({
 }: Props) {
   const sectionRef = useRef<HTMLElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const stripRef = useRef<HTMLDivElement>(null);
   const meetRef = useRef<HTMLDivElement>(null);
   const meetTextColRef = useRef<HTMLDivElement>(null);
   const meetPhotoRef = useRef<HTMLDivElement>(null);
@@ -52,10 +58,11 @@ export function AboutTeaserScroll({
       const vh = window.innerHeight;
       const meetCenter = rect.top + rect.height / 2;
       const viewportCenter = vh / 2;
-      const startCenter = vh * 0.76;
-      return Math.min(
-        1,
-        Math.max(0, (startCenter - meetCenter) / (startCenter - viewportCenter))
+      const startCenter = vh * 0.9;
+      return clamp(
+        (startCenter - meetCenter) / (startCenter - viewportCenter),
+        0,
+        1
       );
     };
 
@@ -66,7 +73,7 @@ export function AboutTeaserScroll({
 
     const MAX_EXTRA_RATIO = 1;
     const MEET_RADIUS = "1.5rem";
-    const OPEN_EASE_POWER = 0.55;
+    const OPEN_EASE_POWER = 0.72;
     const FREEZE_PROGRESS = 0.98;
 
     const easeOpen = (progress: number) => Math.pow(progress, OPEN_EASE_POWER);
@@ -75,7 +82,7 @@ export function AboutTeaserScroll({
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const base = meetBaseWidth();
 
-      if (reduceMotion) {
+      if (reduceMotion || isTouchLayout()) {
         meet.style.width = "";
         meet.style.height = "";
         meetTextCol.style.width = "";
@@ -104,26 +111,29 @@ export function AboutTeaserScroll({
       meetPhoto.style.borderRadius = isOpen ? `0 ${MEET_RADIUS} ${MEET_RADIUS} 0` : "0";
     };
 
-    let frozenScrollLeft: number | null = null;
-
-    const isMeetHorizontallyCentered = () => {
-      const rect = meet.getBoundingClientRect();
-      const meetCenterX = rect.left + rect.width / 2;
-      return Math.abs(meetCenterX - window.innerWidth / 2) <= 20;
+    const meetTargetScrollLeft = () => {
+      const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+      const meetCenter = meet.offsetLeft + meet.offsetWidth / 2;
+      return clamp(meetCenter - scroller.clientWidth / 2, 0, max);
     };
 
     const computeBase = () => {
       const progress = meetScrollProgress();
       const eased = easeOpen(progress);
+      const centered = meetTargetScrollLeft();
+
+      if (progress >= FREEZE_PROGRESS) {
+        return centered;
+      }
+
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const maxShift = reduceMotion ? 0 : Math.min(window.innerWidth * 0.55, 480);
       const meetCenter = meet.offsetLeft + meet.offsetWidth / 2;
       const shift = (1 - eased) * maxShift;
-      return meetCenter - scroller.clientWidth / 2 - shift;
-    };
+      const shifted = meetCenter - scroller.clientWidth / 2 - shift;
 
-    const isTouchLayout = () =>
-      window.matchMedia("(max-width: 639px), (pointer: coarse)").matches;
+      return shifted + (centered - shifted) * eased;
+    };
 
     const applyScroll = () => {
       updateMeetCard();
@@ -131,33 +141,16 @@ export function AboutTeaserScroll({
       if (isTouchLayout()) return;
 
       const progress = meetScrollProgress();
-
-      if (frozenScrollLeft !== null && progress < FREEZE_PROGRESS) {
-        frozenScrollLeft = null;
+      if (progress >= FREEZE_PROGRESS) {
         manualOffset = 0;
       }
 
-      if (frozenScrollLeft === null) {
-        baseScroll = computeBase();
-      } else {
-        baseScroll = frozenScrollLeft;
-      }
+      baseScroll = computeBase();
 
       const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
-      const next = Math.min(max, Math.max(0, baseScroll + manualOffset));
+      const next = clamp(baseScroll + manualOffset, 0, max);
       syncing = true;
       scroller.scrollLeft = next;
-
-      if (
-        frozenScrollLeft === null &&
-        progress >= FREEZE_PROGRESS &&
-        isMeetHorizontallyCentered()
-      ) {
-        frozenScrollLeft = scroller.scrollLeft;
-        manualOffset = 0;
-        baseScroll = frozenScrollLeft;
-      }
-
       manualOffset = scroller.scrollLeft - baseScroll;
       syncing = false;
     };
@@ -177,6 +170,7 @@ export function AboutTeaserScroll({
     let dragStartScroll = 0;
 
     const onPointerDown = (event: PointerEvent) => {
+      if (isTouchLayout()) return;
       if (event.pointerType === "mouse" && event.button !== 0) return;
       dragPointerId = event.pointerId;
       dragStartX = event.clientX;
@@ -224,18 +218,62 @@ export function AboutTeaserScroll({
   }, []);
 
   return (
-    <section id="about" ref={sectionRef} className="scroll-mt-24 pt-10 pb-6 md:pt-14 md:pb-8">
-      <p className="px-6 pb-3 text-xs text-warm-brown/60 sm:hidden">
-        Swipe to explore
-      </p>
+    <section id="about" ref={sectionRef} className="scroll-mt-24 pt-10 pb-4 md:pt-14 md:pb-8">
+      {/* Mobile: brand gradient intro + photo (static, no scroll trap) */}
+      <div className="sm:hidden px-6">
+        <article className="overflow-hidden rounded-3xl ring-1 ring-charcoal/8">
+          <div className="relative overflow-hidden bg-brand-gradient bg-center [background-size:118%] px-7 py-9 text-center text-white">
+            <p className="text-sm text-white/80 mb-2 tracking-wide">Hello, I&apos;m</p>
+            <p className="font-display text-[clamp(2.75rem,11vw,3.5rem)] leading-none mb-4">
+              Rhoda
+            </p>
+            <p className="text-white/88 leading-relaxed text-[0.95rem] max-w-[18rem] mx-auto text-balance">
+              I love sharing beauty with the world. Each bouquet is cut from what&apos;s
+              blooming that week. I also host pick-your-own days and seasonal workshops
+              when the garden has enough to share.
+            </p>
+          </div>
+
+          <div className="relative aspect-[4/3] w-full overflow-hidden">
+            <Image
+              src={rhodaPhoto.src}
+              alt={rhodaPhoto.alt || "Rhoda among the flowers at Front Porch Flowers"}
+              fill
+              quality={90}
+              className="object-cover object-[72%_38%]"
+              sizes="92vw"
+              priority
+            />
+            <div className="absolute inset-x-0 bottom-0 z-10 flex items-end justify-end gap-2.5 p-4">
+              <a
+                href={facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Front Porch Flowers on Facebook"
+                className="flex h-11 w-11 items-center justify-center rounded-button bg-white/92 text-charcoal transition-transform active:scale-95"
+              >
+                <FacebookIcon className="w-4 h-4" />
+              </a>
+              <a
+                href={instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Front Porch Flowers on Instagram"
+                className="flex h-11 w-11 items-center justify-center rounded-button bg-white/92 text-charcoal transition-transform active:scale-95"
+              >
+                <InstagramIcon className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      {/* Desktop: horizontal photo strip */}
       <div
         ref={scrollerRef}
-        className="overflow-x-auto overflow-y-hidden overscroll-x-contain touch-pan-x cursor-grab active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="hidden sm:block overflow-x-auto overflow-y-hidden overscroll-x-contain touch-pan-x cursor-grab active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        <div
-          ref={stripRef}
-          className="flex w-max items-center gap-4 md:gap-5 px-6"
-        >
+        <div className="flex w-max items-center gap-4 md:gap-5 px-6">
           {leftPhotos.map((photo) => (
             <ImageCard key={photo.src} photo={photo} />
           ))}

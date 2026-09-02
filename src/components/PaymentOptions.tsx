@@ -1,24 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { InPersonPaymentLogos, InteracPaymentLogo } from "@/components/PaymentLogos";
 
 const PAY_HASH = "pay";
-
-function paymentGradientProgress(section: HTMLElement): number {
-  const rect = section.getBoundingClientRect();
-  const travel = section.offsetHeight + window.innerHeight;
-  if (travel <= 0) return 0;
-  return Math.min(1, Math.max(0, (window.innerHeight - rect.top) / travel));
-}
-
-function applyPaymentGradientScroll(section: HTMLElement, progress: number) {
-  section.style.setProperty("--payment-scroll-rotate", `${progress * 420}deg`);
-  section.style.setProperty("--payment-scroll-scale", String(1 + progress * 0.18));
-  section.style.setProperty("--payment-scroll-shift-x", `${(progress - 0.5) * 14}%`);
-  section.style.setProperty("--payment-scroll-shift-y", `${Math.sin(progress * Math.PI) * 8}%`);
-}
 
 function formatPhoneDisplay(phone: string): string {
   const digits = phone.replace(/\D/g, "");
@@ -69,42 +55,7 @@ export function PaymentOptions({
 }: PaymentOptionsProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
   const phoneDisplay = formatPhoneDisplay(phone);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    const update = () => {
-      if (!sectionRef.current) return;
-      if (reducedMotion) {
-        applyPaymentGradientScroll(sectionRef.current, 0);
-        return;
-      }
-      applyPaymentGradientScroll(
-        sectionRef.current,
-        paymentGradientProgress(sectionRef.current)
-      );
-    };
-
-    update();
-    let frame = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(update);
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", update);
-    };
-  }, []);
 
   useEffect(() => {
     if (shouldOpenFromUrl()) {
@@ -113,8 +64,14 @@ export function PaymentOptions({
     }
 
     const onHashChange = () => {
-      if (shouldOpenFromUrl()) setOpen(true);
+      if (shouldOpenFromUrl()) {
+        setOpen(true);
+        return;
+      }
+      setOpen(false);
+      setCopied(false);
     };
+
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
@@ -135,11 +92,6 @@ export function PaymentOptions({
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
-
-  function openModal() {
-    setOpen(true);
-    writePayHash();
-  }
 
   function close() {
     setOpen(false);
@@ -262,31 +214,9 @@ export function PaymentOptions({
       : null;
 
   return (
-    <section
-      ref={sectionRef}
-      id="pay"
-      className="relative py-24 md:py-32 scroll-mt-24 bg-payment-options text-cream"
-    >
-      <div className="max-w-6xl mx-auto px-6 text-center">
-        <p className="text-cream/60 text-sm uppercase tracking-[0.2em] mb-3">
-          Checkout
-        </p>
-        <h2 className="font-display text-3xl md:text-4xl text-cream mb-4">
-          Payment options
-        </h2>
-        <p className="text-cream/75 max-w-md mx-auto mb-8">
-          Ready to pay for your flowers? Here&apos;s how.
-        </p>
-        <button
-          type="button"
-          onClick={openModal}
-          className="btn gap-2 bg-terracotta-dark text-cream hover:bg-[color-mix(in_srgb,var(--color-terracotta-dark)_82%,var(--color-charcoal)_18%)]"
-        >
-          View payment options
-        </button>
-      </div>
-
+    <>
+      <div id="pay" className="sr-only" aria-hidden="true" />
       {modal}
-    </section>
+    </>
   );
 }

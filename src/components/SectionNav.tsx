@@ -13,12 +13,19 @@ import {
 const SPRING_EASE = "cubic-bezier(0.34, 1.56, 0.64, 1)";
 const SCROLL_OFFSET = 100;
 
-function pillBackground(color: string, navTheme: HeaderSurface, solid = false) {
-  const mix = solid
-    ? 82
-    : navTheme === "hero" || navTheme === "gradient" || navTheme === "dark" || navTheme === "follow"
-      ? 44
-      : 28;
+function pillBackground(
+  color: string,
+  navTheme: HeaderSurface,
+  solid = false,
+  followDark = false
+) {
+  const mix = followDark
+    ? 88
+    : solid
+      ? 82
+      : navTheme === "hero" || navTheme === "gradient" || navTheme === "dark" || navTheme === "follow"
+        ? 44
+        : 28;
   return `color-mix(in srgb, ${color} ${mix}%, transparent)`;
 }
 
@@ -42,7 +49,7 @@ interface SectionNavProps {
   navTheme: HeaderSurface;
   lightNavText?: boolean;
   surfaceAccent?: string;
-  onNavigate?: () => void;
+  onNavigate?: (sectionId?: HomeSectionId) => void;
   variant?: "desktop" | "mobile";
 }
 
@@ -157,8 +164,11 @@ export function SectionNav({
 
   const scrollTo = (id: HomeSectionId) => {
     setActiveId(id);
+    if (variant === "mobile") {
+      onNavigate?.(id);
+      return;
+    }
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    onNavigate?.();
   };
 
   if (variant === "mobile") {
@@ -168,10 +178,10 @@ export function SectionNav({
           const isActive = isHome && activeId === section.id;
           const href = isHome ? `#${section.id}` : `/#${section.id}`;
 
-          const mobileClass = `font-display text-4xl sm:text-5xl py-3.5 px-4 -mx-4 text-left rounded-2xl transition-colors border-l-[3px] ${
+          const mobileClass = `font-display text-4xl sm:text-5xl py-3 w-full text-center transition-colors ${
             isActive
-              ? "text-cream border-cream bg-cream/10"
-              : "text-cream/65 border-transparent hover:text-cream hover:bg-cream/5"
+              ? "text-white"
+              : "text-cream/50 hover:text-cream/75"
           }`;
 
           if (isHome) {
@@ -191,7 +201,7 @@ export function SectionNav({
             <Link
               key={section.id}
               href={href}
-              onClick={onNavigate}
+              onClick={() => onNavigate?.()}
               className={mobileClass}
             >
               {section.label}
@@ -211,7 +221,7 @@ export function SectionNav({
           left: pill.left,
           width: pill.width,
           opacity: pill.width > 0 ? 1 : 0,
-          backgroundColor: pillBackground(pillColor, navTheme, followActiveOnDark),
+          backgroundColor: pillBackground(pillColor, navTheme, followActiveOnDark, followActiveOnDark),
           transition: `left 320ms ${SPRING_EASE}, width 320ms ${SPRING_EASE}, opacity 180ms ease, background-color 120ms linear`,
         }}
       />

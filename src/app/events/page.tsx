@@ -33,11 +33,11 @@ export default async function EventsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="In the garden"
+        eyebrow="Bedell, NB"
         title="Events"
         description={
           nextPyo
-            ? "Come for Stem & Style — pick and arrange your own bouquet. Next workshop is ready to reserve."
+            ? undefined
             : "Workshops and pick-your-own days — announcements coming soon on social."
         }
       />

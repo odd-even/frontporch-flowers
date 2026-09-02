@@ -12,7 +12,7 @@ export const LOCAL_SEO = {
   description:
     "Locally grown cut flowers and wild whimsical bouquets in Woodstock, NB. Backyard blooms by Rhoda for local pickup, plus seasonal workshops and pick-your-own garden days.",
   shortDescription:
-    "Cut flowers and seasonal bouquets grown in Woodstock, New Brunswick — local pickup available.",
+    "Locally grown cut flowers and bouquets serving Woodstock, New Brunswick.",
 } as const;
 
 export function absoluteUrl(path = "/"): string {
@@ -61,6 +61,14 @@ export function getLocalBusinessJsonLd(options?: {
         },
       },
       {
+        "@type": "Place",
+        name: "Bedell",
+        containedInPlace: {
+          "@type": "City",
+          name: "Woodstock",
+        },
+      },
+      {
         "@type": "AdministrativeArea",
         name: "Carleton County",
       },
@@ -81,6 +89,7 @@ export function getLocalBusinessJsonLd(options?: {
       "pick your own flowers",
       "flower workshops",
       "Woodstock NB",
+      "Bedell NB",
     ],
   };
 }

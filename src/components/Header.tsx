@@ -4,9 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import { SectionNav } from "@/components/SectionNav";
 import { FacebookIcon, InstagramIcon } from "@/components/SocialIcons";
 import { getFacebookPageUrl } from "@/lib/facebook";
+import type { HomeSectionId } from "@/lib/home-sections";
 import {
   headerBorderClass,
   headerOpaqueBackgroundStyle,
@@ -58,9 +60,11 @@ export function Header() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [surfaceState, setSurfaceState] = useState<HeaderSurfaceState>(DEFAULT_SURFACE);
   const headerRef = useRef<HTMLElement>(null);
+  const pendingSectionRef = useRef<HomeSectionId | null>(null);
 
   useEffect(() => {
     if (!isHome) return;
@@ -105,17 +109,63 @@ export function Header() {
 
   const mobileIconClass = lightText ? "text-cream" : "text-charcoal";
 
+  const handleMobileNavigate = (sectionId?: HomeSectionId) => {
+    if (sectionId) pendingSectionRef.current = sectionId;
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    const root = document.createElement("div");
+    root.id = "mobile-nav-portal";
+    document.documentElement.appendChild(root);
+    setMounted(true);
+    return () => {
+      root.remove();
+    };
+  }, []);
+
   useEffect(() => {
     if (!open) return;
 
+    const scrollLockY = window.scrollY;
+    const html = document.documentElement;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
     };
 
+    html.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollLockY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+    document.body.style.touchAction = "none";
+
     window.addEventListener("keydown", onKeyDown);
     return () => {
+      html.style.overflow = "";
       document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.width = "";
+      document.body.style.touchAction = "";
+      const pendingSection = pendingSectionRef.current;
+      pendingSectionRef.current = null;
+      if (pendingSection) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            document.getElementById(pendingSection)?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          });
+        });
+      } else {
+        window.scrollTo(0, scrollLockY);
+      }
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
@@ -237,84 +287,95 @@ export function Header() {
         </div>
       </header>
 
-      <nav
-        id="mobile-nav-panel"
-        className={`md:hidden fixed inset-0 z-[140] w-full bg-mobile-nav flex flex-col transition-[opacity,transform] duration-300 ease-out ${
-          open
-            ? "opacity-100 translate-y-0 pointer-events-auto"
-            : "hidden pointer-events-none"
-        }`}
-        aria-label="Mobile"
-        aria-hidden={!open}
-      >
-        <div className="shrink-0 flex items-center justify-between px-6 py-2.5 border-b border-cream/15 pt-[max(0.625rem,env(safe-area-inset-top))]">
-          <Link href="/" className="group shrink-0" onClick={() => setOpen(false)}>
-            <Image
-              src="/logo-header.svg"
-              alt="Front Porch Flowers"
-              width={3072}
-              height={745}
-              priority
-              className="h-8 w-auto brightness-0 invert transition-opacity group-hover:opacity-80"
-            />
-          </Link>
-          <button
-            type="button"
-            className="p-3 -mr-1 text-cream transition-colors hover:text-cream/80"
-            onClick={() => setOpen(false)}
-            aria-label="Close menu"
-          >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+      {mounted
+        ? createPortal(
+            <nav
+              id="mobile-nav-panel"
+              className={`md:hidden mobile-nav-overlay transition-[opacity,visibility] duration-300 ease-out ${
+                open
+                  ? "opacity-100 visible pointer-events-auto"
+                  : "opacity-0 invisible pointer-events-none"
+              }`}
+              aria-label="Mobile"
+              aria-hidden={!open}
+            >
+              <div className="shrink-0 flex items-center justify-between px-6 py-2.5 border-b border-cream/15 pt-[max(0.625rem,env(safe-area-inset-top))]">
+                <Link href="/" className="group shrink-0" onClick={() => setOpen(false)}>
+                  <Image
+                    src="/logo-header.svg"
+                    alt="Front Porch Flowers"
+                    width={3072}
+                    height={745}
+                    priority
+                    className="h-8 w-auto brightness-0 invert transition-opacity group-hover:opacity-80"
+                  />
+                </Link>
+                <button
+                  type="button"
+                  className="p-3 -mr-1 text-cream transition-colors hover:text-cream/80"
+                  onClick={() => setOpen(false)}
+                  aria-label="Close menu"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
 
-        <div className="flex-1 min-h-0 overflow-y-auto px-8 pb-[max(2rem,env(safe-area-inset-bottom))] pt-8">
-          <p className="mb-6 text-xs uppercase tracking-[0.22em] text-cream/50">Explore</p>
-          <div className="flex flex-col gap-1">
-            <SectionNav
-              isHome={isHome}
-              navTheme="dark"
-              lightNavText
-              variant="mobile"
-              onNavigate={() => setOpen(false)}
-            />
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="font-display text-4xl sm:text-5xl text-cream/75 hover:text-cream transition-colors py-3"
-                onClick={() => setOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-          <div className={`mt-10 w-fit ${socialPillClass(true)}`}>
-            <a
-              href={FACEBOOK_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Follow on Facebook"
-              className={socialIconClass(true)}
-              onClick={() => setOpen(false)}
-            >
-              <FacebookIcon />
-            </a>
-            <a
-              href={INSTAGRAM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Follow on Instagram"
-              className={socialIconClass(true)}
-              onClick={() => setOpen(false)}
-            >
-              <InstagramIcon />
-            </a>
-          </div>
-        </div>
-      </nav>
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-8 py-6 overflow-y-auto overscroll-contain">
+                  <div className="flex w-full max-w-md flex-col items-center text-center">
+                    <div className="flex w-full flex-col items-center gap-1">
+                      <SectionNav
+                        isHome={isHome}
+                        navTheme="dark"
+                        lightNavText
+                        variant="mobile"
+                        onNavigate={handleMobileNavigate}
+                      />
+                      {navLinks.map((link) => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          className="font-display text-4xl sm:text-5xl text-cream/75 hover:text-cream transition-colors py-3 text-center"
+                          onClick={() => setOpen(false)}
+                        >
+                          {link.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="shrink-0 flex justify-center px-8 pt-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
+                  <div className="inline-flex items-center gap-3">
+                    <a
+                      href={FACEBOOK_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Follow on Facebook"
+                      className="flex h-11 w-11 items-center justify-center rounded-full text-cream/70 transition-colors hover:bg-cream/10 hover:text-cream"
+                      onClick={() => setOpen(false)}
+                    >
+                      <FacebookIcon className="w-5 h-5" />
+                    </a>
+                    <a
+                      href={INSTAGRAM_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Follow on Instagram"
+                      className="flex h-11 w-11 items-center justify-center rounded-full text-cream/70 transition-colors hover:bg-cream/10 hover:text-cream"
+                      onClick={() => setOpen(false)}
+                    >
+                      <InstagramIcon className="w-5 h-5" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </nav>,
+            document.getElementById("mobile-nav-portal") ?? document.documentElement
+          )
+        : null}
     </>
   );
 }

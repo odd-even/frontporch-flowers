@@ -40,19 +40,19 @@ export async function EventsTeaser() {
   const facebookUrl = getFacebookPageUrl(settings.facebookPageUrl);
 
   return (
-    <section id="events" className="scroll-mt-24 py-20 md:py-28 bg-brand-wash">
+    <section id="events" className="scroll-mt-24 pt-10 pb-20 md:pt-14 md:pb-28 bg-brand-wash">
       <div className="max-w-6xl mx-auto px-6">
         <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
             <p className="text-sage-dark text-sm uppercase tracking-[0.2em] mb-3">
-              In the garden
+              Bedell, NB
             </p>
             <h2 className="font-display text-4xl md:text-5xl text-charcoal">Events</h2>
-            <p className="text-warm-brown/80 max-w-xl mt-3">
-              {nextPyo
-                ? "Next up: Stem & Style — pick and arrange your own bouquet in the garden."
-                : "Pick-your-own days and seasonal workshops — dates are announced on social."}
-            </p>
+            {!nextPyo ? (
+              <p className="text-warm-brown/80 max-w-xl mt-3">
+                Pick-your-own days and seasonal workshops — dates are announced on social.
+              </p>
+            ) : null}
           </div>
           <Link
             href="/events"

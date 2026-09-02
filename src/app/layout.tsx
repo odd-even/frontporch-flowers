@@ -31,6 +31,10 @@ const poppins = Poppins({
   weight: ["300", "400", "500", "600"],
 });
 
+export const viewport = {
+  viewportFit: "cover" as const,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {

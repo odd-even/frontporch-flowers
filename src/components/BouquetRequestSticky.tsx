@@ -71,11 +71,11 @@ export function BouquetRequestSticky({
           <button
             type="button"
             onClick={() => openOrder()}
-            className="group relative flex items-center gap-2.5 rounded-button bg-cream py-1.5 pl-1.5 pr-4 shadow-lg shadow-charcoal/15 ring-1 ring-sage/25 transition-colors hover:bg-cream-dark hover:ring-sage/40"
+            className="group relative flex items-center gap-2.5 rounded-full bg-cream py-1.5 pl-1.5 pr-5 shadow-lg shadow-charcoal/15 ring-1 ring-sage/25 transition-colors hover:bg-cream-dark hover:ring-sage/40"
             aria-label="Request a bouquet"
           >
             <span
-              className="bouquet-request-ring pointer-events-none absolute inset-0 rounded-button"
+              className="bouquet-request-ring pointer-events-none absolute inset-0 rounded-full"
               aria-hidden="true"
             />
             <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full ring-2 ring-white/90">

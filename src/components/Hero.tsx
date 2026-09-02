@@ -29,6 +29,13 @@ export function Hero({ tagline, photos }: HeroProps) {
     setIndex(next);
   }
 
+  function heroImageClass(src: string) {
+    if (src.includes("hero-evi")) {
+      return "object-cover object-[62%_32%] md:object-center";
+    }
+    return "object-cover object-[center_32%] md:object-center";
+  }
+
   return (
     <>
       <section
@@ -52,7 +59,7 @@ export function Hero({ tagline, photos }: HeroProps) {
                 priority={i === 0}
                 loading={i === 0 ? undefined : "lazy"}
                 quality={90}
-                className="object-cover object-[center_32%] md:object-center"
+                className={heroImageClass(photo.src)}
                 sizes="100vw"
               />
             </div>

@@ -13,6 +13,59 @@ export type BouquetRequestEmailInput = {
   customerPhone?: string;
 };
 
+export type BouquetOrderEmailDetails = {
+  presentationLabel: string;
+  unitPriceLabel?: string;
+  quantity: string;
+  colorLabel: string;
+  pickupLabel: string;
+  note?: string;
+  payment?: {
+    totalLabel: string;
+    squarePaymentLinkId?: string;
+  };
+};
+
+const QUANTITY_LABELS: Record<string, string> = {
+  "1": "1",
+  "2": "2",
+  "3": "3",
+  "4+": "4+",
+};
+
+export function buildBouquetOrderEmailMessage(details: BouquetOrderEmailDetails): string {
+  const quantityLabel = QUANTITY_LABELS[details.quantity] ?? details.quantity;
+  const priceSuffix = details.unitPriceLabel ? ` (${details.unitPriceLabel} each)` : "";
+
+  const lines = [
+    `Hi Rhoda! I'd like a bouquet finished ${details.presentationLabel.toLowerCase()}.`,
+    "",
+    "Order details:",
+    `Quantity: ${quantityLabel}`,
+    `Color scheme: ${details.colorLabel}`,
+    `Presentation: ${details.presentationLabel}${priceSuffix}`,
+    `Pickup / ready by: ${details.pickupLabel}`,
+  ];
+
+  if (details.payment) {
+    lines.push(
+      "",
+      `Payment: customer is paying now via Square — ${details.payment.totalLabel} CAD prepaid.`,
+      "Square checkout has been started; confirm payment in your Square dashboard."
+    );
+    if (details.payment.squarePaymentLinkId) {
+      lines.push(`Square payment link ID: ${details.payment.squarePaymentLinkId}`);
+    }
+  }
+
+  if (details.note?.trim()) {
+    lines.push("", `A few more details: ${details.note.trim()}`);
+  }
+
+  lines.push("", "Thanks!");
+  return lines.join("\n");
+}
+
 function getRecipientEmail(): string {
   return (
     process.env.CONTACT_EMAIL ||
@@ -66,12 +119,14 @@ export async function sendBouquetRequestEmail(input: BouquetRequestEmailInput) {
   }
 
   const contactLines = [
+    "Contact:",
     `Customer name: ${customerName}`,
     `Customer email: ${customerEmail}`,
-    customerPhone ? `Customer phone: ${customerPhone}` : null,
-  ].filter(Boolean);
+    `Customer phone: ${customerPhone || "(not provided)"}`,
+    "",
+  ];
 
-  const fullMessage = [...contactLines, "", message].join("\n");
+  const fullMessage = [...contactLines, message].join("\n");
 
   const resend = new Resend(apiKey);
   const { error } = await resend.emails.send({

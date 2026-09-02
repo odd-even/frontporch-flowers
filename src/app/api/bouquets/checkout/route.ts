@@ -7,7 +7,10 @@ import {
   PRESENTATION_LABELS,
   parseBouquetQuantity,
 } from "@/lib/bouquet-pricing";
-import { sendBouquetRequestEmail } from "@/lib/bouquet-request.server";
+import {
+  buildBouquetOrderEmailMessage,
+  sendBouquetRequestEmail,
+} from "@/lib/bouquet-request.server";
 import { createBouquetCheckoutLink, isSquareConfigured } from "@/lib/square";
 
 export const runtime = "nodejs";
@@ -37,8 +40,8 @@ function formatPickupLabel(
   if (pickupDate === "custom") {
     const detail = customDateNote.trim();
     return detail
-      ? `Custom date: ${detail}`
-      : "Custom date — to discuss with Rhoda";
+      ? `Custom date (to discuss): ${detail}`
+      : "Custom date — discuss timing with Rhoda";
   }
 
   const date = new Date(`${pickupDate}T12:00:00`);
@@ -108,57 +111,49 @@ export async function POST(request: Request) {
   const colorLabel = COLOR_LABELS[color] || color;
   const pickupLabel = formatPickupLabel(pickupDate, customDateNote);
   const totalLabel = formatCents(totalCents);
-
-  const requestLines = [
-    `Hi Rhoda! I'd like a bouquet finished ${presentationLabel.toLowerCase()}.`,
-    "",
-    `Quantity: ${parsedQuantity}`,
-    `Color scheme: ${colorLabel}`,
-    `Presentation: ${presentationLabel} (${formatCents(unitCents)} each)`,
-    `Pickup / ready by: ${pickupLabel}`,
-    "",
-    `Payment: customer is paying now via Square — ${totalLabel} CAD prepaid.`,
-  ];
-
-  if (note) {
-    requestLines.push("", `A few more details: ${note}`);
-  }
-
-  requestLines.push("", "Thanks!");
+  const unitPriceLabel = formatCents(unitCents);
 
   try {
     const checkout = await createBouquetCheckoutLink({
       presentationId,
       quantity: parsedQuantity,
-      colorLabel: COLOR_LABELS[color] || color,
-      pickupLabel: formatPickupLabel(pickupDate, customDateNote),
+      colorLabel,
+      pickupLabel,
       customerName,
       customerEmail,
       customerPhone,
       note,
     });
 
-    void sendBouquetRequestEmail({
-      subject: `Bouquet order (pay now): ${presentationLabel}`,
-      message: requestLines.join("\n"),
+    const message = buildBouquetOrderEmailMessage({
+      presentationLabel,
+      unitPriceLabel,
+      quantity,
+      colorLabel,
+      pickupLabel,
+      note,
+      payment: {
+        totalLabel,
+        squarePaymentLinkId: checkout.paymentLinkId,
+      },
+    });
+
+    await sendBouquetRequestEmail({
+      subject: `Bouquet order (pay now): ${presentationLabel} — ${totalLabel}`,
+      message,
       customerName,
       customerEmail,
       customerPhone,
-    }).catch((error) => {
-      console.error("Bouquet pay-now notification error:", error);
     });
 
     return NextResponse.json({ url: checkout.url, totalCents });
   } catch (error) {
     console.error("Square bouquet checkout error:", error);
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Could not start checkout. Please try again.",
-      },
-      { status: 502 }
-    );
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Could not start checkout. Please try again.";
+    const status = message.includes("not configured") ? 503 : 502;
+    return NextResponse.json({ error: message }, { status });
   }
 }
