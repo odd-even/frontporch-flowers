@@ -3,11 +3,14 @@
 import { useEffect, useState, useTransition, type MouseEvent } from "react";
 import Image from "next/image";
 import { ArrowIcon } from "@/components/ArrowIcon";
+import { FacebookIcon, InstagramIcon } from "@/components/SocialIcons";
 import type { FacebookMediaItem, FacebookPost } from "@/lib/facebook";
 
 interface FacebookFeedGridProps {
   initialPosts: FacebookPost[];
   initialCursor: string | null;
+  facebookUrl: string;
+  instagramUrl?: string;
 }
 
 function getMediaItems(post: FacebookPost): FacebookMediaItem[] {
@@ -98,19 +101,19 @@ function PostMedia({
             type="button"
             onClick={showPrevious}
             aria-label="Previous media"
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-11 w-11 items-center justify-center rounded-button bg-charcoal/70 text-cream hover:bg-charcoal/90 transition-colors"
+            className="absolute left-1.5 top-1/2 -translate-y-1/2 z-10 flex h-12 w-12 items-center justify-center rounded-button bg-transparent text-cream drop-shadow-[0_0_10px_rgba(0,0,0,0.65)] hover:bg-cream/10 transition-colors"
           >
-            <ArrowIcon className="w-5 h-5" direction="left" />
+            <ArrowIcon className="w-7 h-7 drop-shadow-[0_0_8px_rgba(0,0,0,0.9)]" direction="left" />
           </button>
           <button
             type="button"
             onClick={showNext}
             aria-label="Next media"
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-11 w-11 items-center justify-center rounded-button bg-charcoal/70 text-cream hover:bg-charcoal/90 transition-colors"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 z-10 flex h-12 w-12 items-center justify-center rounded-button bg-transparent text-cream drop-shadow-[0_0_10px_rgba(0,0,0,0.65)] hover:bg-cream/10 transition-colors"
           >
-            <ArrowIcon className="w-5 h-5" />
+            <ArrowIcon className="w-7 h-7 drop-shadow-[0_0_8px_rgba(0,0,0,0.9)]" />
           </button>
-          <p className="absolute bottom-2 right-2 z-10 rounded-full bg-charcoal/70 px-2.5 py-1 text-xs text-cream tabular-nums">
+          <p className="absolute top-2 right-2 z-10 rounded-full bg-transparent px-2.5 py-1 text-xs text-cream tabular-nums drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]">
             {index + 1} / {mediaItems.length}
           </p>
         </>
@@ -128,40 +131,68 @@ function FacebookPostCard({
 }) {
   const [index, setIndex] = useState(0);
   const message = post.message?.trim() || "";
-  const canExpand = message.length > 140;
+  const overlayMessage = message.replace(/^\s+/, "").replace(/\n{3,}/g, "\n\n");
+
+  function openModal() {
+    onReadMore(post, index);
+  }
 
   return (
-    <article className="overflow-hidden rounded-xl bg-cream/5 ring-1 ring-cream/10 hover:ring-cream/25 transition-all text-left flex flex-col">
+    <article
+      role="button"
+      tabIndex={0}
+      onClick={openModal}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openModal();
+        }
+      }}
+      aria-label={message ? `Open post: ${message.slice(0, 80)}` : "Open Facebook post"}
+      className="group relative isolate cursor-pointer overflow-hidden rounded-xl bg-[#121c22] ring-1 ring-cream/10 hover:ring-cream/25 transition-all text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/40"
+    >
       <PostMedia
         post={post}
         index={index}
         onIndexChange={setIndex}
-        linked
       />
 
-      {message ? (
-        <div className="flex flex-1 flex-col px-3.5 py-3">
-          <p className="text-cream/85 text-sm leading-relaxed line-clamp-3 whitespace-pre-wrap">
-            {message}
-          </p>
-          {canExpand ? (
-            <button
-              type="button"
-              onClick={() => onReadMore(post, index)}
-              className="mt-2 self-start text-sm text-sage-light hover:text-cream transition-colors"
-            >
-              Read more
-            </button>
-          ) : null}
-          <a
-            href={post.permalink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-auto pt-3 inline-flex items-center gap-1.5 text-sm text-cream/55 hover:text-cream transition-colors"
+      {overlayMessage ? (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] overflow-hidden rounded-b-xl px-5 pb-5 pt-24">
+          {/* Solid fade under blur so soft edges never sample cream/white */}
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#121c22]/80 via-[#1a2830]/40 to-transparent transition-opacity duration-500 ease-out group-hover:opacity-0"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#070b0e]/95 via-[#121c22]/70 to-transparent opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute -inset-x-1 inset-y-0 origin-bottom backdrop-blur-xl bg-[#121c22]/15 transition-[background-color] duration-500 ease-out group-hover:bg-[#070b0e]/45"
+            style={{
+              WebkitMaskImage:
+                "linear-gradient(to top, black 0%, black 40%, transparent 100%)",
+              maskImage:
+                "linear-gradient(to top, black 0%, black 40%, transparent 100%)",
+            }}
+            aria-hidden="true"
+          />
+          {/* Caption low at rest; on hover lifts to clear space for Read more */}
+          <div
+            className={`relative flex min-h-[2.75em] flex-col justify-end transition-[margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              overlayMessage.length > 110 ? "mb-0 group-hover:mb-7" : "mb-0"
+            }`}
           >
-            View on Facebook
-            <ArrowIcon className="w-3.5 h-3.5" />
-          </a>
+            <p className="text-cream text-sm leading-snug whitespace-pre-line line-clamp-2 group-hover:line-clamp-5">
+              {overlayMessage}
+            </p>
+            {overlayMessage.length > 110 ? (
+              <span className="pointer-events-none absolute left-0 top-full mt-1.5 text-xs text-cream/75 opacity-0 translate-y-1.5 transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] delay-75 group-hover:opacity-100 group-hover:translate-y-0">
+                Read more
+              </span>
+            ) : null}
+          </div>
         </div>
       ) : null}
     </article>
@@ -194,14 +225,14 @@ function FacebookPostModal({
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-6 bg-charcoal/65"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6 bg-charcoal/65"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Facebook post"
     >
       <div
-        className="relative w-full sm:max-w-md max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-charcoal text-cream text-left shadow-xl ring-1 ring-cream/15 pb-[max(1rem,env(safe-area-inset-bottom))]"
+        className="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl bg-charcoal text-cream text-left shadow-xl ring-1 ring-cream/15"
         onClick={(event) => event.stopPropagation()}
       >
         <button
@@ -241,6 +272,8 @@ function FacebookPostModal({
 export function FacebookFeedGrid({
   initialPosts,
   initialCursor,
+  facebookUrl,
+  instagramUrl = "https://www.instagram.com/front_porchflowers",
 }: FacebookFeedGridProps) {
   const [posts, setPosts] = useState(initialPosts);
   const [cursor, setCursor] = useState(initialCursor);
@@ -280,7 +313,7 @@ export function FacebookFeedGrid({
   }
 
   return (
-    <div className="mb-10">
+    <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {posts.map((post) => (
           <FacebookPostCard
@@ -293,60 +326,93 @@ export function FacebookFeedGrid({
         ))}
       </div>
 
-      {cursor ? (
-        <div className="mt-8 flex flex-col items-center">
-          <button
-            type="button"
-            onClick={loadMore}
-            disabled={isPending}
-            aria-label={isPending ? "Loading more posts" : "Load more posts"}
-            className="group inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-button border border-cream/30 text-cream transition-[max-width,background-color] duration-300 ease-out max-w-[2.75rem] enabled:hover:w-auto enabled:hover:max-w-[9.5rem] enabled:hover:justify-start enabled:hover:bg-cream/10 enabled:focus-visible:w-auto enabled:focus-visible:max-w-[9.5rem] enabled:focus-visible:justify-start enabled:focus-visible:bg-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/30 disabled:cursor-wait disabled:opacity-60"
-          >
-            <span
-              className="flex h-11 w-11 shrink-0 items-center justify-center"
-              aria-hidden="true"
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center">
+          {cursor ? (
+            <button
+              type="button"
+              onClick={loadMore}
+              disabled={isPending}
+              aria-label={isPending ? "Loading more posts" : "Load more posts"}
+              className={`group inline-flex h-11 shrink-0 items-center overflow-hidden rounded-button border border-cream/35 text-cream/85 transition-[max-width,background-color,border-color,color,justify-content] duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/30 disabled:cursor-wait ${
+                isPending
+                  ? "max-w-[9.5rem] justify-start border-cream/55 bg-cream/5 text-cream"
+                  : "max-w-[2.75rem] justify-center enabled:hover:max-w-[9.5rem] enabled:hover:justify-start enabled:hover:border-cream/55 enabled:hover:bg-cream/5 enabled:hover:text-cream enabled:focus-visible:max-w-[9.5rem] enabled:focus-visible:justify-start enabled:focus-visible:border-cream/55 enabled:focus-visible:bg-cream/5 enabled:focus-visible:text-cream"
+              }`}
             >
-              {isPending ? (
-                <svg
-                  className="h-5 w-5 animate-spin"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
+              <span
+                className="flex h-11 w-11 shrink-0 items-center justify-center"
+                aria-hidden="true"
+              >
+                {isPending ? (
+                  <svg
+                    className="h-5 w-5 animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
                     stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="h-5 w-5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                >
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-              )}
-            </span>
-            <span
-              className="min-w-0 max-w-0 overflow-hidden whitespace-nowrap pr-0 text-sm font-medium opacity-0 transition-[max-width,opacity,padding] duration-300 ease-out group-hover:max-w-[5.5rem] group-hover:pr-3 group-hover:opacity-100 group-focus-visible:max-w-[5.5rem] group-focus-visible:pr-3 group-focus-visible:opacity-100"
-            >
-              {isPending ? "Loading…" : "Load more"}
-            </span>
-          </button>
-          {error ? <p className="mt-3 text-sm text-cream/60">{error}</p> : null}
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                  >
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                )}
+              </span>
+              <span
+                className={`min-w-0 overflow-hidden whitespace-nowrap text-sm font-medium transition-[max-width,opacity,padding] duration-300 ease-out ${
+                  isPending
+                    ? "max-w-[5.5rem] pr-3 opacity-100"
+                    : "max-w-0 pr-0 opacity-0 group-hover:max-w-[5.5rem] group-hover:pr-3 group-hover:opacity-100 group-focus-visible:max-w-[5.5rem] group-focus-visible:pr-3 group-focus-visible:opacity-100"
+                }`}
+              >
+                {isPending ? "Loading…" : "More"}
+              </span>
+            </button>
+          ) : null}
         </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-sm text-cream/70">Follow along</p>
+          <a
+            href={facebookUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Front Porch Flowers on Facebook"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-button border border-cream/35 bg-transparent text-cream transition-colors hover:border-cream/55 hover:bg-cream/5"
+          >
+            <FacebookIcon className="w-5 h-5" />
+          </a>
+          <a
+            href={instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Front Porch Flowers on Instagram"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-button border border-cream/35 bg-transparent text-cream transition-colors hover:border-cream/55 hover:bg-cream/5"
+          >
+            <InstagramIcon className="w-5 h-5" />
+          </a>
+        </div>
+      </div>
+      {error ? (
+        <p className="mt-3 text-left text-sm text-cream/60">{error}</p>
       ) : null}
 
       {activePost ? (

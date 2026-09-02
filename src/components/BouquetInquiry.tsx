@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowIcon } from "@/components/ArrowIcon";
+import { Reveal } from "@/components/Reveal";
 import {
   bouquetOrderTotalCents,
   canCheckoutBouquet,
@@ -1525,22 +1526,27 @@ export function FinishRequestPicker({
     <BouquetOrderSession squareReady={squareReady}>
       {(openOrder) => (
         <div>
-          <div className="mb-8">
+          <Reveal variant="up" className="mb-8">
             <p className="text-sage text-sm uppercase tracking-[0.2em] mb-2">
               Choose an arrangement
             </p>
             <h3 className="font-display text-4xl md:text-5xl text-charcoal mb-2">
               Order a bouquet
             </h3>
-          </div>
+          </Reveal>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+          <Reveal
+            stagger
+            variant="scale"
+            staggerMs={60}
+            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4"
+          >
             {PRESENTATION_OPTIONS.map((option) => (
               <button
                 key={option.id}
                 type="button"
                 onClick={() => openOrder(option.id)}
-                className="group relative aspect-[3/4] overflow-hidden rounded-button text-left ring-1 ring-sage/35 hover:ring-sage/55 transition-all"
+                className="group relative aspect-[3/4] w-full overflow-hidden rounded-button text-left ring-1 ring-sage/35 hover:ring-sage/55 transition-all"
               >
                 <Image
                   src={option.imageSrc}
@@ -1587,7 +1593,7 @@ export function FinishRequestPicker({
                 </span>
               </button>
             ))}
-          </div>
+          </Reveal>
         </div>
       )}
     </BouquetOrderSession>

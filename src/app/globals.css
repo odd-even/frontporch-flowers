@@ -237,6 +237,19 @@
     .bouquet-request-ring {
       animation: none;
     }
+
+    .reveal,
+    .reveal-stagger > .reveal {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+
+    .hero-copy-in {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
   }
 
   @keyframes bouquet-request-ring {
@@ -259,6 +272,81 @@
   .bouquet-request-ring {
     border: 1px solid color-mix(in srgb, var(--color-terracotta) 28%, transparent);
     animation: bouquet-request-ring 6.5s ease-out infinite;
+  }
+
+  /* Scroll / enter reveals — soft app-like motion */
+  .reveal {
+    --reveal-delay: 0ms;
+    opacity: 0;
+    will-change: transform, opacity;
+    transition:
+      opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay),
+      transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay);
+  }
+
+  .reveal-up {
+    transform: translate3d(0, 1.75rem, 0);
+  }
+
+  .reveal-fade {
+    transform: none;
+  }
+
+  .reveal-scale {
+    transform: translate3d(0, 0.85rem, 0) scale(0.97);
+  }
+
+  .reveal-left {
+    transform: translate3d(-1.5rem, 0.6rem, 0);
+  }
+
+  .reveal-right {
+    transform: translate3d(1.5rem, 0.6rem, 0);
+  }
+
+  .reveal.is-revealed,
+  .reveal-stagger.is-revealed > .reveal {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  .reveal-stagger > .reveal {
+    opacity: 0;
+    will-change: transform, opacity;
+    transition:
+      opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay),
+      transform 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay);
+  }
+
+  @keyframes hero-copy-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1.25rem, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .hero-copy-in {
+    animation: hero-copy-in 0.95s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .hero-copy-in-delay-1 {
+    animation-delay: 0.12s;
+  }
+
+  .hero-copy-in-delay-2 {
+    animation-delay: 0.24s;
+  }
+
+  .hero-copy-in-delay-3 {
+    animation-delay: 0.36s;
+  }
+
+  .hero-copy-in-delay-4 {
+    animation-delay: 0.48s;
   }
 
   .bg-payment-options {

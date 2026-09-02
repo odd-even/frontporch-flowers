@@ -71,24 +71,24 @@ export function Hero({ tagline, photos }: HeroProps) {
 
         <div className="relative w-full px-6 md:px-8 lg:px-10 pb-12 md:pb-16 pt-24">
           <div className="max-w-2xl flex flex-col items-start">
-            <p className="mb-6 rounded-full bg-cream/15 backdrop-blur-sm border border-cream/20 px-3.5 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-cream/90">
+            <p className="hero-copy-in mb-6 rounded-full bg-cream/15 backdrop-blur-sm border border-cream/20 px-3.5 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-cream/90">
               Woodstock, NB
             </p>
-            <h1 className="font-display text-5xl md:text-7xl text-cream leading-[1.1] mb-6">
+            <h1 className="hero-copy-in hero-copy-in-delay-1 font-display text-5xl md:text-7xl text-cream leading-[1.1] mb-6">
               <span className="block">Wild &amp; whimsical</span>
               <span className="font-accent text-6xl md:text-8xl text-sage-light block -ml-[0.24em]">
                 bouquets
               </span>
             </h1>
-            <p className="font-body text-lg md:text-xl text-cream/85 leading-relaxed mb-8 max-w-xl md:max-w-2xl text-balance">
+            <p className="hero-copy-in hero-copy-in-delay-2 font-body text-lg md:text-xl text-cream/85 leading-relaxed mb-8 max-w-xl md:max-w-2xl text-balance">
               I grow flowers in my backyard and make seasonal bouquets for local pickup.
             </p>
             {tagline ? (
-              <p className="text-cream/75 text-base md:text-lg leading-relaxed mb-8 max-w-lg">
+              <p className="hero-copy-in hero-copy-in-delay-3 text-cream/75 text-base md:text-lg leading-relaxed mb-8 max-w-lg">
                 {tagline}
               </p>
             ) : null}
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="hero-copy-in hero-copy-in-delay-4 flex flex-wrap items-center gap-3">
               <Link
                 href="#bouquets"
                 className="btn bg-terracotta text-cream hover:bg-terracotta-dark"

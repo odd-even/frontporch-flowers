@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { AboutTeaserScroll } from "@/components/AboutTeaserScroll";
 import { PickYourOwnFeatured } from "@/components/PickYourOwnFeatured";
+import { Reveal } from "@/components/Reveal";
 import { getFacebookPageUrl } from "@/lib/facebook";
 import {
   getAboutStripPhotos,
@@ -17,12 +18,14 @@ export async function AboutTeaser() {
   const instagramUrl = `https://www.instagram.com/${instagramHandle}`;
 
   return (
-    <AboutTeaserScroll
-      sidePhotos={getAboutStripPhotos()}
-      rhodaPhoto={getMeetRhodaPhoto()}
-      facebookUrl={facebookUrl}
-      instagramUrl={instagramUrl}
-    />
+    <Reveal variant="up" className="w-full">
+      <AboutTeaserScroll
+        sidePhotos={getAboutStripPhotos()}
+        rhodaPhoto={getMeetRhodaPhoto()}
+        facebookUrl={facebookUrl}
+        instagramUrl={instagramUrl}
+      />
+    </Reveal>
   );
 }
 
@@ -40,7 +43,7 @@ export async function EventsTeaser() {
   return (
     <section id="events" className="scroll-mt-24 pt-10 pb-20 md:pt-14 md:pb-28 bg-brand-wash">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="mb-10">
+        <Reveal variant="up" className="mb-10">
           <p className="text-sage-dark text-sm uppercase tracking-[0.2em] mb-3">
             Events
           </p>
@@ -50,16 +53,18 @@ export async function EventsTeaser() {
               Pick-your-own days and seasonal workshops — dates are announced on social.
             </p>
           ) : null}
-        </div>
+        </Reveal>
 
         {nextPyo ? (
-          <PickYourOwnFeatured
-            event={nextPyo}
-            photos={workshopPhotos.length ? workshopPhotos : [workshopCover]}
-            facebookUrl={facebookUrl}
-          />
+          <Reveal variant="scale" delay={80}>
+            <PickYourOwnFeatured
+              event={nextPyo}
+              photos={workshopPhotos.length ? workshopPhotos : [workshopCover]}
+              facebookUrl={facebookUrl}
+            />
+          </Reveal>
         ) : (
-          <div className="grid sm:grid-cols-2 gap-4 md:gap-6">
+          <Reveal stagger variant="up" className="grid sm:grid-cols-2 gap-4 md:gap-6">
             {[
               { title: "Pick Your Own", hint: "Announcements coming soon", image: pyoPhoto },
               { title: "Workshops", hint: "Announcements coming soon", image: workshopCover },
@@ -85,7 +90,7 @@ export async function EventsTeaser() {
                 </span>
               </article>
             ))}
-          </div>
+          </Reveal>
         )}
       </div>
     </section>
@@ -103,7 +108,7 @@ export function PageHeader({
 }) {
   return (
     <div className="bg-brand-wash-header border-b border-sage/15 py-16 md:py-24">
-      <div className="max-w-6xl mx-auto px-6">
+      <Reveal variant="up" className="max-w-6xl mx-auto px-6">
         {eyebrow && (
           <p className="text-sage text-sm uppercase tracking-[0.2em] mb-3">{eyebrow}</p>
         )}
@@ -115,7 +120,7 @@ export function PageHeader({
             {description}
           </p>
         )}
-      </div>
+      </Reveal>
     </div>
   );
 }

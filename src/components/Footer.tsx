@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FacebookIcon, InstagramIcon } from "@/components/SocialIcons";
 import { getFacebookPageUrl } from "@/lib/facebook";
+
 const EXPLORE_LINKS = [
   { href: "/#about", label: "About" },
   { href: "/bouquets", label: "Bouquets" },
