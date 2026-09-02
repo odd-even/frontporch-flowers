@@ -863,7 +863,7 @@ function PresentationChooser({
                     </span>
                   </span>
                   <span
-                    className={`shrink-0 text-[11px] sm:text-xs tabular-nums ${
+                    className={`shrink-0 text-base sm:text-sm tabular-nums ${
                       isSelected ? "font-medium text-terracotta" : "text-warm-brown/82"
                     }`}
                   >
@@ -1546,7 +1546,7 @@ export function FinishRequestPicker({
                 key={option.id}
                 type="button"
                 onClick={() => openOrder(option.id)}
-                className="group relative aspect-[3/4] w-full overflow-hidden rounded-button text-left ring-1 ring-sage/35 hover:ring-sage/55 transition-all"
+                className="group relative aspect-square sm:aspect-[3/4] w-full overflow-hidden rounded-button text-left ring-1 ring-sage/35 hover:ring-sage/55 transition-all"
               >
                 <Image
                   src={option.imageSrc}
