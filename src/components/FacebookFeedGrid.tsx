@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition, type MouseEvent } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { ArrowIcon } from "@/components/ArrowIcon";
 import { FacebookIcon, InstagramIcon } from "@/components/SocialIcons";
@@ -209,7 +210,12 @@ function FacebookPostModal({
   onClose: () => void;
 }) {
   const [index, setIndex] = useState(initialIndex);
+  const [mounted, setMounted] = useState(false);
   const message = post.message?.trim() || "";
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -223,7 +229,9 @@ function FacebookPostModal({
     };
   }, [onClose]);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div
       className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6 bg-charcoal/65"
       onClick={onClose}
@@ -265,7 +273,8 @@ function FacebookPostModal({
           </a>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
