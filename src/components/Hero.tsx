@@ -31,23 +31,31 @@ export function Hero({ tagline, photos }: HeroProps) {
 
   return (
     <>
-      <section data-header-zone="hero" className="relative h-svh min-h-svh flex items-end overflow-hidden">
+      <section
+        data-header-zone="hero"
+        className="relative flex h-[100dvh] max-h-[100dvh] items-end overflow-hidden md:h-svh md:max-h-none"
+      >
         <div className="absolute inset-0">
           {slides.map((photo, i) => (
-            <Image
+            <div
               key={photo.src}
-              src={photo.src}
-              alt={i === index ? photo.alt : ""}
-              fill
-              priority={i === 0}
-              quality={90}
-              aria-hidden={i !== index}
-              className={`object-cover object-center transition-opacity ease-in-out ${
+              className={`absolute inset-0 transition-opacity ease-in-out ${
                 i === index ? "opacity-100" : "opacity-0"
               }`}
               style={{ transitionDuration: `${FADE_MS}ms` }}
-              sizes="100vw"
-            />
+              aria-hidden={i !== index}
+            >
+              <Image
+                src={photo.src}
+                alt={i === index ? photo.alt : ""}
+                fill
+                priority={i === 0}
+                loading={i === 0 ? undefined : "lazy"}
+                quality={90}
+                className="object-cover object-[center_32%] md:object-center"
+                sizes="100vw"
+              />
+            </div>
           ))}
           <div className="absolute inset-0 bg-charcoal/15" />
           <div className="absolute inset-0 bg-brand-gradient opacity-15 mix-blend-soft-light" />

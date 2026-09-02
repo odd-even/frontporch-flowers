@@ -239,10 +239,10 @@ export function Header() {
 
       <nav
         id="mobile-nav-panel"
-        className={`md:hidden fixed inset-0 z-[140] min-h-dvh h-dvh w-full bg-mobile-nav flex flex-col transition-[opacity,transform,visibility] duration-300 ease-out ${
+        className={`md:hidden fixed inset-0 z-[140] w-full bg-mobile-nav flex flex-col transition-[opacity,transform] duration-300 ease-out ${
           open
-            ? "opacity-100 translate-y-0 visible pointer-events-auto"
-            : "opacity-0 translate-y-2 invisible pointer-events-none"
+            ? "opacity-100 translate-y-0 pointer-events-auto"
+            : "hidden pointer-events-none"
         }`}
         aria-label="Mobile"
         aria-hidden={!open}
