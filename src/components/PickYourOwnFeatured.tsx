@@ -48,7 +48,7 @@ export async function PickYourOwnFeatured({
     capacity.capacity || 8,
     8
   );
-  const spotsLabel = capacity.soldOut ? "Sold out" : "Limited · prepaid";
+  const spotsLabel = capacity.soldOut ? "Sold out" : "Prepay to reserve";
 
   const titleLines = workshopTitleLines(event.title);
 
@@ -171,7 +171,7 @@ export async function PickYourOwnFeatured({
             {capacity.capacity > 0 || capacity.soldOut ? (
               <li className="rounded-xl bg-sage/10 px-4 py-3">
                 <span className="block text-xs uppercase tracking-wider text-sage-dark mb-1">
-                  Spots
+                  {capacity.soldOut ? "Spots" : "Limited spots"}
                 </span>
                 <span className="font-medium text-charcoal">{spotsLabel}</span>
               </li>
