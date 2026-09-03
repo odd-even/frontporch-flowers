@@ -5,9 +5,8 @@ import { getFacebookPageUrl } from "@/lib/facebook";
 
 const EXPLORE_LINKS = [
   { href: "/#about", label: "About" },
-  { href: "/bouquets", label: "Bouquets" },
+  { href: "/#bouquets", label: "Bouquets" },
   { href: "/#events", label: "Events" },
-  { href: "/gallery", label: "Gallery" },
   { href: "/#follow", label: "Follow" },
 ] as const;
 
@@ -20,32 +19,32 @@ export function Footer() {
         className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[#1c2220]/28 via-[#151a19]/68 to-[#121716]"
         aria-hidden="true"
       />
-      <div className="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-10 md:pt-16 md:pb-10">
-        <div className="grid md:grid-cols-[2fr_auto] gap-8 md:gap-6 items-stretch">
-          <div className="flex flex-col sm:flex-row gap-5 sm:gap-6 md:gap-8 items-center sm:items-center text-center sm:text-left">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 pt-10 pb-8 md:pt-12 md:pb-8">
+        <div className="grid md:grid-cols-[2fr_auto] gap-6 md:gap-8 items-center">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 md:gap-6 items-center sm:items-center text-center sm:text-left">
             <Link href="/" className="shrink-0 group">
               <Image
                 src="/logo.svg"
                 alt="Front Porch Flowers"
                 width={256}
                 height={256}
-                className="w-56 h-56 sm:w-52 sm:h-52 md:w-56 md:h-56 transition-transform duration-500 group-hover:scale-105"
+                className="w-36 h-36 sm:w-40 sm:h-40 md:w-44 md:h-44 transition-transform duration-500 group-hover:scale-105"
               />
             </Link>
             <div className="flex-1 max-w-[17rem] sm:max-w-xs md:max-w-none">
               <p className="text-cream/88 text-sm leading-relaxed text-balance">
                 Locally grown cut flowers and bouquets serving Woodstock, New Brunswick.
               </p>
-              <p className="text-cream/72 text-xs mt-2">Local pickup available</p>
+              <p className="text-cream/72 text-xs mt-1.5">Local pickup available</p>
             </div>
           </div>
 
-          <div className="flex flex-col sm:grid sm:h-full sm:grid-cols-[1fr_auto_1fr] sm:items-stretch rounded-2xl border border-cream/20 py-5 gap-5 sm:gap-0">
+          <div className="flex flex-col sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-stretch rounded-2xl border border-cream/20 py-3.5 gap-3.5 sm:gap-0">
             <div className="flex flex-col px-4 sm:px-5">
-              <h4 className="font-medium text-sm uppercase tracking-widest text-cream/90 mb-3">
+              <h4 className="font-medium text-xs uppercase tracking-widest text-cream/90 mb-2">
                 Explore
               </h4>
-              <ul className="space-y-2 text-sm text-cream/85">
+              <ul className="space-y-1.5 text-sm text-cream/85">
                 {EXPLORE_LINKS.map((link) => (
                   <li key={link.href}>
                     <Link
@@ -62,10 +61,10 @@ export function Footer() {
             <div className="h-px sm:h-auto sm:w-px bg-cream/20 mx-4 sm:mx-0" aria-hidden="true" />
 
             <div className="flex flex-col px-4 sm:px-5">
-              <h4 className="font-medium text-sm uppercase tracking-widest text-cream/90 mb-3">
+              <h4 className="font-medium text-xs uppercase tracking-widest text-cream/90 mb-2">
                 Connect
               </h4>
-              <ul className="space-y-2 text-sm text-cream/85">
+              <ul className="space-y-1.5 text-sm text-cream/85">
                 <li>
                   <a
                     href={facebookUrl}

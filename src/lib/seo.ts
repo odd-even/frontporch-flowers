@@ -1,6 +1,6 @@
 export const SITE_URL = "https://www.frontporchflowers.ca";
 export const SITE_NAME = "Front Porch Flowers";
-export const DEFAULT_OG_IMAGE = "/photos/boquets/hero-evi5.webp";
+export const DEFAULT_OG_IMAGE = "/photos/boquets/hero-evi4.webp";
 
 export const LOCAL_SEO = {
   city: "Woodstock",
