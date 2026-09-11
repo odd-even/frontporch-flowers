@@ -66,12 +66,18 @@ export function buildBouquetOrderEmailMessage(details: BouquetOrderEmailDetails)
   return lines.join("\n");
 }
 
-function getRecipientEmail(): string {
-  return (
+function getRecipientEmails(): string[] {
+  const primary =
     process.env.CONTACT_EMAIL ||
     process.env.NEXT_PUBLIC_CONTACT_EMAIL ||
-    DEFAULT_CONTACT_EMAIL
-  );
+    DEFAULT_CONTACT_EMAIL;
+  const extras = process.env.NOTIFICATION_EMAILS || "ernest@darrowdesign.ca";
+
+  const emails = [...primary.split(","), ...extras.split(",")]
+    .map((email) => email.trim())
+    .filter(Boolean);
+
+  return [...new Set(emails)];
 }
 
 function getFromAddress(): string {
@@ -131,7 +137,7 @@ export async function sendBouquetRequestEmail(input: BouquetRequestEmailInput) {
   const resend = new Resend(apiKey);
   const { error } = await resend.emails.send({
     from: getFromAddress(),
-    to: [getRecipientEmail()],
+    to: getRecipientEmails(),
     replyTo: customerEmail,
     subject,
     text: fullMessage,
