@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { FacebookIcon } from "@/components/SocialIcons";
 
 interface EventBookingFormProps {
   eventId: string;
@@ -23,6 +22,7 @@ function formatMoney(cents: number, currency = "CAD") {
 
 export function EventBookingForm({
   eventId,
+  eventTitle = "Workshop",
   eventSummary,
   priceCents,
   currency = "CAD",
@@ -103,15 +103,27 @@ export function EventBookingForm({
 
   if (!squareReady) {
     return (
-      <a
-        href={facebookUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="btn w-full sm:w-fit bg-terracotta text-cream hover:bg-terracotta-dark"
-      >
-        <FacebookIcon className="w-5 h-5" />
-        Reserve your spot
-      </a>
+      <div className="w-full sm:w-fit">
+        <button
+          type="button"
+          disabled
+          className="btn w-full sm:w-fit bg-terracotta/50 text-cream cursor-not-allowed"
+        >
+          Reserve your spot
+        </button>
+        <p className="mt-2 text-sm text-warm-brown/70 max-w-sm">
+          Online checkout is connecting. Refresh in a moment, or message Rhoda on{" "}
+          <a
+            href={facebookUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-terracotta hover:text-terracotta-dark transition-colors"
+          >
+            Facebook
+          </a>{" "}
+          if you need help booking.
+        </p>
+      </div>
     );
   }
 
@@ -151,7 +163,7 @@ export function EventBookingForm({
             <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6">
               <div>
                 <p className="text-sage text-xs uppercase tracking-[0.2em] mb-2">
-                  Stem &amp; Style
+                  {eventTitle}
                 </p>
                 <h2
                   id="event-booking-title"

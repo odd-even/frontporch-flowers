@@ -22,6 +22,9 @@ export interface FacebookPost {
   /** Ordered images and videos for the post. */
   media: FacebookMediaItem[];
   permalink: string;
+  likeCount: number;
+  commentCount: number;
+  shareCount: number;
 }
 
 export interface FacebookPostsPage {
@@ -132,6 +135,10 @@ type GraphAttachment = {
   };
 };
 
+type GraphEngagement = {
+  summary?: { total_count?: number };
+};
+
 type GraphPost = {
   id: string;
   message?: string;
@@ -140,7 +147,24 @@ type GraphPost = {
   full_picture?: string;
   permalink_url?: string;
   attachments?: { data?: GraphAttachment[] };
+  reactions?: GraphEngagement;
+  likes?: GraphEngagement;
+  comments?: GraphEngagement;
+  shares?: { count?: number };
 };
+
+function engagementCount(
+  value: GraphEngagement | { count?: number } | undefined
+): number {
+  if (!value) return 0;
+  if ("summary" in value && typeof value.summary?.total_count === "number") {
+    return value.summary.total_count;
+  }
+  if ("count" in value && typeof value.count === "number") {
+    return value.count;
+  }
+  return 0;
+}
 
 const SKIPPED_ATTACHMENT_TYPES = new Set([
   "profile_media",
@@ -247,6 +271,10 @@ function mapPosts(items: GraphPost[]): FacebookPost[] {
         mediaUrls,
         media,
         permalink: item.permalink_url,
+        likeCount:
+          engagementCount(item.reactions) || engagementCount(item.likes),
+        commentCount: engagementCount(item.comments),
+        shareCount: engagementCount(item.shares),
       };
     })
     .filter((post): post is FacebookPost => post !== null);
@@ -302,7 +330,7 @@ export async function getFacebookPostsPage({
   const page = await resolvePageAccess(token);
   if (!page) return { posts: [], nextCursor: null };
 
-  const fields = [
+  const pageFields = [
     "id",
     "message",
     "story",
@@ -311,7 +339,13 @@ export async function getFacebookPostsPage({
     "permalink_url",
     "created_time",
     "attachments{media{image,source},type,title,subattachments{media{image,source},type}}",
-  ].join(",");
+  ];
+  const engagementFields = [
+    "reactions.limit(0).summary(true)",
+    "comments.limit(0).summary(true)",
+    "shares",
+  ];
+  let includeEngagement = true;
 
   const fetchLimit = Math.min(Math.max(limit * 2, 12), 50);
   const fetchOptions: GraphFetchOptions = dynamic
@@ -323,9 +357,12 @@ export async function getFacebookPostsPage({
   let nextCursor: string | null = null;
   let attempts = 0;
 
-  while (dedupeFacebookPosts(collected).length < limit && attempts < 4) {
+  while (dedupeFacebookPosts(collected).length < limit && attempts < 5) {
     attempts += 1;
     const afterPart = cursor ? `&after=${encodeURIComponent(cursor)}` : "";
+    const fields = (
+      includeEngagement ? [...pageFields, ...engagementFields] : pageFields
+    ).join(",");
 
     const data = await graphGet<{
       data?: GraphPost[];
@@ -339,7 +376,16 @@ export async function getFacebookPostsPage({
       fetchOptions
     );
 
-    if (!data?.data?.length) {
+    if (!data) {
+      if (includeEngagement) {
+        includeEngagement = false;
+        continue;
+      }
+      nextCursor = null;
+      break;
+    }
+
+    if (!data.data?.length) {
       nextCursor = null;
       break;
     }

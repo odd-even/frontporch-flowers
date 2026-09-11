@@ -8,6 +8,7 @@ import {
   getBouquetWorkshopPhotos,
   getMeetRhodaPhoto,
   getPickYourOwnPhoto,
+  getPumpkinWorkshopPhotos,
 } from "@/lib/photos.server";
 import { getPickYourOwnEvents, getSiteSettings } from "@/lib/queries";
 
@@ -48,10 +49,19 @@ export async function EventsTeaser() {
     getSiteSettings(),
   ]);
   const pyoPhoto = getPickYourOwnPhoto();
-  const workshopPhotos = getBouquetWorkshopPhotos();
-  const workshopCover = workshopPhotos[0] || pyoPhoto;
-  const nextPyo = events[0];
   const facebookUrl = getFacebookPageUrl(settings.facebookPageUrl);
+  const pumpkinPhotos = getPumpkinWorkshopPhotos();
+  const bouquetPhotos = getBouquetWorkshopPhotos();
+  const fallbackCover = bouquetPhotos[0] || pumpkinPhotos[0] || pyoPhoto;
+
+  function photosForEvent(event: (typeof events)[number]) {
+    const isPumpkin =
+      /pumpkin/i.test(event.title) || /pumpkin/i.test(event.description || "");
+    if (isPumpkin && pumpkinPhotos.length) return pumpkinPhotos;
+    if (bouquetPhotos.length) return bouquetPhotos;
+    if (pumpkinPhotos.length) return pumpkinPhotos;
+    return [fallbackCover];
+  }
 
   return (
     <section id="events" className="scroll-mt-24 pt-10 pb-20 md:pt-14 md:pb-28 bg-brand-wash">
@@ -61,26 +71,30 @@ export async function EventsTeaser() {
             Events
           </p>
           <h2 className="font-display text-4xl md:text-5xl text-charcoal">Workshops</h2>
-          {!nextPyo ? (
+          {!events.length ? (
             <p className="text-warm-brown/80 max-w-xl mt-3">
               Pick-your-own days and seasonal workshops — dates are announced on social.
             </p>
           ) : null}
         </Reveal>
 
-        {nextPyo ? (
-          <Reveal variant="scale" delay={80}>
-            <PickYourOwnFeatured
-              event={nextPyo}
-              photos={workshopPhotos.length ? workshopPhotos : [workshopCover]}
-              facebookUrl={facebookUrl}
-            />
-          </Reveal>
+        {events.length ? (
+          <div className="flex flex-col gap-8 md:gap-10">
+            {events.map((event, index) => (
+              <Reveal key={event._id} variant="scale" delay={80 + index * 60}>
+                <PickYourOwnFeatured
+                  event={event}
+                  photos={photosForEvent(event)}
+                  facebookUrl={facebookUrl}
+                />
+              </Reveal>
+            ))}
+          </div>
         ) : (
           <Reveal stagger variant="up" className="grid sm:grid-cols-2 gap-4 md:gap-6">
             {[
               { title: "Pick Your Own", hint: "Announcements coming soon", image: pyoPhoto },
-              { title: "Workshops", hint: "Announcements coming soon", image: workshopCover },
+              { title: "Workshops", hint: "Announcements coming soon", image: fallbackCover },
             ].map((card) => (
               <article
                 key={card.title}

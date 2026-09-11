@@ -64,6 +64,18 @@ export const fallbackEvents: PickYourOwnEvent[] = [
     currency: "CAD",
     squarePaymentLinkUrl: "https://square.link/u/CrXwEatf",
   },
+  {
+    _id: "workshop-pumpkin-oct-4-2026",
+    title: "Dried Floral Pumpkin Arrangements",
+    date: "2026-10-04",
+    startTime: "2:00 PM",
+    endTime: "4:00 PM",
+    description:
+      "Join me for a cozy afternoon making dried floral pumpkin arrangements. You’ll take home two pumpkins each, and all supplies are provided — just bring yourself.",
+    spotsAvailable: 10,
+    priceCents: 5500,
+    currency: "CAD",
+  },
 ];
 
 export const fallbackBouquets: Bouquet[] = [

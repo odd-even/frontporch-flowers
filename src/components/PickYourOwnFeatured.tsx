@@ -4,7 +4,7 @@ import { EventImageRotator } from "@/components/EventImageRotator";
 import type { SitePhoto } from "@/lib/photos.shared";
 import { getEventCapacity, isEventCheckoutReady } from "@/lib/square";
 import type { PickYourOwnEvent } from "@/lib/types";
-import { formatDate } from "@/lib/utils";
+import { formatDate, workshopAnchorId } from "@/lib/utils";
 
 interface PickYourOwnFeaturedProps {
   event: PickYourOwnEvent;
@@ -18,6 +18,9 @@ function workshopTitleLines(title: string) {
   if (/stem\s*&\s*style/i.test(normalized)) {
     return { lead: "Stem & Style", accent: "Gather & arrange in the garden" };
   }
+  if (/dried\s+floral\s+pumpkin/i.test(normalized)) {
+    return { lead: "Dried Floral Pumpkins", accent: "Arrangements to take home" };
+  }
   if (/pick.*arrange.*your own bouquet/i.test(normalized)) {
     return { lead: "Pick & arrange", accent: "your own bouquet" };
   }
@@ -29,6 +32,17 @@ function workshopTitleLines(title: string) {
     };
   }
   return { lead: normalized, accent: null };
+}
+
+function workshopIncludes(event: PickYourOwnEvent): string[] {
+  if (/pumpkin/i.test(event.title) || /pumpkin/i.test(event.description || "")) {
+    return ["Two pumpkins each", "All supplies provided"];
+  }
+  return ["Vase included", "Homemade floral lemonade"];
+}
+
+function isPumpkinWorkshop(event: PickYourOwnEvent) {
+  return /pumpkin/i.test(event.title) || /pumpkin/i.test(event.description || "");
 }
 
 export async function PickYourOwnFeatured({
@@ -53,18 +67,21 @@ export async function PickYourOwnFeatured({
       }
     : await getEventCapacity(event);
   const maxQuantity = Math.min(
-    capacity.remaining > 0 ? capacity.remaining : capacity.capacity || 8,
-    capacity.capacity || 8,
-    8
+    capacity.remaining > 0 ? capacity.remaining : capacity.capacity || 10,
+    capacity.capacity || 10,
+    10
   );
   const spotsLabel = capacity.soldOut ? "Sold out" : "Prepay to reserve";
 
   const titleLines = workshopTitleLines(event.title);
-
-  const includes = ["Vase included", "Homemade floral lemonade"];
+  const includes = workshopIncludes(event);
+  const pumpkin = isPumpkinWorkshop(event);
 
   return (
-    <article className="overflow-hidden rounded-3xl border border-sage/15 bg-cream shadow-[0_20px_60px_-40px_rgba(60,50,40,0.45)]">
+    <article
+      id={workshopAnchorId(event)}
+      className="scroll-mt-28 overflow-hidden rounded-3xl border border-sage/15 bg-cream shadow-[0_20px_60px_-40px_rgba(60,50,40,0.45)]"
+    >
       <div className="grid md:grid-cols-2">
         <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[380px]">
           <EventImageRotator photos={photos} />
@@ -185,12 +202,21 @@ export async function PickYourOwnFeatured({
                 <span className="font-medium text-charcoal">{spotsLabel}</span>
               </li>
             ) : null}
-            <li className="rounded-xl bg-sage/10 px-4 py-3">
-              <span className="block text-xs uppercase tracking-wider text-sage-dark mb-1">
-                Refreshment
-              </span>
-              <span className="font-medium text-charcoal">Floral lemonade</span>
-            </li>
+            {pumpkin ? (
+              <li className="rounded-xl bg-sage/10 px-4 py-3">
+                <span className="block text-xs uppercase tracking-wider text-sage-dark mb-1">
+                  You take home
+                </span>
+                <span className="font-medium text-charcoal">2 pumpkins</span>
+              </li>
+            ) : (
+              <li className="rounded-xl bg-sage/10 px-4 py-3">
+                <span className="block text-xs uppercase tracking-wider text-sage-dark mb-1">
+                  Refreshment
+                </span>
+                <span className="font-medium text-charcoal">Floral lemonade</span>
+              </li>
+            )}
             {event.priceCents ? (
               <li className="rounded-xl bg-terracotta/10 px-4 py-3">
                 <span className="block text-xs uppercase tracking-wider text-terracotta mb-1">
@@ -239,6 +265,7 @@ export async function PickYourOwnFeatured({
             ) : (
               <EventBookingForm
                 eventId={event._id}
+                eventTitle={event.title}
                 eventSummary={`${event.startTime} – ${event.endTime} · Bedell, NB`}
                 priceCents={event.priceCents}
                 currency={event.currency || "CAD"}

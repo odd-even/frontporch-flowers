@@ -6,6 +6,7 @@ import {
   useState,
   useTransition,
   type MouseEvent,
+  type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
@@ -253,6 +254,102 @@ function FacebookPostCard({
   );
 }
 
+function formatEngagementCount(n: number) {
+  return n.toLocaleString("en-CA");
+}
+
+function PostEngagement({
+  post,
+  className = "",
+}: {
+  post: FacebookPost;
+  className?: string;
+}) {
+  const likes = post.likeCount || 0;
+  const comments = post.commentCount || 0;
+  const shares = post.shareCount || 0;
+  if (likes + comments + shares === 0) return null;
+
+  const items = [
+    likes
+      ? {
+          key: "likes",
+          count: likes,
+          label: likes === 1 ? "1 like" : `${formatEngagementCount(likes)} likes`,
+          icon: (
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M7 11v9H4.5A1.5 1.5 0 0 1 3 18.5v-6A1.5 1.5 0 0 1 4.5 11H7Zm0 0 3.2-6.5A2.2 2.2 0 0 1 12.2 3c.9 0 1.6.7 1.6 1.6V8h5.1a2 2 0 0 1 2 2.3l-1.2 7A2 2 0 0 1 17.7 20H7"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ),
+        }
+      : null,
+    comments
+      ? {
+          key: "comments",
+          count: comments,
+          label:
+            comments === 1
+              ? "1 comment"
+              : `${formatEngagementCount(comments)} comments`,
+          icon: (
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M5 18.5 3.5 21 7 18.7A9 9 0 1 0 5 18.5Z"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ),
+        }
+      : null,
+    shares
+      ? {
+          key: "shares",
+          count: shares,
+          label: shares === 1 ? "1 share" : `${formatEngagementCount(shares)} shares`,
+          icon: (
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M8.5 12.5 15 9m-6.5 2.5L15 15.5M9 12a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm11-4.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm0 9a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ),
+        }
+      : null,
+  ].filter(Boolean) as Array<{
+    key: string;
+    count: number;
+    label: string;
+    icon: ReactNode;
+  }>;
+
+  return (
+    <ul
+      className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-warm-brown/75 ${className}`}
+    >
+      {items.map((item) => (
+        <li key={item.key} className="inline-flex items-center gap-1.5">
+          {item.icon}
+          <span className="tabular-nums" aria-label={item.label}>
+            {formatEngagementCount(item.count)}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function ModalPostCard({
   post,
   initialMediaIndex = 0,
@@ -269,7 +366,6 @@ function ModalPostCard({
     <article
       ref={cardRef}
       className="relative w-full max-w-md shrink-0 origin-center snap-center overflow-hidden rounded-2xl bg-cream text-charcoal text-left shadow-xl will-change-transform"
-      style={{ transform: "scale(0.86)", opacity: 1 }}
     >
       <PostMedia
         post={post}
@@ -284,6 +380,10 @@ function ModalPostCard({
             {message}
           </p>
         ) : null}
+        <PostEngagement
+          post={post}
+          className={message ? "mt-4" : undefined}
+        />
         <a
           href={post.permalink}
           target="_blank"
@@ -348,20 +448,18 @@ function FacebookPostModal({
   function updateScales() {
     const scroller = scrollerRef.current;
     if (!scroller) return;
-    const viewMid = scroller.clientHeight / 2;
+    // Layout coords (not scaled rects) so above/below center stay symmetric.
+    const viewMid = scroller.scrollTop + scroller.clientHeight / 2;
     const range = Math.max(160, scroller.clientHeight * 0.38);
 
     itemRefs.current.forEach((el) => {
       if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const scrollerRect = scroller.getBoundingClientRect();
-      const elMid = rect.top - scrollerRect.top + rect.height / 2;
+      const elMid = el.offsetTop + el.offsetHeight / 2;
       const t = Math.min(1, Math.abs(elMid - viewMid) / range);
-      // Size down away from center; stay opaque — edge masks cover them
       const eased = t * t;
-      const scale = 1 - eased * 0.16;
-      el.style.transform = `scale(${scale})`;
-      el.style.opacity = "1";
+      el.style.transformOrigin = "center center";
+      el.style.transform = `scale(${1 - eased * 0.16})`;
+      el.style.opacity = String(1 - eased * 0.55);
     });
   }
 

@@ -13,6 +13,7 @@ const FOLDER_CATEGORY: Record<string, PhotoCategory> = {
   "hydrangia workshop": "workshops",
   "wreath workshop": "workshops",
   "bouquet workshop": "workshops",
+  "pumpkin workshop": "workshops",
 };
 
 const ALT_BY_CATEGORY: Record<PhotoCategory, string> = {
@@ -41,6 +42,9 @@ function altForPhoto(relativePath: string, category: PhotoCategory): string {
   }
   if (folder === "bouquet workshop") {
     return "Pick and arrange bouquet workshop at Front Porch Flowers";
+  }
+  if (folder === "pumpkin workshop") {
+    return "Dried floral pumpkin arrangement workshop at Front Porch Flowers";
   }
   if (folder === "rhoda") {
     return "Rhoda of Front Porch Flowers";
@@ -335,10 +339,9 @@ export function getWorkshopPhotos(): SitePhoto[] {
   return getPhotosByCategory("workshops");
 }
 
-/** Cover + gallery images for the pick-and-arrange bouquet workshop. */
-export function getBouquetWorkshopPhotos(): SitePhoto[] {
+function workshopPhotosInFolder(subcategory: string): SitePhoto[] {
   const photos = getAllPhotos()
-    .filter((photo) => photo.subcategory === "bouquet workshop")
+    .filter((photo) => photo.subcategory === subcategory)
     .sort((a, b) => a.src.localeCompare(b.src));
 
   // Prefer webp when both jpg and webp exist for the same stem.
@@ -351,6 +354,16 @@ export function getBouquetWorkshopPhotos(): SitePhoto[] {
     }
   }
   return Array.from(byStem.values()).sort((a, b) => a.src.localeCompare(b.src));
+}
+
+/** Cover + gallery images for the pick-and-arrange bouquet workshop. */
+export function getBouquetWorkshopPhotos(): SitePhoto[] {
+  return workshopPhotosInFolder("bouquet workshop");
+}
+
+/** Cover + gallery images for the dried floral pumpkin workshop. */
+export function getPumpkinWorkshopPhotos(): SitePhoto[] {
+  return workshopPhotosInFolder("pumpkin workshop");
 }
 
 export function getBouquetWorkshopCoverPhoto(): SitePhoto {

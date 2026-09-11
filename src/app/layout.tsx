@@ -18,7 +18,7 @@ import { getFacebookPageUrl } from "@/lib/facebook";
 import { getSiteSettings } from "@/lib/queries";
 
 const laborUnion = localFont({
-  src: "../fonts/LaborUnion-Regular.woff",
+  src: "../fonts/LaborUnion-Small.otf",
   variable: "--font-labor-union",
   display: "swap",
 });

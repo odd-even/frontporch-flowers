@@ -29,7 +29,12 @@ const OPEN_HOLD_MS = 30 * 60 * 1000;
 const ORDER_LOOKBACK_MS = 180 * 24 * 60 * 60 * 1000;
 
 export function isSquareConfigured() {
-  return Boolean(process.env.SQUARE_ACCESS_TOKEN && process.env.SQUARE_LOCATION_ID);
+  const token = process.env.SQUARE_ACCESS_TOKEN?.trim();
+  const locationId = process.env.SQUARE_LOCATION_ID?.trim();
+  if (!token || !locationId) return false;
+  // vercel env pull writes [SENSITIVE] for secrets that cannot be downloaded
+  if (token.includes("SENSITIVE") || locationId.includes("SENSITIVE")) return false;
+  return true;
 }
 
 /** Ready to take payment: fixed Square link and/or API credentials. */
