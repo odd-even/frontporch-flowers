@@ -143,3 +143,45 @@ export async function sendBouquetRequestEmail(input: BouquetRequestEmailInput) {
     throw new Error("Could not send the request. Please try again.");
   }
 }
+
+export type WorkshopBookingEmailDetails = {
+  eventTitle: string;
+  eventDateLabel: string;
+  eventTimeLabel: string;
+  quantity: number;
+  totalLabel: string;
+  currency?: string;
+  squarePaymentLinkId?: string;
+};
+
+export function buildWorkshopBookingEmailMessage(
+  details: WorkshopBookingEmailDetails
+): string {
+  const guestLabel = details.quantity === 1 ? "1 guest" : `${details.quantity} guests`;
+  const currency = details.currency || "CAD";
+
+  const lines = [
+    "Hi Rhoda — someone just started a workshop booking checkout.",
+    "",
+    "Workshop:",
+    details.eventTitle,
+    details.eventDateLabel,
+    details.eventTimeLabel,
+    "",
+    "Booking:",
+    `Guests: ${guestLabel}`,
+    `Total: ${details.totalLabel} ${currency} prepaid via Square`,
+    "",
+    "Square checkout has been started — confirm payment in your Square dashboard.",
+  ];
+
+  if (details.squarePaymentLinkId) {
+    lines.push(`Square payment link ID: ${details.squarePaymentLinkId}`);
+  }
+
+  lines.push("", "Reply to this email to reach the guest.");
+  return lines.join("\n");
+}
+
+/** Alias for workshop / general site notifications to Rhoda. */
+export const sendSiteNotificationEmail = sendBouquetRequestEmail;

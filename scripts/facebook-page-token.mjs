@@ -82,7 +82,7 @@ async function main() {
   if (!shortToken) {
     console.error(
       "Usage: node scripts/facebook-page-token.mjs <short-lived-user-token>\n" +
-        "Create the token in Graph API Explorer with pages_show_list + pages_read_engagement"
+        "Create the token in Graph API Explorer with pages_show_list + pages_read_engagement (+ pages_read_user_content for comment counts)"
     );
     process.exit(1);
   }
@@ -132,7 +132,7 @@ async function main() {
 
   if (!pages.length) {
     throw new Error(
-      "No Pages returned. Grant pages_show_list + pages_read_engagement for Front Porch Flowers (enable both under Use cases → Customize first)."
+      "No Pages returned. Grant pages_show_list + pages_read_engagement for Front Porch Flowers (enable both under Use cases → Customize first). Add pages_read_user_content if you want comment counts."
     );
   }
 

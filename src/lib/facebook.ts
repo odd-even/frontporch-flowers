@@ -69,7 +69,17 @@ async function graphGet<T>(
     );
 
     if (!res.ok) {
-      console.error("Facebook Graph API error:", res.status, await res.text());
+      const body = await res.text();
+      // Permission / token issues are expected until Meta scopes are granted —
+      // keep them out of the Next.js error overlay (console.error).
+      const permissionDenied =
+        res.status === 400 &&
+        /OAuthException|#10|permission|access/i.test(body);
+      if (permissionDenied) {
+        console.warn("Facebook Graph API unavailable:", res.status);
+      } else {
+        console.error("Facebook Graph API error:", res.status, body);
+      }
       return null;
     }
 
@@ -340,9 +350,10 @@ export async function getFacebookPostsPage({
     "created_time",
     "attachments{media{image,source},type,title,subattachments{media{image,source},type}}",
   ];
+  // reactions + shares need pages_read_engagement.
+  // comments need pages_read_user_content — omit unless the Page token has it.
   const engagementFields = [
     "reactions.limit(0).summary(true)",
-    "comments.limit(0).summary(true)",
     "shares",
   ];
   let includeEngagement = true;
@@ -356,8 +367,10 @@ export async function getFacebookPostsPage({
   let cursor: string | undefined = after;
   let nextCursor: string | null = null;
   let attempts = 0;
+  // Prefer published_posts; fall back to posts if the app lacks that edge.
+  let edge: "published_posts" | "posts" = "published_posts";
 
-  while (dedupeFacebookPosts(collected).length < limit && attempts < 5) {
+  while (dedupeFacebookPosts(collected).length < limit && attempts < 6) {
     attempts += 1;
     const afterPart = cursor ? `&after=${encodeURIComponent(cursor)}` : "";
     const fields = (
@@ -371,7 +384,7 @@ export async function getFacebookPostsPage({
         next?: string;
       };
     }>(
-      `/${page.pageId}/published_posts?fields=${fields}&limit=${fetchLimit}${afterPart}`,
+      `/${page.pageId}/${edge}?fields=${fields}&limit=${fetchLimit}${afterPart}`,
       page.accessToken,
       fetchOptions
     );
@@ -379,6 +392,11 @@ export async function getFacebookPostsPage({
     if (!data) {
       if (includeEngagement) {
         includeEngagement = false;
+        continue;
+      }
+      if (edge === "published_posts" && !cursor && collected.length === 0) {
+        edge = "posts";
+        includeEngagement = true;
         continue;
       }
       nextCursor = null;

@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import {
+  buildWorkshopBookingEmailMessage,
+  sendSiteNotificationEmail,
+} from "@/lib/bouquet-request.server";
+import { getPickYourOwnEvents } from "@/lib/queries";
+import {
   countBookedSpotsForEvent,
   createEventCheckoutLink,
   isSquareConfigured,
 } from "@/lib/square";
-import { getPickYourOwnEvents } from "@/lib/queries";
+import { formatDate } from "@/lib/utils";
 
 export const runtime = "nodejs";
 
@@ -114,6 +119,34 @@ export async function POST(request: Request) {
       customerName,
       customerEmail,
     });
+
+    const currency = event.currency || "CAD";
+    const totalLabel = new Intl.NumberFormat("en-CA", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0,
+    }).format((event.priceCents * quantity) / 100);
+
+    try {
+      await sendSiteNotificationEmail({
+        subject: `Workshop booking: ${event.title} — ${totalLabel}`,
+        message: buildWorkshopBookingEmailMessage({
+          eventTitle: event.title,
+          eventDateLabel: formatDate(event.date),
+          eventTimeLabel: `${event.startTime} – ${event.endTime}`,
+          quantity,
+          totalLabel,
+          currency,
+          squarePaymentLinkId: checkout.paymentLinkId,
+        }),
+        customerName,
+        customerEmail,
+      });
+    } catch (emailError) {
+      // Don't block the guest checkout if Resend is down — Rhoda can still see Square.
+      console.error("Workshop booking email failed:", emailError);
+    }
+
     return NextResponse.json({ url: checkout.url });
   } catch (error) {
     console.error("Square checkout error:", error);
