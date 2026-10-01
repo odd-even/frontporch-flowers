@@ -6,6 +6,7 @@ import {
   PRESENTATION_LABELS,
 } from "@/lib/bouquet-pricing";
 import { SITE_URL } from "@/lib/seo";
+import { notifyPaidOrderFromThanks } from "@/lib/square-thanks-notify";
 
 export const metadata = {
   title: "Thank you",
@@ -24,9 +25,15 @@ const FACEBOOK_URL =
 export default async function BouquetThanksPage({
   searchParams,
 }: {
-  searchParams: Promise<{ presentation?: string; quantity?: string }>;
+  searchParams: Promise<{
+    presentation?: string;
+    quantity?: string;
+    orderId?: string;
+    order_id?: string;
+  }>;
 }) {
   const params = await searchParams;
+  await notifyPaidOrderFromThanks(params);
   const presentationId = params.presentation?.trim() || "";
   const quantity = params.quantity?.trim() || "1";
   const presentationLabel = PRESENTATION_LABELS[presentationId];

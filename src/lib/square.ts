@@ -78,11 +78,48 @@ function resolveSquareEnvironment() {
   return SquareEnvironment.Sandbox;
 }
 
-function getSquareClient() {
+export function getSquareClient() {
   const token = process.env.SQUARE_ACCESS_TOKEN?.trim();
   if (!token) throw new Error("SQUARE_ACCESS_TOKEN is not set");
 
   return new SquareClient({ token, environment: resolveSquareEnvironment() });
+}
+
+function metaValue(value: string | undefined, max = 190) {
+  const trimmed = value?.trim() || "";
+  if (!trimmed) return undefined;
+  return trimmed.length > max ? trimmed.slice(0, max) : trimmed;
+}
+
+/** Put Square's order id on the thanks redirect so we can confirm payment via API. */
+async function attachOrderIdToRedirect(options: {
+  paymentLinkId?: string;
+  paymentLinkVersion?: number;
+  orderId?: string;
+  redirectUrl: string;
+}) {
+  const { paymentLinkId, paymentLinkVersion, orderId, redirectUrl } = options;
+  if (!paymentLinkId || paymentLinkVersion == null || !orderId) return redirectUrl;
+
+  const withOrder = new URL(redirectUrl);
+  withOrder.searchParams.set("orderId", orderId);
+
+  try {
+    const client = getSquareClient();
+    await client.checkout.paymentLinks.update({
+      id: paymentLinkId,
+      paymentLink: {
+        version: paymentLinkVersion,
+        checkoutOptions: {
+          redirectUrl: withOrder.toString(),
+        },
+      },
+    });
+    return withOrder.toString();
+  } catch (error) {
+    console.error("Could not attach orderId to Square redirect URL:", error);
+    return redirectUrl;
+  }
 }
 
 function getSquareLocationId() {
@@ -227,7 +264,7 @@ export async function createEventCheckoutLink({
   quantity: number;
   customerName?: string;
   customerEmail?: string;
-}): Promise<{ url: string; paymentLinkId?: string }> {
+}): Promise<{ url: string; paymentLinkId?: string; orderId?: string }> {
   if (event.squarePaymentLinkUrl) {
     return { url: event.squarePaymentLinkUrl };
   }
@@ -252,6 +289,8 @@ export async function createEventCheckoutLink({
     ? `Guest: ${customerName.trim()}`
     : undefined;
 
+  const redirectUrl = `${origin}/workshop/thanks?event=${encodeURIComponent(event._id)}`;
+
   try {
     const response = await client.checkout.paymentLinks.create({
       idempotencyKey: randomUUID(),
@@ -259,6 +298,20 @@ export async function createEventCheckoutLink({
       order: {
         locationId,
         referenceId: eventOrderReferenceId(event._id),
+        metadata: {
+          fp_kind: "workshop",
+          fp_event: metaValue(event._id, 40) || event._id.slice(0, 40),
+          ...(metaValue(customerName, 80)
+            ? { fp_name: metaValue(customerName, 80)! }
+            : {}),
+          ...(metaValue(customerEmail, 80)
+            ? { fp_email: metaValue(customerEmail, 80)! }
+            : {}),
+          ...(metaValue(event.title, 80)
+            ? { fp_title: metaValue(event.title, 80)! }
+            : {}),
+          fp_when: metaValue(whenNote, 80) || whenNote.slice(0, 80),
+        },
         lineItems: [
           {
             name: lineName,
@@ -274,7 +327,7 @@ export async function createEventCheckoutLink({
       checkoutOptions: {
         allowTipping: false,
         askForShippingAddress: false,
-        redirectUrl: `${origin}/events/booked?event=${encodeURIComponent(event._id)}`,
+        redirectUrl,
       },
       paymentNote: `Front Porch Flowers · ${lineName} × ${quantity}`,
       prePopulatedData: {
@@ -293,9 +346,17 @@ export async function createEventCheckoutLink({
       throw new Error("Square did not return a checkout URL.");
     }
 
+    await attachOrderIdToRedirect({
+      paymentLinkId: response.paymentLink?.id,
+      paymentLinkVersion: response.paymentLink?.version,
+      orderId: response.paymentLink?.orderId,
+      redirectUrl,
+    });
+
     return {
       url,
       paymentLinkId: response.paymentLink?.id,
+      orderId: response.paymentLink?.orderId,
     };
   } catch (error) {
     if (error instanceof SquareError) {
@@ -307,7 +368,7 @@ export async function createEventCheckoutLink({
 
 export async function createBouquetCheckoutLink(
   input: BouquetCheckoutInput
-): Promise<{ url: string; paymentLinkId?: string }> {
+): Promise<{ url: string; paymentLinkId?: string; orderId?: string }> {
   if (!isSquareConfigured()) {
     throw new Error("Square payments are not configured yet.");
   }
@@ -340,6 +401,8 @@ export async function createBouquetCheckoutLink(
     .filter(Boolean)
     .join(" · ");
 
+  const redirectUrl = `${origin}/bouquets/thanks?presentation=${encodeURIComponent(input.presentationId)}&quantity=${encodeURIComponent(quantityLabel)}`;
+
   try {
     const response = await client.checkout.paymentLinks.create({
       idempotencyKey: randomUUID(),
@@ -347,6 +410,28 @@ export async function createBouquetCheckoutLink(
       order: {
         locationId,
         referenceId: bouquetOrderReferenceId(input.presentationId),
+        metadata: {
+          fp_kind: "bouquet",
+          fp_pres: metaValue(input.presentationId, 40) || input.presentationId.slice(0, 40),
+          ...(metaValue(input.customerName, 80)
+            ? { fp_name: metaValue(input.customerName, 80)! }
+            : {}),
+          ...(metaValue(input.customerEmail, 80)
+            ? { fp_email: metaValue(input.customerEmail, 80)! }
+            : {}),
+          ...(metaValue(input.customerPhone, 40)
+            ? { fp_phone: metaValue(input.customerPhone, 40)! }
+            : {}),
+          ...(metaValue(input.colorLabel, 40)
+            ? { fp_color: metaValue(input.colorLabel, 40)! }
+            : {}),
+          ...(metaValue(input.pickupLabel, 120)
+            ? { fp_pickup: metaValue(input.pickupLabel, 120)! }
+            : {}),
+          ...(metaValue(input.note, 190)
+            ? { fp_note: metaValue(input.note, 190)! }
+            : {}),
+        },
         lineItems: [
           {
             name: lineName,
@@ -362,7 +447,7 @@ export async function createBouquetCheckoutLink(
       checkoutOptions: {
         allowTipping: false,
         askForShippingAddress: false,
-        redirectUrl: `${origin}/bouquets/thanks?presentation=${encodeURIComponent(input.presentationId)}&quantity=${encodeURIComponent(quantityLabel)}`,
+        redirectUrl,
       },
       paymentNote: `Front Porch Flowers · ${lineName} × ${input.quantity}`,
       prePopulatedData: {
@@ -380,9 +465,17 @@ export async function createBouquetCheckoutLink(
       throw new Error("Square did not return a checkout URL.");
     }
 
+    await attachOrderIdToRedirect({
+      paymentLinkId: response.paymentLink?.id,
+      paymentLinkVersion: response.paymentLink?.version,
+      orderId: response.paymentLink?.orderId,
+      redirectUrl,
+    });
+
     return {
       url,
       paymentLinkId: response.paymentLink?.id,
+      orderId: response.paymentLink?.orderId,
     };
   } catch (error) {
     if (error instanceof SquareError) {

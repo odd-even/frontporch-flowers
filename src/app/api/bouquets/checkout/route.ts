@@ -2,15 +2,10 @@ import { NextResponse } from "next/server";
 import {
   bouquetOrderTotalCents,
   canCheckoutBouquet,
-  formatCents,
   getPresentationPriceCents,
   PRESENTATION_LABELS,
   parseBouquetQuantity,
 } from "@/lib/bouquet-pricing";
-import {
-  buildBouquetOrderEmailMessage,
-  sendBouquetRequestEmail,
-} from "@/lib/bouquet-request.server";
 import { createBouquetCheckoutLink, isSquareConfigured } from "@/lib/square";
 
 export const runtime = "nodejs";
@@ -107,13 +102,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Could not calculate order total." }, { status: 400 });
   }
 
-  const presentationLabel = PRESENTATION_LABELS[presentationId] || presentationId;
   const colorLabel = COLOR_LABELS[color] || color;
   const pickupLabel = formatPickupLabel(pickupDate, customDateNote);
-  const totalLabel = formatCents(totalCents);
-  const unitPriceLabel = formatCents(unitCents);
 
   try {
+    // Email Rhoda only after Square confirms payment (webhook / thanks verification).
     const checkout = await createBouquetCheckoutLink({
       presentationId,
       quantity: parsedQuantity,
@@ -123,27 +116,6 @@ export async function POST(request: Request) {
       customerEmail,
       customerPhone,
       note,
-    });
-
-    const message = buildBouquetOrderEmailMessage({
-      presentationLabel,
-      unitPriceLabel,
-      quantity,
-      colorLabel,
-      pickupLabel,
-      note,
-      payment: {
-        totalLabel,
-        squarePaymentLinkId: checkout.paymentLinkId,
-      },
-    });
-
-    await sendBouquetRequestEmail({
-      subject: `Bouquet order (pay now): ${presentationLabel} — ${totalLabel}`,
-      message,
-      customerName,
-      customerEmail,
-      customerPhone,
     });
 
     return NextResponse.json({ url: checkout.url, totalCents });
