@@ -10,6 +10,9 @@ import {
   formatCents,
 } from "@/lib/bouquet-pricing";
 
+/** Everyday bouquets are closed until next spring. Wedding and event requests stay open. */
+const SEASONAL_BOUQUETS_CLOSED = true;
+
 const CUSTOM_DATE_ID = "custom" as const;
 const SAME_DAY_CUTOFF_HOUR = 10;
 /** Fri–Mon are not available for pickup in the weekly picker. */
@@ -187,9 +190,9 @@ export const PRESENTATION_OPTIONS = [
   },
   {
     id: "custom",
-    label: "Custom",
-    shortLabel: "Custom",
-    hint: "your own idea",
+    label: "Weddings & events",
+    shortLabel: "Weddings & events",
+    hint: "for next year",
     price: "Get in touch",
     imageSrc: "/photos/boquets/custom-arrangement.webp",
   },
@@ -911,6 +914,8 @@ function InquiryModal({
   onSubmitPay,
   canPay,
   totalLabel,
+  closedForSeason = false,
+  eventRequest = false,
 }: {
   open: boolean;
   onClose: () => void;
@@ -943,6 +948,8 @@ function InquiryModal({
   onSubmitPay?: () => void;
   canPay: boolean;
   totalLabel: string | null;
+  closedForSeason?: boolean;
+  eventRequest?: boolean;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -987,7 +994,29 @@ function InquiryModal({
         </button>
 
         <div className="p-6 sm:p-8">
-          {submitted ? (
+          {closedForSeason ? (
+            <div className="text-center py-6 sm:py-8">
+              <p className="text-sage text-xs uppercase tracking-[0.2em] mb-3">
+                Order a bouquet
+              </p>
+              <h2
+                id="bouquet-inquiry-title"
+                className="font-display text-3xl text-charcoal mb-3"
+              >
+                Closed for the season
+              </h2>
+              <p className="text-warm-brown/90 leading-relaxed mb-8">
+                Check back next spring.
+              </p>
+              <button
+                type="button"
+                onClick={onClose}
+                className="btn bg-sage text-cream hover:bg-sage-dark"
+              >
+                Close
+              </button>
+            </div>
+          ) : submitted ? (
             <div className="text-center py-4">
               <p className="font-display text-2xl text-charcoal mb-3">Request sent</p>
               <p className="text-warm-brown/90 text-sm leading-relaxed mb-6">
@@ -1004,7 +1033,9 @@ function InquiryModal({
             </div>
           ) : (
             <>
-              <p className="text-sage text-xs uppercase tracking-[0.2em] mb-2">Custom request</p>
+              <p className="text-sage text-xs uppercase tracking-[0.2em] mb-2">
+                {eventRequest ? "For next year" : "Custom request"}
+              </p>
               <h2
                 id="bouquet-inquiry-title"
                 className="font-display text-2xl text-charcoal mb-1 pr-8"
@@ -1021,19 +1052,43 @@ function InquiryModal({
                 }}
                 className="space-y-6"
               >
-                {setPresentation && (
+                {setPresentation && !eventRequest && (
                   <PresentationChooser value={presentation} onChange={setPresentation} />
                 )}
 
-                <QuantityStepper value={quantity} onChange={setQuantity} />
-
-                <PickupDatePicker
-                  value={pickupDate}
-                  onChange={setPickupDate}
-                  customDateNote={customDateNote}
-                  onCustomDateNoteChange={setCustomDateNote}
-                  dayOptions={dayOptions}
+                <QuantityStepper
+                  value={quantity}
+                  onChange={setQuantity}
+                  legend={eventRequest ? "How many arrangements?" : undefined}
                 />
+
+                {eventRequest ? (
+                  <div>
+                    <label htmlFor="event-date" className="block text-sm font-medium text-charcoal mb-2">
+                      Event date
+                    </label>
+                    <input
+                      id="event-date"
+                      type="text"
+                      required
+                      value={customDateNote}
+                      onChange={(event) => {
+                        setCustomDateNote(event.target.value);
+                        setPickupDate(CUSTOM_DATE_ID);
+                      }}
+                      placeholder="e.g. June 14, 2027"
+                      className="w-full rounded-xl border border-sage/45 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/55 focus:outline-none focus:border-sage/70"
+                    />
+                  </div>
+                ) : (
+                  <PickupDatePicker
+                    value={pickupDate}
+                    onChange={setPickupDate}
+                    customDateNote={customDateNote}
+                    onCustomDateNoteChange={setCustomDateNote}
+                    dayOptions={dayOptions}
+                  />
+                )}
 
                 <ColorChooser value={color} onChange={setColor} />
 
@@ -1098,7 +1153,11 @@ function InquiryModal({
                     value={note}
                     onChange={(event) => setNote(event.target.value)}
                     rows={3}
-                    placeholder="Occasion, anything to avoid, delivery notes..."
+                    placeholder={
+                      eventRequest
+                        ? "Wedding, celebration, colours, where it will be..."
+                        : "Occasion, anything to avoid, delivery notes..."
+                    }
                     className="w-full rounded-xl border border-sage/45 bg-cream px-4 py-3 text-base text-charcoal placeholder:text-warm-brown/55 focus:outline-none focus:border-sage/70 resize-none"
                   />
                 </div>
@@ -1144,7 +1203,9 @@ function InquiryModal({
                   >
                     {submitting && submittingMode === "email"
                       ? "Sending…"
-                      : "Send bouquet request"}
+                      : eventRequest
+                        ? "Send request"
+                        : "Send bouquet request"}
                   </button>
                 </div>
 
@@ -1183,7 +1244,10 @@ export function BouquetInquiry({
   const [submittingMode, setSubmittingMode] = useState<"email" | "pay" | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const dayOptions = useMemo(() => getUpcomingDays(), [open]);
-  const canPay = squareReady && canCheckoutBouquet(presentation, quantity);
+  const eventRequest = SEASONAL_BOUQUETS_CLOSED && bouquetId === "for-your-event";
+  const closedForSeason = SEASONAL_BOUQUETS_CLOSED && !eventRequest;
+  const canPay =
+    !SEASONAL_BOUQUETS_CLOSED && squareReady && canCheckoutBouquet(presentation, quantity);
   const totalCents = bouquetOrderTotalCents(presentation, quantity);
   const totalLabel = totalCents != null ? formatCents(totalCents) : null;
 
@@ -1293,11 +1357,13 @@ export function BouquetInquiry({
       <InquiryModal
         open={open}
         onClose={handleClose}
-        title={`Something like ${bouquetTitle}`}
+        title={eventRequest ? "Weddings & events" : `Something like ${bouquetTitle}`}
         description={
-          canPay
-            ? "Pick your preferences — pay now with Square, or send a request for Rhoda to follow up."
-            : "Pick a few preferences and send your request straight to Rhoda."
+          eventRequest
+            ? "Tell Rhoda about your wedding or event for next year. She'll follow up by email."
+            : canPay
+              ? "Pick your preferences — pay now with Square, or send a request for Rhoda to follow up."
+              : "Pick a few preferences and send your request straight to Rhoda."
         }
         presentation={presentation}
         setPresentation={setPresentation}
@@ -1326,6 +1392,8 @@ export function BouquetInquiry({
         onSubmitPay={canPay ? handleSubmitPay : undefined}
         canPay={canPay}
         totalLabel={totalLabel}
+        closedForSeason={closedForSeason}
+        eventRequest={eventRequest}
       />
     </>
   );
@@ -1353,7 +1421,10 @@ function BouquetOrderSession({
   const [submittingMode, setSubmittingMode] = useState<"email" | "pay" | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const dayOptions = useMemo(() => getUpcomingDays(), [open]);
-  const canPay = squareReady && canCheckoutBouquet(presentation, quantity);
+  const eventRequest = SEASONAL_BOUQUETS_CLOSED && presentation === "custom";
+  const closedForSeason = SEASONAL_BOUQUETS_CLOSED && !eventRequest;
+  const canPay =
+    !SEASONAL_BOUQUETS_CLOSED && squareReady && canCheckoutBouquet(presentation, quantity);
   const totalCents = bouquetOrderTotalCents(presentation, quantity);
   const totalLabel = totalCents != null ? formatCents(totalCents) : null;
 
@@ -1459,11 +1530,13 @@ function BouquetOrderSession({
       <InquiryModal
         open={open}
         onClose={handleClose}
-        title={presentationLabel}
+        title={eventRequest ? "Weddings & events" : presentationLabel}
         description={
-          canPay
-            ? "Choose colour and timing — pay now with Square, or send a request for Rhoda to follow up."
-            : "Choose colour and timing — then send your request to Rhoda."
+          eventRequest
+            ? "Tell Rhoda about your wedding or event for next year. She'll follow up by email."
+            : canPay
+              ? "Choose colour and timing — pay now with Square, or send a request for Rhoda to follow up."
+              : "Choose colour and timing — then send your request to Rhoda."
         }
         presentation={presentation}
         setPresentation={setPresentation}
@@ -1492,6 +1565,8 @@ function BouquetOrderSession({
         onSubmitPay={canPay ? handleSubmitPay : undefined}
         canPay={canPay}
         totalLabel={totalLabel}
+        closedForSeason={closedForSeason}
+        eventRequest={eventRequest}
       />
     </>
   );
@@ -1507,7 +1582,9 @@ export function OrderBouquetControls({
 }) {
   return (
     <BouquetOrderSession squareReady={squareReady}>
-      {(openOrder) => children(() => openOrder())}
+      {(openOrder) =>
+        children(() => openOrder(SEASONAL_BOUQUETS_CLOSED ? "custom" : undefined))
+      }
     </BouquetOrderSession>
   );
 }
@@ -1533,6 +1610,9 @@ export function FinishRequestPicker({
             <h3 className="font-display text-4xl md:text-5xl text-charcoal mb-2">
               Order a bouquet
             </h3>
+            <p className="text-warm-brown/80 max-w-xl">
+              Closed for the season. Wedding and event requests for next year are still open.
+            </p>
           </Reveal>
 
           <Reveal

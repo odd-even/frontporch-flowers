@@ -14,7 +14,7 @@ export const PRESENTATION_LABELS: Record<string, string> = {
   "mason-jar": "In a mason jar",
   "gift-bag-posie": "Gift bag posie",
   bucket: "In a bucket",
-  custom: "Custom",
+  custom: "Weddings & events",
 };
 
 export function getPresentationPriceCents(presentationId: string): number | null {

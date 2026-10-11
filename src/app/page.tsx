@@ -57,6 +57,7 @@ export default async function HomePage() {
     <>
       <Hero photos={heroPhotos} />
       <AboutTeaser />
+      <EventsTeaser />
       <section id="bouquets" className="scroll-mt-24 pt-8 pb-10 md:pt-16 md:pb-14">
         <div className="max-w-6xl mx-auto px-6">
           <FinishRequestPicker
@@ -66,7 +67,6 @@ export default async function HomePage() {
         </div>
       </section>
       <PaymentOptions etransferEmail={etransferEmail} phone={phone} />
-      <EventsTeaser />
       <FacebookFeed pageUrl={settings.facebookPageUrl} />
     </>
   );

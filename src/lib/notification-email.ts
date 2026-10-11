@@ -45,7 +45,7 @@ export function workshopEmailImageSrc(
   }
   if (key.includes("wreath")) {
     return photoUrl(
-      "/photos/wreath workshop/590752628_122113192107020895_7718133177270323166_n.jpg",
+      "/photos/wreath workshop/579181303_122111904303020895_6124998152200369731_n.jpg",
       absolute
     );
   }

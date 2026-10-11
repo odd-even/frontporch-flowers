@@ -50,6 +50,17 @@ function formatPickupLabel(
 }
 
 export async function POST(request: Request) {
+  const seasonalCheckoutClosed = true as boolean;
+  if (seasonalCheckoutClosed) {
+    return NextResponse.json(
+      {
+        error:
+          "Bouquet ordering is closed for the season. Wedding and event requests can still be sent from the site.",
+      },
+      { status: 503 }
+    );
+  }
+
   let body: CheckoutBody;
   try {
     body = (await request.json()) as CheckoutBody;

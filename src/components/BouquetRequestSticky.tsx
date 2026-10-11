@@ -72,7 +72,7 @@ export function BouquetRequestSticky({
             type="button"
             onClick={() => openOrder()}
             className="group relative flex items-center gap-2.5 rounded-full bg-cream py-1.5 pl-1.5 pr-5 shadow-lg shadow-charcoal/15 ring-1 ring-sage/25 transition-colors hover:bg-cream-dark hover:ring-sage/40"
-            aria-label="Request a bouquet"
+            aria-label="Request flowers for a wedding or event"
           >
             <span
               className="bouquet-request-ring pointer-events-none absolute inset-0 rounded-full"
@@ -89,7 +89,7 @@ export function BouquetRequestSticky({
               />
             </span>
             <span className="relative pr-0.5 text-sm font-medium text-charcoal whitespace-nowrap">
-              Request a bouquet
+              Weddings &amp; events
             </span>
           </button>
         </div>

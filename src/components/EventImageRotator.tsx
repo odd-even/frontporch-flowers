@@ -16,25 +16,38 @@ export function EventImageRotator({ photos }: { photos: SitePhoto[] }) {
       setIndex((current) => (current + 1) % slides.length);
     }, ROTATE_MS);
     return () => window.clearInterval(id);
-  }, [slides.length]);
+  }, [slides.length, index]);
+
+  function showNext() {
+    if (slides.length < 2) return;
+    setIndex((current) => (current + 1) % slides.length);
+  }
 
   if (slides.length === 0) return null;
 
   return (
     <div className="absolute inset-0">
-      {slides.map((photo, i) => (
-        <Image
-          key={photo.src}
-          src={photo.src}
-          alt={photo.alt}
-          fill
-          className={`object-cover transition-opacity duration-1000 ease-in-out ${
-            i === index ? "opacity-100" : "opacity-0"
-          }`}
-          sizes="(max-width: 768px) 100vw, 50vw"
-          loading={i === 0 ? "eager" : "lazy"}
-        />
-      ))}
+      <button
+        type="button"
+        onClick={showNext}
+        disabled={slides.length < 2}
+        aria-label={slides.length > 1 ? "Show next photo" : slides[0]?.alt}
+        className="absolute inset-0 cursor-pointer disabled:cursor-default"
+      >
+        {slides.map((photo, i) => (
+          <Image
+            key={photo.src}
+            src={photo.src}
+            alt={i === index ? photo.alt : ""}
+            fill
+            className={`object-cover transition-opacity duration-1000 ease-in-out ${
+              i === index ? "opacity-100" : "opacity-0"
+            }`}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            loading={i === 0 ? "eager" : "lazy"}
+          />
+        ))}
+      </button>
       {slides.length > 1 ? (
         <div className="absolute bottom-5 right-5 z-10 flex gap-1.5 md:bottom-6 md:right-6">
           {slides.map((photo, i) => (

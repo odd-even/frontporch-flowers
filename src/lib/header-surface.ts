@@ -17,8 +17,8 @@ export type HeaderSurfaceState = {
 const HOME_SURFACE_BY_SELECTOR: Record<string, HeaderSurface> = {
   '[data-header-zone="hero"]': "hero",
   "#about": "light",
-  "#bouquets": "light",
   "#events": "light",
+  "#bouquets": "light",
   "#follow": "follow",
   footer: "dark",
 };

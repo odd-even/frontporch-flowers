@@ -1,8 +1,7 @@
 import { BouquetGrid } from "@/components/BouquetCard";
 import { PageHeader } from "@/components/AboutTeaser";
-import { ArrowIcon } from "@/components/ArrowIcon";
 import { getBouquets, getSiteSettings } from "@/lib/queries";
-import { buildMailtoUrl, getContactEmail } from "@/lib/email";
+import { getContactEmail } from "@/lib/email";
 import { isSquareConfigured } from "@/lib/square";
 
 import { pageMetadata } from "@/lib/seo";
@@ -17,11 +16,6 @@ export const metadata = pageMetadata({
 export default async function BouquetsPage() {
   const [bouquets, settings] = await Promise.all([getBouquets(), getSiteSettings()]);
   const contactEmail = getContactEmail(settings.email);
-  const orderMailto = buildMailtoUrl(
-    contactEmail,
-    "Bouquet order inquiry",
-    "Hi Rhoda!\n\nI'd love to order a bouquet. Here are a few details:\n\nOccasion:\nColor (Soft / Bright / Surprise me):\nPickup date:\n\nThanks!"
-  );
 
   return (
     <>
@@ -39,19 +33,12 @@ export default async function BouquetsPage() {
       <section className="py-16 bg-cream-dark/30">
         <div className="max-w-2xl mx-auto px-6 text-center">
           <h2 className="font-display text-2xl text-charcoal mb-4">
-            Ready to order?
+            Closed for the season
           </h2>
-          <p className="text-warm-brown/80 mb-6">
-            Email Rhoda with your occasion, Soft or Bright preference, and pickup date.
-            She&apos;ll arrange whatever&apos;s blooming for you.
+          <p className="text-warm-brown/80">
+            Everyday bouquets are closed until next spring. Wedding and event requests for next
+            year are still open on the home page.
           </p>
-          <a
-            href={orderMailto}
-            className="btn gap-2 bg-terracotta text-cream hover:bg-terracotta-dark"
-          >
-            Order by email
-            <ArrowIcon />
-          </a>
         </div>
       </section>
     </>

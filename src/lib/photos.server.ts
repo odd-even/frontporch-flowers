@@ -366,9 +366,19 @@ export function getPumpkinWorkshopPhotos(): SitePhoto[] {
   return workshopPhotosInFolder("pumpkin workshop");
 }
 
+/** Omitted from the winter wreath booking slideshow (1-based slots 4, 6, and 9). */
+const EXCLUDED_FROM_WREATH_WORKSHOP = new Set([
+  "589025025_122113192131020895_6947044346203922382_n.jpg",
+  "590752628_122113192107020895_7718133177270323166_n.jpg",
+  "615827668_122118755457020895_6640944669745610152_n.jpg",
+]);
+
 /** Photos from the previous evergreen wreath workshop. */
 export function getWreathWorkshopPhotos(): SitePhoto[] {
-  return workshopPhotosInFolder("wreath workshop");
+  return workshopPhotosInFolder("wreath workshop").filter((photo) => {
+    const filename = decodeURIComponent(photo.src).split("/").pop() || "";
+    return !EXCLUDED_FROM_WREATH_WORKSHOP.has(filename);
+  });
 }
 
 export function getBouquetWorkshopCoverPhoto(): SitePhoto {
