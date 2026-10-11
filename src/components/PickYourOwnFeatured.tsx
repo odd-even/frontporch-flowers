@@ -21,6 +21,9 @@ function workshopTitleLines(title: string) {
   if (/dried\s+floral\s+pumpkin/i.test(normalized)) {
     return { lead: "Dried Floral Pumpkins", accent: "Arrangements to take home" };
   }
+  if (/winter\s+wreath/i.test(normalized)) {
+    return { lead: "Winter Wreath", accent: "Workshop to take home" };
+  }
   if (/pick.*arrange.*your own bouquet/i.test(normalized)) {
     return { lead: "Pick & arrange", accent: "your own bouquet" };
   }
@@ -38,11 +41,18 @@ function workshopIncludes(event: PickYourOwnEvent): string[] {
   if (/pumpkin/i.test(event.title) || /pumpkin/i.test(event.description || "")) {
     return ["Two pumpkins each", "All supplies provided"];
   }
+  if (/wreath/i.test(event.title) || /wreath/i.test(event.description || "")) {
+    return ["Wreath to take home", "All supplies provided"];
+  }
   return ["Vase included", "Homemade floral lemonade"];
 }
 
 function isPumpkinWorkshop(event: PickYourOwnEvent) {
   return /pumpkin/i.test(event.title) || /pumpkin/i.test(event.description || "");
+}
+
+function isWreathWorkshop(event: PickYourOwnEvent) {
+  return /wreath/i.test(event.title) || /wreath/i.test(event.description || "");
 }
 
 export async function PickYourOwnFeatured({
@@ -71,7 +81,12 @@ export async function PickYourOwnFeatured({
     capacity.capacity || 10,
     10
   );
-  const spotsLabel = capacity.soldOut ? "Sold out" : "Prepay to reserve";
+  const wreath = isWreathWorkshop(event);
+  const spotsLabel = capacity.soldOut
+    ? "Sold out"
+    : wreath
+      ? "Limited spaces available"
+      : "Prepay to reserve";
 
   const titleLines = workshopTitleLines(event.title);
   const includes = workshopIncludes(event);
@@ -197,17 +212,19 @@ export async function PickYourOwnFeatured({
             {capacity.capacity > 0 || capacity.soldOut ? (
               <li className="rounded-xl bg-sage/10 px-4 py-3">
                 <span className="block text-xs uppercase tracking-wider text-sage-dark mb-1">
-                  {capacity.soldOut ? "Spots" : "Limited spots"}
+                  {capacity.soldOut ? "Spots" : wreath ? "Spaces" : "Limited spots"}
                 </span>
                 <span className="font-medium text-charcoal">{spotsLabel}</span>
               </li>
             ) : null}
-            {pumpkin ? (
+            {pumpkin || wreath ? (
               <li className="rounded-xl bg-sage/10 px-4 py-3">
                 <span className="block text-xs uppercase tracking-wider text-sage-dark mb-1">
                   You take home
                 </span>
-                <span className="font-medium text-charcoal">2 pumpkins</span>
+                <span className="font-medium text-charcoal">
+                  {wreath ? "A winter wreath" : "2 pumpkins"}
+                </span>
               </li>
             ) : (
               <li className="rounded-xl bg-sage/10 px-4 py-3">

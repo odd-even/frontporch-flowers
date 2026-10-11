@@ -23,6 +23,9 @@ export function workshopAnchorId(event: PickYourOwnEvent) {
   if (/pumpkin/i.test(event.title) || /pumpkin/i.test(event.description || "")) {
     return "workshop-pumpkin";
   }
+  if (/wreath/i.test(event.title) || /wreath/i.test(event.description || "")) {
+    return "workshop-wreath";
+  }
   if (/stem\s*&\s*style/i.test(event.title)) {
     return "workshop-stem-style";
   }

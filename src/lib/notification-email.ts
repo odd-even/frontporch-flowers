@@ -43,6 +43,12 @@ export function workshopEmailImageSrc(
   if (key.includes("pumpkin")) {
     return photoUrl("/photos/pumpkin workshop/dried-pumpkin-1.jpg", absolute);
   }
+  if (key.includes("wreath")) {
+    return photoUrl(
+      "/photos/wreath workshop/590752628_122113192107020895_7718133177270323166_n.jpg",
+      absolute
+    );
+  }
   return photoUrl("/photos/bouquet workshop/pick-arrange-1.jpg", absolute);
 }
 

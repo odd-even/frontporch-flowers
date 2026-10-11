@@ -76,6 +76,18 @@ export const fallbackEvents: PickYourOwnEvent[] = [
     priceCents: 5500,
     currency: "CAD",
   },
+  {
+    _id: "workshop-winter-wreath-nov-21-2026",
+    title: "Winter Wreath Workshop",
+    date: "2026-11-21",
+    startTime: "2:00 PM",
+    endTime: "4:00 PM",
+    description:
+      "Join me for a cozy afternoon making a winter wreath to take home. All supplies are provided — just bring yourself. Limited spaces available.",
+    spotsAvailable: 6,
+    priceCents: 7500,
+    currency: "CAD",
+  },
 ];
 
 export const fallbackBouquets: Bouquet[] = [

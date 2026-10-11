@@ -366,6 +366,11 @@ export function getPumpkinWorkshopPhotos(): SitePhoto[] {
   return workshopPhotosInFolder("pumpkin workshop");
 }
 
+/** Photos from the previous evergreen wreath workshop. */
+export function getWreathWorkshopPhotos(): SitePhoto[] {
+  return workshopPhotosInFolder("wreath workshop");
+}
+
 export function getBouquetWorkshopCoverPhoto(): SitePhoto {
   const photos = getBouquetWorkshopPhotos();
   // Prefer the finished vase bouquet as the booking card image

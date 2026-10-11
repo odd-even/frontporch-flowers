@@ -9,6 +9,7 @@ import {
   getMeetRhodaPhoto,
   getPickYourOwnPhoto,
   getPumpkinWorkshopPhotos,
+  getWreathWorkshopPhotos,
 } from "@/lib/photos.server";
 import { getPickYourOwnEvents, getSiteSettings } from "@/lib/queries";
 
@@ -52,11 +53,16 @@ export async function EventsTeaser() {
   const facebookUrl = getFacebookPageUrl(settings.facebookPageUrl);
   const pumpkinPhotos = getPumpkinWorkshopPhotos();
   const bouquetPhotos = getBouquetWorkshopPhotos();
-  const fallbackCover = bouquetPhotos[0] || pumpkinPhotos[0] || pyoPhoto;
+  const wreathPhotos = getWreathWorkshopPhotos();
+  const fallbackCover =
+    wreathPhotos[0] || bouquetPhotos[0] || pumpkinPhotos[0] || pyoPhoto;
 
   function photosForEvent(event: (typeof events)[number]) {
     const isPumpkin =
       /pumpkin/i.test(event.title) || /pumpkin/i.test(event.description || "");
+    const isWreath =
+      /wreath/i.test(event.title) || /wreath/i.test(event.description || "");
+    if (isWreath && wreathPhotos.length) return wreathPhotos;
     if (isPumpkin && pumpkinPhotos.length) return pumpkinPhotos;
     if (bouquetPhotos.length) return bouquetPhotos;
     if (pumpkinPhotos.length) return pumpkinPhotos;

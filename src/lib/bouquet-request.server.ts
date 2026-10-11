@@ -400,8 +400,9 @@ export function buildWorkshopCustomerReceiptHtml(
       },
       { label: "Name on booking", value: details.customerName },
     ],
-    footerNote:
-      "Keep this email for your records. Wear comfortable shoes — you'll be arranging in the garden. Questions? Reply here or message Rhoda on Facebook.",
+    footerNote: /wreath/i.test(details.eventTitle)
+      ? "Keep this email for your records. All supplies are included, and you'll take home a finished wreath. Questions? Reply here or message Rhoda on Facebook."
+      : "Keep this email for your records. Wear comfortable shoes — you'll be arranging in the garden. Questions? Reply here or message Rhoda on Facebook.",
     footerExtraHtml: venueFooterHtml("Where to go"),
   });
 }
