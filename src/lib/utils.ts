@@ -18,6 +18,14 @@ export function formatShortDate(dateString: string): string {
   });
 }
 
+/** Square sometimes repeats query keys, which Next exposes as an array. */
+export function firstQueryValue(
+  value: string | string[] | undefined
+): string {
+  const raw = Array.isArray(value) ? value.find((item) => item?.trim()) : value;
+  return raw?.trim() || "";
+}
+
 /** Stable homepage anchors for workshop banner deep-links. */
 export function workshopAnchorId(event: PickYourOwnEvent) {
   if (/pumpkin/i.test(event.title) || /pumpkin/i.test(event.description || "")) {

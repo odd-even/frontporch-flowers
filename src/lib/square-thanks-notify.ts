@@ -1,6 +1,7 @@
 import "server-only";
 
 import { notifyPaidSquareOrder } from "@/lib/square-paid-notify";
+import { firstQueryValue } from "@/lib/utils";
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -11,11 +12,12 @@ function sleep(ms: number) {
  * via the Square Orders API and email Rhoda. Retries briefly while payment settles.
  */
 export async function notifyPaidOrderFromThanks(searchParams: {
-  orderId?: string;
-  order_id?: string;
+  orderId?: string | string[];
+  order_id?: string | string[];
 }) {
   const orderId =
-    searchParams.orderId?.trim() || searchParams.order_id?.trim() || "";
+    firstQueryValue(searchParams.orderId) ||
+    firstQueryValue(searchParams.order_id);
   if (!orderId) return;
 
   // Payment can lag a moment behind the redirect.

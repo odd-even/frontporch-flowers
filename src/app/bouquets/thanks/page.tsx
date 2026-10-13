@@ -7,6 +7,7 @@ import {
 } from "@/lib/bouquet-pricing";
 import { SITE_URL } from "@/lib/seo";
 import { notifyPaidOrderFromThanks } from "@/lib/square-thanks-notify";
+import { firstQueryValue } from "@/lib/utils";
 
 export const metadata = {
   title: "Thank you",
@@ -26,16 +27,20 @@ export default async function BouquetThanksPage({
   searchParams,
 }: {
   searchParams: Promise<{
-    presentation?: string;
-    quantity?: string;
-    orderId?: string;
-    order_id?: string;
+    presentation?: string | string[];
+    quantity?: string | string[];
+    orderId?: string | string[];
+    order_id?: string | string[];
   }>;
 }) {
   const params = await searchParams;
-  await notifyPaidOrderFromThanks(params);
-  const presentationId = params.presentation?.trim() || "";
-  const quantity = params.quantity?.trim() || "1";
+  try {
+    await notifyPaidOrderFromThanks(params);
+  } catch (error) {
+    console.error("Bouquet thanks notify failed:", error);
+  }
+  const presentationId = firstQueryValue(params.presentation);
+  const quantity = firstQueryValue(params.quantity) || "1";
   const presentationLabel = PRESENTATION_LABELS[presentationId];
   const totalCents = presentationLabel
     ? bouquetOrderTotalCents(presentationId, quantity)

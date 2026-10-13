@@ -3,7 +3,7 @@ import { ArrowIcon } from "@/components/ArrowIcon";
 import { getPickYourOwnEvents } from "@/lib/queries";
 import { SITE_URL } from "@/lib/seo";
 import { notifyPaidOrderFromThanks } from "@/lib/square-thanks-notify";
-import { formatDate } from "@/lib/utils";
+import { firstQueryValue, formatDate } from "@/lib/utils";
 
 export const metadata = {
   title: "Thank you",
@@ -25,18 +25,23 @@ export default async function WorkshopThanksPage({
   searchParams,
 }: {
   searchParams: Promise<{
-    event?: string;
-    orderId?: string;
-    order_id?: string;
+    event?: string | string[];
+    orderId?: string | string[];
+    order_id?: string | string[];
   }>;
 }) {
   const params = await searchParams;
   // Backup if Square appends orderId on redirect; webhook is the primary notify path.
-  await notifyPaidOrderFromThanks(params);
+  // Never let a notify failure replace the confirmation page.
+  try {
+    await notifyPaidOrderFromThanks(params);
+  } catch (error) {
+    console.error("Workshop thanks notify failed:", error);
+  }
 
   const events = await getPickYourOwnEvents();
-  const event =
-    events.find((item) => item._id === params.event?.trim()) || events[0];
+  const eventId = firstQueryValue(params.event);
+  const event = events.find((item) => item._id === eventId) || events[0];
 
   const priceLabel = event?.priceCents
     ? new Intl.NumberFormat("en-CA", {
