@@ -197,10 +197,7 @@ async function notifyWorkshopPaid(
     await sendCustomerReceiptEmail({
       subject: `You're booked: ${eventTitle}`,
       message: buildWorkshopCustomerReceiptMessage(guest),
-      html: buildWorkshopCustomerReceiptHtml({
-        ...guest,
-        customerEmail,
-      }),
+      html: buildWorkshopCustomerReceiptHtml(guest),
       customerName,
       customerEmail,
     });
