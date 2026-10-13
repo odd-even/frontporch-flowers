@@ -14,6 +14,7 @@ import {
   sendSiteNotificationEmail,
 } from "@/lib/bouquet-request.server";
 import { formatCents, PRESENTATION_LABELS } from "@/lib/bouquet-pricing";
+import { DEFAULT_CONTACT_EMAIL } from "@/lib/email";
 import { getPickYourOwnEvents } from "@/lib/queries";
 import {
   bouquetOrderReferenceId,
@@ -22,7 +23,7 @@ import {
   getSquareClient,
   isSquareConfigured,
 } from "@/lib/square";
-import { fallbackEvents } from "@/lib/types";
+import { fallbackEvents, type PickYourOwnEvent } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
 /** Avoid duplicate emails within a warm serverless instance. */
@@ -46,6 +47,55 @@ function guestFromLineNote(order: Order) {
     if (match?.[1]?.trim()) return match[1].trim();
   }
   return "";
+}
+
+function orderSearchText(order: Order) {
+  return [
+    order.referenceId,
+    meta(order, "fp_title"),
+    meta(order, "fp_event"),
+    meta(order, "fp_when"),
+    ...(order.lineItems ?? []).flatMap((item) => [item.name, item.note]),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+function findWorkshopForOrder(order: Order, events: PickYourOwnEvent[]) {
+  const eventId = meta(order, "fp_event");
+  const referenceId = order.referenceId || "";
+  const text = orderSearchText(order);
+
+  return (
+    events.find((item) => item._id === eventId) ||
+    events.find((item) => eventOrderReferenceId(item._id) === referenceId) ||
+    events.find((item) => {
+      const title = item.title.trim().toLowerCase();
+      return title.length > 3 && text.includes(title);
+    }) ||
+    null
+  );
+}
+
+async function resolveBuyerEmail(order: Order, payment?: Payment | null) {
+  const direct =
+    meta(order, "fp_email") || payment?.buyerEmailAddress?.trim() || "";
+  if (direct) return direct;
+
+  const paymentId = (order.tenders ?? [])
+    .map((tender) => tender.paymentId)
+    .find((id) => Boolean(id));
+  if (!paymentId) return "";
+
+  try {
+    const client = getSquareClient();
+    const response = await client.payments.get({ paymentId });
+    return response.payment?.buyerEmailAddress?.trim() || "";
+  } catch (error) {
+    console.error("Could not load Square buyer email:", error);
+    return "";
+  }
 }
 
 function orderIsPaid(order: Order) {
@@ -89,10 +139,7 @@ async function notifyWorkshopPaid(
 ) {
   const upcoming = await getPickYourOwnEvents();
   const events = [...upcoming, ...fallbackEvents];
-  const eventId = meta(order, "fp_event") || order.referenceId || "";
-  const event =
-    events.find((item) => item._id === eventId) ||
-    events.find((item) => eventOrderReferenceId(item._id) === order.referenceId);
+  const event = findWorkshopForOrder(order, events);
 
   const quantity = Math.max(1, lineItemQuantity(order));
   const totalCents = Number(order.totalMoney?.amount ?? 0);
@@ -106,14 +153,10 @@ async function notifyWorkshopPaid(
 
   const customerName =
     meta(order, "fp_name") || guestFromLineNote(order) || "Workshop guest";
-  const customerEmail =
-    meta(order, "fp_email") ||
-    payment?.buyerEmailAddress?.trim() ||
-    "";
+  const customerEmail = await resolveBuyerEmail(order, payment);
 
   if (!customerEmail) {
     console.error("Paid workshop order missing customer email:", order.id);
-    return;
   }
 
   const eventTitle =
@@ -125,7 +168,7 @@ async function notifyWorkshopPaid(
 
   const booking = {
     eventTitle,
-    eventId: event?._id || eventId,
+    eventId: event?._id || meta(order, "fp_event") || order.referenceId || "",
     eventDateLabel: eventDateLabel || "See Square receipt",
     eventTimeLabel,
     quantity,
@@ -134,21 +177,30 @@ async function notifyWorkshopPaid(
     squarePaymentLinkId: paymentId || order.id,
   };
 
-  const guest = { ...booking, customerName, customerEmail };
+  const guest = {
+    ...booking,
+    customerName,
+    customerEmail: customerEmail || "Not provided",
+  };
 
   await sendSiteNotificationEmail({
     subject: `Workshop booked (paid): ${eventTitle} — ${totalLabel}`,
     message: buildWorkshopBookingEmailMessage(booking),
     html: buildWorkshopPaidEmailHtml(guest),
     customerName,
-    customerEmail,
+    customerEmail: customerEmail || DEFAULT_CONTACT_EMAIL,
   });
+
+  if (!customerEmail) return;
 
   try {
     await sendCustomerReceiptEmail({
       subject: `You're booked: ${eventTitle}`,
       message: buildWorkshopCustomerReceiptMessage(guest),
-      html: buildWorkshopCustomerReceiptHtml(guest),
+      html: buildWorkshopCustomerReceiptHtml({
+        ...guest,
+        customerEmail,
+      }),
       customerName,
       customerEmail,
     });
@@ -277,13 +329,16 @@ export async function notifyPaidSquareOrder(options: {
 
   const kind = meta(order, "fp_kind");
   const referenceId = order.referenceId || "";
+  const isBouquet = kind === "bouquet" || referenceId.startsWith("bouq-");
+  const events = [
+    ...(await getPickYourOwnEvents()),
+    ...fallbackEvents,
+  ];
+  const matchedWorkshop = isBouquet ? null : findWorkshopForOrder(order, events);
   const isWorkshop =
     kind === "workshop" ||
-    (!kind &&
-      !referenceId.startsWith("bouq-") &&
-      Boolean(referenceId));
-  const isBouquet =
-    kind === "bouquet" || referenceId.startsWith("bouq-");
+    Boolean(matchedWorkshop) ||
+    (!kind && !isBouquet && Boolean(referenceId) && !referenceId.startsWith("bouq-"));
 
   if (!isWorkshop && !isBouquet) {
     return { notified: false, reason: "unrelated_order" };

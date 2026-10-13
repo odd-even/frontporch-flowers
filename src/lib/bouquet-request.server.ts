@@ -402,7 +402,9 @@ export function buildWorkshopCustomerReceiptHtml(
     ],
     footerNote: /wreath/i.test(details.eventTitle)
       ? "Keep this email for your records. All supplies are included, and you'll take home a finished wreath. Questions? Reply here or message Rhoda on Facebook."
-      : "Keep this email for your records. Wear comfortable shoes — you'll be arranging in the garden. Questions? Reply here or message Rhoda on Facebook.",
+      : /pumpkin/i.test(details.eventTitle)
+        ? "Keep this email for your records. You'll take home two pumpkins, and all supplies are included. Questions? Reply here or message Rhoda on Facebook."
+        : "Keep this email for your records. All workshop supplies are included. Questions? Reply here or message Rhoda on Facebook.",
     footerExtraHtml: venueFooterHtml("Where to go"),
   });
 }
