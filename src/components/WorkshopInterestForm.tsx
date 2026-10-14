@@ -48,11 +48,9 @@ export function WorkshopInterestForm({ eventId }: WorkshopInterestFormProps) {
   if (done) {
     return (
       <div className="rounded-2xl bg-sage/10 px-5 py-4">
-        <p className="font-medium text-charcoal">You&apos;re on the list</p>
+        <p className="font-medium text-charcoal">Thanks</p>
         <p className="mt-1 text-sm text-warm-brown/75 leading-relaxed">
-          Rhoda has your interest for {quantity === 1 ? "1 guest" : `${quantity} guests`}.
-          She&apos;ll email you if she adds another wreath workshop. This doesn&apos;t hold a
-          spot.
+          We&apos;ll email you if another date is added.
         </p>
       </div>
     );
@@ -60,11 +58,7 @@ export function WorkshopInterestForm({ eventId }: WorkshopInterestFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="rounded-2xl bg-sage/10 px-5 py-4">
-      <p className="font-medium text-charcoal">This date is full</p>
-      <p className="mt-1 text-sm text-warm-brown/75 leading-relaxed">
-        If Rhoda adds another wreath workshop, leave your name and how many people.
-        She&apos;ll use this list to decide. It doesn&apos;t reserve a spot.
-      </p>
+      <p className="font-medium text-charcoal">Interested in another wreath workshop?</p>
 
       <div className="mt-4 space-y-3">
         <input
@@ -137,7 +131,7 @@ export function WorkshopInterestForm({ eventId }: WorkshopInterestFormProps) {
         disabled={submitting}
         className="btn mt-4 w-full sm:w-fit bg-terracotta text-cream hover:bg-terracotta-dark disabled:opacity-60"
       >
-        {submitting ? "Sending…" : "Count me in"}
+        {submitting ? "Sending…" : "I'm interested"}
       </button>
     </form>
   );

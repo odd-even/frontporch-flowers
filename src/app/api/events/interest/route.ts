@@ -68,13 +68,11 @@ export async function POST(request: Request) {
   const eventDateLabel = formatDate(event.date);
   const guestLabel = quantity === 1 ? "1 guest" : `${quantity} guests`;
   const message = [
-    `${customerName} wants a spot if you add another wreath workshop.`,
+    `${customerName} is interested in another wreath workshop.`,
     "",
     `People: ${guestLabel}`,
-    `Full workshop: ${event.title}`,
+    event.title,
     eventDateLabel,
-    "",
-    "This is not a booking.",
   ].join("\n");
 
   try {
@@ -101,14 +99,14 @@ export async function POST(request: Request) {
   try {
     const firstName = customerName.split(/\s+/)[0] || "there";
     await sendCustomerReceiptEmail({
-      subject: "We'll let you know if another wreath workshop is added",
+      subject: "Interested in another wreath workshop",
       message: [
         `Hi ${firstName},`,
         "",
-        "Thanks for letting Rhoda know you'd like another wreath workshop.",
+        "Thanks for your interest in another wreath workshop.",
         `People: ${guestLabel}`,
         "",
-        "This doesn't hold a spot. She'll email you if she adds another date.",
+        "We'll email you if another date is added.",
         "",
         "Rhoda",
       ].join("\n"),

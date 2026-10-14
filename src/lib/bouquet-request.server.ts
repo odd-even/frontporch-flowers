@@ -447,7 +447,7 @@ export function buildWorkshopInterestEmailHtml(details: {
   return buildNotificationEmailHtml({
     eyebrow: "Workshop interest",
     title: "Another wreath date",
-    subtitle: `${details.customerName} would like a spot if you add another wreath workshop.`,
+    subtitle: `${details.customerName} is interested in another wreath workshop.`,
     imageUrl,
     imageAlt: details.eventTitle,
     badge: "Interest",
@@ -456,8 +456,7 @@ export function buildWorkshopInterestEmailHtml(details: {
       { label: "Guests", value: guestLabel },
       { label: "Full workshop", value: `${details.eventTitle} · ${details.eventDateLabel}` },
     ],
-    footerNote:
-      "This is not a booking. Reply to this email to reach them. Add up these notes to see if another date is worth scheduling.",
+    footerNote: "Reply to this email to reach them.",
   });
 }
 
@@ -472,15 +471,14 @@ export function buildWorkshopInterestReceiptHtml(details: {
   return buildNotificationEmailHtml({
     eyebrow: "Front Porch Flowers",
     title: "You're on the list",
-    subtitle: `Hi ${firstName} — thanks for saying you'd like another wreath workshop.`,
+    subtitle: `Hi ${firstName} — thanks for your interest in another wreath workshop.`,
     imageUrl,
     imageAlt: "Winter wreath workshop",
     badge: "Interest",
     details: [
       { label: "Guests", value: guestLabel },
-      { label: "What this means", value: "Rhoda will email you if she adds another date." },
     ],
-    footerNote: "This doesn't hold a spot. The current workshop is still sold out.",
+    footerNote: "We'll email you if another date is added.",
   });
 }
 
