@@ -6,7 +6,7 @@ import type { SitePhoto } from "@/lib/photos.shared";
 import { WorkshopSpotsLeft } from "@/components/WorkshopSpotsLeft";
 import { getEventCapacity, isEventCheckoutReady } from "@/lib/square";
 import type { PickYourOwnEvent } from "@/lib/types";
-import { formatDate, workshopAnchorId } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 
 interface PickYourOwnFeaturedProps {
   event: PickYourOwnEvent;
@@ -87,7 +87,7 @@ export async function PickYourOwnFeatured({
 
   return (
     <article
-      id={workshopAnchorId(event)}
+      id={`workshop-${event._id}`}
       className="scroll-mt-28 overflow-hidden rounded-3xl border border-sage/15 bg-cream shadow-[0_20px_60px_-40px_rgba(60,50,40,0.45)]"
     >
       <div className="grid md:grid-cols-2">

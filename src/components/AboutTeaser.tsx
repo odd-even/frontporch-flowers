@@ -71,6 +71,7 @@ export async function EventsTeaser() {
 
   return (
     <section id="events" className="scroll-mt-24 pt-10 pb-20 md:pt-14 md:pb-28 bg-brand-wash">
+      <div id="workshop-wreath" className="scroll-mt-28" />
       <div className="max-w-6xl mx-auto px-6">
         <Reveal variant="up" className="mb-10">
           <p className="text-sage-dark text-sm uppercase tracking-[0.2em] mb-3">
