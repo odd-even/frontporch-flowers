@@ -1,6 +1,7 @@
 import { EventBookingForm } from "@/components/EventBookingForm";
 import { EventCountdown } from "@/components/EventCountdown";
 import { EventImageRotator } from "@/components/EventImageRotator";
+import { WorkshopInterestForm } from "@/components/WorkshopInterestForm";
 import type { SitePhoto } from "@/lib/photos.shared";
 import { WorkshopSpotsLeft } from "@/components/WorkshopSpotsLeft";
 import { getEventCapacity, isEventCheckoutReady } from "@/lib/square";
@@ -247,22 +248,26 @@ export async function PickYourOwnFeatured({
           </ul>
 
           {event.priceCents ? (
-            capacity.soldOut && squareReady && !paymentLinkUrl ? (
-              <div className="rounded-2xl bg-sage/10 px-5 py-4">
-                <p className="font-medium text-charcoal">Sold out</p>
-                <p className="mt-1 text-sm text-warm-brown/75 leading-relaxed">
-                  All spots are booked. Message Rhoda on{" "}
-                  <a
-                    href={facebookUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-terracotta hover:text-terracotta-dark transition-colors"
-                  >
-                    Facebook
-                  </a>{" "}
-                  if you’d like to join a waitlist.
-                </p>
-              </div>
+            capacity.soldOut && !paymentLinkUrl ? (
+              wreath ? (
+                <WorkshopInterestForm eventId={event._id} />
+              ) : (
+                <div className="rounded-2xl bg-sage/10 px-5 py-4">
+                  <p className="font-medium text-charcoal">Sold out</p>
+                  <p className="mt-1 text-sm text-warm-brown/75 leading-relaxed">
+                    All spots are booked. Message Rhoda on{" "}
+                    <a
+                      href={facebookUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-terracotta hover:text-terracotta-dark transition-colors"
+                    >
+                      Facebook
+                    </a>{" "}
+                    if you’d like to join a waitlist.
+                  </p>
+                </div>
+              )
             ) : paymentLinkUrl ? (
               <a
                 href={paymentLinkUrl}
@@ -282,6 +287,7 @@ export async function PickYourOwnFeatured({
                 maxQuantity={Math.max(1, maxQuantity)}
                 facebookUrl={facebookUrl}
                 squareReady={squareReady}
+                collectInterest={wreath}
               />
             )
           ) : (

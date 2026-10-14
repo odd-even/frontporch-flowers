@@ -435,6 +435,55 @@ export function buildWorkshopCustomerReceiptMessage(
   ].join("\n");
 }
 
+export function buildWorkshopInterestEmailHtml(details: {
+  eventTitle: string;
+  eventDateLabel: string;
+  customerName: string;
+  quantity: number;
+}): string {
+  const guestLabel = details.quantity === 1 ? "1 guest" : `${details.quantity} guests`;
+  const imageUrl = workshopEmailImageSrc(details.eventTitle);
+
+  return buildNotificationEmailHtml({
+    eyebrow: "Workshop interest",
+    title: "Another wreath date",
+    subtitle: `${details.customerName} would like a spot if you add another wreath workshop.`,
+    imageUrl,
+    imageAlt: details.eventTitle,
+    badge: "Interest",
+    details: [
+      { label: "Guest", value: details.customerName },
+      { label: "Guests", value: guestLabel },
+      { label: "Full workshop", value: `${details.eventTitle} · ${details.eventDateLabel}` },
+    ],
+    footerNote:
+      "This is not a booking. Reply to this email to reach them. Add up these notes to see if another date is worth scheduling.",
+  });
+}
+
+export function buildWorkshopInterestReceiptHtml(details: {
+  customerName: string;
+  quantity: number;
+}): string {
+  const firstName = details.customerName.trim().split(/\s+/)[0] || "there";
+  const guestLabel = details.quantity === 1 ? "1 guest" : `${details.quantity} guests`;
+  const imageUrl = workshopEmailImageSrc("wreath");
+
+  return buildNotificationEmailHtml({
+    eyebrow: "Front Porch Flowers",
+    title: "You're on the list",
+    subtitle: `Hi ${firstName} — thanks for saying you'd like another wreath workshop.`,
+    imageUrl,
+    imageAlt: "Winter wreath workshop",
+    badge: "Interest",
+    details: [
+      { label: "Guests", value: guestLabel },
+      { label: "What this means", value: "Rhoda will email you if she adds another date." },
+    ],
+    footerNote: "This doesn't hold a spot. The current workshop is still sold out.",
+  });
+}
+
 /** Alias for workshop / general site notifications to Rhoda. */
 export const sendSiteNotificationEmail = sendBouquetRequestEmail;
 

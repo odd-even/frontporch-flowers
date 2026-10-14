@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
+import { WorkshopInterestForm } from "@/components/WorkshopInterestForm";
 
 interface EventBookingFormProps {
   eventId: string;
@@ -12,6 +13,7 @@ interface EventBookingFormProps {
   maxQuantity?: number;
   facebookUrl: string;
   squareReady: boolean;
+  collectInterest?: boolean;
 }
 
 function formatMoney(cents: number, currency = "CAD") {
@@ -30,6 +32,7 @@ export function EventBookingForm({
   maxQuantity = 6,
   facebookUrl,
   squareReady,
+  collectInterest = false,
 }: EventBookingFormProps) {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
@@ -144,6 +147,10 @@ export function EventBookingForm({
   }
 
   if (liveSoldOut) {
+    if (collectInterest) {
+      return <WorkshopInterestForm eventId={eventId} />;
+    }
+
     return (
       <div className="rounded-2xl bg-sage/10 px-5 py-4">
         <p className="font-medium text-charcoal">Sold out</p>
