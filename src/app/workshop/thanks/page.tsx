@@ -3,6 +3,7 @@ import { ArrowIcon } from "@/components/ArrowIcon";
 import { getPickYourOwnEvents } from "@/lib/queries";
 import { SITE_URL } from "@/lib/seo";
 import { notifyPaidOrderFromThanks } from "@/lib/square-thanks-notify";
+import { fallbackEvents } from "@/lib/types";
 import { firstQueryValue, formatDate } from "@/lib/utils";
 
 export const metadata = {
@@ -41,7 +42,10 @@ export default async function WorkshopThanksPage({
 
   const events = await getPickYourOwnEvents();
   const eventId = firstQueryValue(params.event);
-  const event = events.find((item) => item._id === eventId) || events[0];
+  const event =
+    events.find((item) => item._id === eventId) ||
+    fallbackEvents.find((item) => item._id === eventId) ||
+    events[0];
 
   const priceLabel = event?.priceCents
     ? new Intl.NumberFormat("en-CA", {

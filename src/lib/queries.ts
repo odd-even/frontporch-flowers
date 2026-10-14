@@ -32,7 +32,7 @@ export const getPickYourOwnEvents = cache(async (): Promise<PickYourOwnEvent[]> 
 
   function upcomingOnly(events: PickYourOwnEvent[]) {
     return events
-      .filter((event) => event.date >= today)
+      .filter((event) => event.date >= today && event.listed !== false)
       .sort((a, b) => a.date.localeCompare(b.date));
   }
 

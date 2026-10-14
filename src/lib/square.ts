@@ -174,8 +174,31 @@ function lineItemQuantity(order: Order) {
   return Math.max(0, sold - returned);
 }
 
-/** Site checkout, metadata, or a Square item named for this workshop. */
-function orderMatchesEvent(order: Order, eventId: string, title: string) {
+function orderBlob(order: Order) {
+  return [
+    order.referenceId,
+    ...Object.values(order.metadata || {}),
+    ...(order.lineItems ?? []).flatMap((item) => [item.name, item.variationName, item.note]),
+  ]
+    .filter((value): value is string => Boolean(value && value.trim()))
+    .join(" ")
+    .toLowerCase();
+}
+
+function mentionsEventDate(text: string, isoDate: string) {
+  const date = new Date(`${isoDate}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return false;
+  const longLabel = date
+    .toLocaleDateString("en-US", { month: "long", day: "numeric" })
+    .toLowerCase();
+  const shortLabel = date
+    .toLocaleDateString("en-US", { month: "short", day: "numeric" })
+    .toLowerCase();
+  return text.includes(isoDate) || text.includes(longLabel) || text.includes(shortLabel);
+}
+
+/** Site checkout, metadata, or a Square item named for this workshop and date. */
+function orderMatchesEvent(order: Order, eventId: string, title: string, isoDate = "") {
   const metadata = order.metadata || {};
   if (metadata.fp_kind === "bouquet" || (order.referenceId || "").startsWith("bouq-")) {
     return false;
@@ -194,7 +217,11 @@ function orderMatchesEvent(order: Order, eventId: string, title: string) {
     .join(" ")
     .toLowerCase();
   const titled = `${names} ${(order.metadata?.fp_title || "").toLowerCase()}`;
-  return titled.includes(fullTitle) || (shortTitle.length > 3 && titled.includes(shortTitle));
+  const titleHit =
+    titled.includes(fullTitle) || (shortTitle.length > 3 && titled.includes(shortTitle));
+  if (!titleHit) return false;
+  if (!isoDate) return true;
+  return mentionsEventDate(orderBlob(order), isoDate);
 }
 
 function orderReservesSpots(order: Order, holdCutoff: number) {
@@ -214,7 +241,8 @@ function orderReservesSpots(order: Order, holdCutoff: number) {
  */
 async function countBookedSpotsForEventUncached(
   eventId: string,
-  title: string
+  title: string,
+  isoDate = ""
 ): Promise<number> {
   if (!isSquareConfigured()) return 0;
 
@@ -246,7 +274,7 @@ async function countBookedSpotsForEventUncached(
     });
 
     for (const order of response.orders ?? []) {
-      if (!orderMatchesEvent(order, eventId, title)) continue;
+      if (!orderMatchesEvent(order, eventId, title, isoDate)) continue;
       if (!orderReservesSpots(order, holdCutoff)) continue;
       const quantity = lineItemQuantity(order);
       booked += quantity > 0 ? quantity : 1;
@@ -260,11 +288,12 @@ async function countBookedSpotsForEventUncached(
 
 export async function countBookedSpotsForEvent(
   eventId: string,
-  title = ""
+  title = "",
+  isoDate = ""
 ): Promise<number> {
   const cached = unstable_cache(
-    () => countBookedSpotsForEventUncached(eventId, title),
-    [`square-event-booked-${eventId}-${title}`],
+    () => countBookedSpotsForEventUncached(eventId, title, isoDate),
+    [`square-event-booked-${eventId}-${title}-${isoDate}`],
     { revalidate: 60, tags: [`square-event-${eventId}`] }
   );
   return cached();
@@ -287,7 +316,7 @@ export async function getEventCapacity(event: PickYourOwnEvent) {
   }
 
   try {
-    const booked = await countBookedSpotsForEvent(event._id, event.title);
+    const booked = await countBookedSpotsForEvent(event._id, event.title, event.date);
     const remaining = Math.max(0, capacity - booked);
     return {
       capacity,

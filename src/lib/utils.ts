@@ -32,7 +32,7 @@ export function workshopAnchorId(event: PickYourOwnEvent) {
     return "workshop-pumpkin";
   }
   if (/wreath/i.test(event.title) || /wreath/i.test(event.description || "")) {
-    return "workshop-wreath";
+    return `workshop-wreath-${event.date}`;
   }
   if (/stem\s*&\s*style/i.test(event.title)) {
     return "workshop-stem-style";
