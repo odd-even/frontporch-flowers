@@ -1,5 +1,6 @@
 import "server-only";
 
+import { revalidatePath, revalidateTag } from "next/cache";
 import type { Order, Payment } from "square";
 import {
   buildBouquetCustomerReceiptHtml,
@@ -351,6 +352,10 @@ export async function notifyPaidSquareOrder(options: {
       await notifyWorkshopPaid(order, payment, paymentId);
     }
     await markOrderNotified(order, paymentId);
+    if (matchedWorkshop?._id) {
+      revalidateTag(`square-event-${matchedWorkshop._id}`);
+      revalidatePath("/");
+    }
     return { notified: true };
   } catch (error) {
     notifiedKeys.delete(dedupeKey);

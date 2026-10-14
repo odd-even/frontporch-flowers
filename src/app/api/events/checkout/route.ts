@@ -75,7 +75,7 @@ export async function POST(request: Request) {
   if (capacity != null) {
     let booked: number;
     try {
-      booked = await countBookedSpotsForEvent(event._id);
+      booked = await countBookedSpotsForEvent(event._id, event.title);
     } catch (error) {
       console.error("Square capacity lookup error:", error);
       return NextResponse.json(

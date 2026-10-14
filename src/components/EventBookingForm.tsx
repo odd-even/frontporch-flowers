@@ -38,17 +38,49 @@ export function EventBookingForm({
   const [customerEmail, setCustomerEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [liveMax, setLiveMax] = useState(maxQuantity);
+  const [liveSoldOut, setLiveSoldOut] = useState(false);
 
   const totalLabel = useMemo(
     () => formatMoney(priceCents * quantity, currency),
     [priceCents, quantity, currency]
   );
   const unitLabel = formatMoney(priceCents, currency);
-  const qtyMax = Math.min(Math.max(maxQuantity, 1), 10);
+  const qtyMax = Math.min(Math.max(liveMax, 1), 10);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadCapacity() {
+      try {
+        const response = await fetch(
+          `/api/events/capacity?eventId=${encodeURIComponent(eventId)}`,
+          { cache: "no-store" }
+        );
+        if (!response.ok) return;
+        const data = (await response.json()) as {
+          remaining?: number;
+          soldOut?: boolean;
+          fresh?: boolean;
+        };
+        if (cancelled || data.fresh !== true || typeof data.remaining !== "number") return;
+        setLiveSoldOut(Boolean(data.soldOut) || data.remaining <= 0);
+        setLiveMax(Math.max(1, Math.min(data.remaining, 10)));
+        setQuantity((current) => Math.min(current, Math.max(1, data.remaining ?? current)));
+      } catch {
+        // Checkout still enforces the live count on submit.
+      }
+    }
+
+    loadCapacity();
+    return () => {
+      cancelled = true;
+    };
+  }, [eventId]);
 
   useEffect(() => {
     if (!open) return;
@@ -109,6 +141,26 @@ export function EventBookingForm({
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (liveSoldOut) {
+    return (
+      <div className="rounded-2xl bg-sage/10 px-5 py-4">
+        <p className="font-medium text-charcoal">Sold out</p>
+        <p className="mt-1 text-sm text-warm-brown/75 leading-relaxed">
+          All spots are booked. Message Rhoda on{" "}
+          <a
+            href={facebookUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-terracotta hover:text-terracotta-dark transition-colors"
+          >
+            Facebook
+          </a>{" "}
+          if you’d like to join a waitlist.
+        </p>
+      </div>
+    );
   }
 
   if (!squareReady) {

@@ -13,7 +13,7 @@ export default function EmailPreviewPage() {
           Booking email preview
         </h1>
         <p className="text-warm-brown/80 mb-8">
-          Open each email as it will look in the inbox (pumpkin workshop sample).
+          Open each email as it will look in the inbox (winter wreath workshop sample).
         </p>
         <ul className="space-y-3">
           <li>

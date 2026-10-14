@@ -158,23 +158,68 @@ export function formatMoneyFromCents(cents: number, currency: string = "CAD") {
 }
 
 function lineItemQuantity(order: Order) {
-  return (order.lineItems ?? []).reduce((sum, item) => {
+  const sold = (order.lineItems ?? []).reduce((sum, item) => {
     const qty = Number.parseInt(item.quantity || "0", 10);
     return sum + (Number.isFinite(qty) ? qty : 0);
   }, 0);
+  const returned = (order.returns ?? []).reduce((sum, entry) => {
+    return (
+      sum +
+      (entry.returnLineItems ?? []).reduce((lineSum, item) => {
+        const qty = Number.parseInt(item.quantity || "0", 10);
+        return lineSum + (Number.isFinite(qty) ? qty : 0);
+      }, 0)
+    );
+  }, 0);
+  return Math.max(0, sold - returned);
+}
+
+/** Site checkout, metadata, or a Square item named for this workshop. */
+function orderMatchesEvent(order: Order, eventId: string, title: string) {
+  const metadata = order.metadata || {};
+  if (metadata.fp_kind === "bouquet" || (order.referenceId || "").startsWith("bouq-")) {
+    return false;
+  }
+
+  const referenceId = eventOrderReferenceId(eventId);
+  if (order.referenceId === referenceId) return true;
+  if (metadata.fp_event === eventId || metadata.fp_event === referenceId) return true;
+
+  const fullTitle = title.trim().toLowerCase();
+  if (fullTitle.length < 4) return false;
+  const shortTitle = fullTitle.replace(/\s+workshop$/, "").trim();
+  const names = (order.lineItems ?? [])
+    .flatMap((item) => [item.name, item.variationName])
+    .filter((value): value is string => Boolean(value && value.trim()))
+    .join(" ")
+    .toLowerCase();
+  const titled = `${names} ${(order.metadata?.fp_title || "").toLowerCase()}`;
+  return titled.includes(fullTitle) || (shortTitle.length > 3 && titled.includes(shortTitle));
+}
+
+function orderReservesSpots(order: Order, holdCutoff: number) {
+  if (order.state === "COMPLETED") return true;
+  if (order.state !== "OPEN") return false;
+  // Paid payment-link orders can stay OPEN after the buyer pays.
+  if ((order.tenders?.length ?? 0) > 0) return true;
+  if (!order.createdAt) return false;
+  const created = Date.parse(order.createdAt);
+  return Number.isFinite(created) && created >= holdCutoff;
 }
 
 /**
  * Counts prepaid spots already taken for an event from Square orders:
- * completed (paid) + recent open orders (active checkouts).
+ * completed (paid), paid-but-still-open orders, and recent unpaid checkouts.
  * Cached briefly so homepage ISR is not forced dynamic by noStore().
  */
-async function countBookedSpotsForEventUncached(eventId: string): Promise<number> {
+async function countBookedSpotsForEventUncached(
+  eventId: string,
+  title: string
+): Promise<number> {
   if (!isSquareConfigured()) return 0;
 
   const client = getSquareClient();
   const locationId = getSquareLocationId();
-  const referenceId = eventOrderReferenceId(eventId);
   const lookbackStart = new Date(Date.now() - ORDER_LOOKBACK_MS).toISOString();
   const holdCutoff = Date.now() - OPEN_HOLD_MS;
 
@@ -188,6 +233,7 @@ async function countBookedSpotsForEventUncached(eventId: string): Promise<number
       limit: 100,
       query: {
         filter: {
+          stateFilter: { states: ["OPEN", "COMPLETED"] },
           dateTimeFilter: {
             createdAt: { startAt: lookbackStart },
           },
@@ -200,20 +246,10 @@ async function countBookedSpotsForEventUncached(eventId: string): Promise<number
     });
 
     for (const order of response.orders ?? []) {
-      if (order.referenceId !== referenceId) continue;
-
-      if (order.state === "COMPLETED") {
-        booked += lineItemQuantity(order);
-        continue;
-      }
-
-      // Soft-hold seats while someone is mid-checkout (not abandoned links).
-      if (order.state === "OPEN" && order.createdAt) {
-        const created = Date.parse(order.createdAt);
-        if (Number.isFinite(created) && created >= holdCutoff) {
-          booked += lineItemQuantity(order);
-        }
-      }
+      if (!orderMatchesEvent(order, eventId, title)) continue;
+      if (!orderReservesSpots(order, holdCutoff)) continue;
+      const quantity = lineItemQuantity(order);
+      booked += quantity > 0 ? quantity : 1;
     }
 
     cursor = response.cursor ?? undefined;
@@ -222,11 +258,14 @@ async function countBookedSpotsForEventUncached(eventId: string): Promise<number
   return booked;
 }
 
-export async function countBookedSpotsForEvent(eventId: string): Promise<number> {
+export async function countBookedSpotsForEvent(
+  eventId: string,
+  title = ""
+): Promise<number> {
   const cached = unstable_cache(
-    () => countBookedSpotsForEventUncached(eventId),
-    [`square-event-booked-${eventId}`],
-    { revalidate: 300, tags: [`square-event-${eventId}`] }
+    () => countBookedSpotsForEventUncached(eventId, title),
+    [`square-event-booked-${eventId}-${title}`],
+    { revalidate: 60, tags: [`square-event-${eventId}`] }
   );
   return cached();
 }
@@ -234,24 +273,39 @@ export async function countBookedSpotsForEvent(eventId: string): Promise<number>
 export async function getEventCapacity(event: PickYourOwnEvent) {
   const capacity = Math.max(0, event.spotsAvailable ?? 0);
   if (!capacity) {
-    return { capacity: 0, booked: 0, remaining: 0, soldOut: false };
+    return { capacity: 0, booked: 0, remaining: 0, soldOut: false, fresh: false };
   }
 
-  let booked = 0;
+  if (!isSquareConfigured()) {
+    return {
+      capacity,
+      booked: 0,
+      remaining: capacity,
+      soldOut: false,
+      fresh: false,
+    };
+  }
+
   try {
-    booked = await countBookedSpotsForEvent(event._id);
+    const booked = await countBookedSpotsForEvent(event._id, event.title);
+    const remaining = Math.max(0, capacity - booked);
+    return {
+      capacity,
+      booked,
+      remaining,
+      soldOut: remaining <= 0,
+      fresh: true,
+    };
   } catch (error) {
     console.error("Square capacity lookup failed:", error);
-    // Fail open on the public page so a Square blip doesn't hide the event.
+    return {
+      capacity,
+      booked: 0,
+      remaining: capacity,
+      soldOut: false,
+      fresh: false,
+    };
   }
-
-  const remaining = Math.max(0, capacity - booked);
-  return {
-    capacity,
-    booked,
-    remaining,
-    soldOut: remaining <= 0,
-  };
 }
 
 export async function createEventCheckoutLink({

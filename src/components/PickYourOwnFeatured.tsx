@@ -2,6 +2,7 @@ import { EventBookingForm } from "@/components/EventBookingForm";
 import { EventCountdown } from "@/components/EventCountdown";
 import { EventImageRotator } from "@/components/EventImageRotator";
 import type { SitePhoto } from "@/lib/photos.shared";
+import { WorkshopSpotsLeft } from "@/components/WorkshopSpotsLeft";
 import { getEventCapacity, isEventCheckoutReady } from "@/lib/square";
 import type { PickYourOwnEvent } from "@/lib/types";
 import { formatDate, workshopAnchorId } from "@/lib/utils";
@@ -66,16 +67,7 @@ export async function PickYourOwnFeatured({
   const day = eventDate.getDate();
   const squareReady = isEventCheckoutReady(event);
   const paymentLinkUrl = event.squarePaymentLinkUrl;
-  // External Square payment links are not tracked via order reference search —
-  // skip the live capacity call so the homepage can stay ISR-friendly.
-  const capacity = paymentLinkUrl
-    ? {
-        capacity: Math.max(0, event.spotsAvailable ?? 0),
-        booked: 0,
-        remaining: Math.max(0, event.spotsAvailable ?? 0),
-        soldOut: false,
-      }
-    : await getEventCapacity(event);
+  const capacity = await getEventCapacity(event);
   const maxQuantity = Math.min(
     capacity.remaining > 0 ? capacity.remaining : capacity.capacity || 10,
     capacity.capacity || 10,
@@ -210,12 +202,13 @@ export async function PickYourOwnFeatured({
               </span>
             </li>
             {capacity.capacity > 0 || capacity.soldOut ? (
-              <li className="rounded-xl bg-sage/10 px-4 py-3">
-                <span className="block text-xs uppercase tracking-wider text-sage-dark mb-1">
-                  {capacity.soldOut ? "Spots" : wreath ? "Spaces" : "Limited spots"}
-                </span>
-                <span className="font-medium text-charcoal">{spotsLabel}</span>
-              </li>
+              <WorkshopSpotsLeft
+                eventId={event._id}
+                heading={wreath ? "Spaces" : "Limited spots"}
+                detail={spotsLabel}
+                initialRemaining={capacity.remaining}
+                initialSoldOut={capacity.soldOut}
+              />
             ) : null}
             {pumpkin || wreath ? (
               <li className="rounded-xl bg-sage/10 px-4 py-3">

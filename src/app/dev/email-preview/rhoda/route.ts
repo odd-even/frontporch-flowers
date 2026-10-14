@@ -1,12 +1,12 @@
 import { buildWorkshopPaidEmailHtml } from "@/lib/bouquet-request.server";
 
 const sample = {
-  eventTitle: "Dried Floral Pumpkin Arrangements",
-  eventId: "workshop-pumpkin-oct-4-2026",
-  eventDateLabel: "Sunday, October 4, 2026",
+  eventTitle: "Winter Wreath Workshop",
+  eventId: "workshop-winter-wreath-nov-21-2026",
+  eventDateLabel: "Saturday, November 21, 2026",
   eventTimeLabel: "2:00 PM – 4:00 PM",
   quantity: 2,
-  totalLabel: "$110",
+  totalLabel: "$150",
   currency: "CAD",
   squarePaymentLinkId: "sample-payment-id",
   customerName: "Jane Smith",
